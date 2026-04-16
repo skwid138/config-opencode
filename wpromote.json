@@ -1,0 +1,30 @@
+{
+    "$schema": "./schemas/wpromote.schema.json",
+    "agentNames": "lotr",
+    "installMethod": "link",
+    "orchestration": {
+        "providerMode": "copilot",
+        "features": {
+            "delegation": true,
+            "diagnostics": true,
+            "vision": true,
+            "continuousLoop": true,
+            "selfHealing": true
+        },
+        "limits": {
+            "maxConcurrent": 3,
+            "maxRetries": 2,
+            "maxIterations": 25
+        },
+        "runtimeFallback": {
+            "enabled": true,
+            "providerOrder": [
+                "copilot",
+                "native"
+            ]
+        },
+        "recovery": {
+            "autoResumeOnStart": true
+        }
+    }
+}
