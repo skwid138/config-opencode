@@ -7,5 +7,10 @@
     "instructions": [
         "instruction/repo-context.md",
         "instruction/codebase-map.md"
-    ]
+    ],
+    "permission": {
+        "external_directory": {
+            "/Users/hunter/code/wpromote/*": "allow"
+        }
+    }
 }
