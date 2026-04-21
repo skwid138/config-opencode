@@ -149,6 +149,19 @@ gh pr diff <number> --repo <owner/repo>
 
 Store the diff for downstream skills that need to check specific hunks.
 
+### Step 5: Fetch the commit history
+
+```bash
+gh pr view <number> --repo <owner/repo> --json commits --jq '.commits[] | "\(.oid[:8]) \(.messageHeadline)"'
+```
+
+This provides the ordered list of commits on the PR branch. Downstream skills
+use this to detect **contradictory feedback loops** — situations where a
+reviewer suggests a change, the author makes it, and a later review suggests
+reverting it. Without commit history, the analyzer cannot distinguish "code
+that was always this way" from "code that was changed in response to earlier
+feedback."
+
 ## Author classification
 
 Classify every comment author into one of three categories:
@@ -200,6 +213,12 @@ skill receives.
 ## Changed Files
 
 <list of file paths modified in the PR>
+
+## Commit History
+
+<ordered list of commits on the PR branch, oldest first>
+- `<short sha>` <commit message>
+- `<short sha>` <commit message>
 
 ## Reviews Summary
 

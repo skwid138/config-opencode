@@ -76,9 +76,15 @@ triage report — no change plan.
 3. For outdated threads (`isOutdated: true`): read the current code at the
    referenced file/line. If the concern still applies, keep the thread. If the
    code has changed and the concern no longer applies, filter it out.
-4. Read the full thread chain before judging any comment.
-5. Inspect the relevant code or diff when a comment references a file or line.
-6. Categorize each surviving comment into exactly one tier:
+4. **Check for contradictory feedback loops.** For each surviving comment,
+   check whether it suggests reverting a change that was made in response to
+   an earlier resolved comment on this PR. Use the commit history and resolved
+   threads to detect this. If a loop is detected, tag the comment as
+   `[feedback loop]` and note it in the output — do not categorize it as
+   "Must Do" unless a hybrid third approach clearly exists.
+5. Read the full thread chain before judging any comment.
+6. Inspect the relevant code or diff when a comment references a file or line.
+7. Categorize each surviving comment into exactly one tier:
 
 ### Must Do
 Genuinely blocking issues: bugs, correctness problems, security vulnerabilities,
@@ -211,6 +217,53 @@ Process each thread from the fetch output:
 
 5. **Filter CI bots**, keep AI reviewers and humans.
 
+6. **Detect contradictory feedback loops:**
+
+   Review comments can create destructive loops: reviewer A suggests changing X
+   to Y, the author complies, then reviewer B (or the same reviewer in a later
+   round) suggests changing Y back to X. If you follow both suggestions, you
+   end up in an infinite cycle. AI reviewers are especially prone to this
+   because they lack memory across review rounds — each round evaluates the
+   code in isolation without knowing what previous rounds suggested.
+
+   To detect loops:
+
+   a. **Correlate resolved threads with commits.** For each resolved thread,
+      check whether a subsequent commit on the PR addressed it. Use the commit
+      history (from the fetch step) and the PR diff to identify commits that
+      modified the same file/region the resolved thread targeted. A commit
+      message referencing "PR comments", "review feedback", or similar is a
+      strong signal.
+
+   b. **Compare unresolved suggestions against resolved ones.** For each
+      unresolved comment, check whether it suggests reverting or undoing a
+      change that was made in response to an earlier resolved comment. Signs
+      of a loop:
+      - An unresolved comment targets code that was *changed by a commit
+        responding to a resolved comment* on the same region
+      - The unresolved suggestion would restore the code to a state similar
+        to what existed before the resolved comment's feedback was applied
+      - The resolved and unresolved comments express opposing preferences
+        (e.g., "use the shared helper" vs. "inline this for performance")
+
+   c. **When a loop is detected**, do not simply pick one side. Both comments
+      identified a real concern — the loop exists because each suggestion
+      solved one problem while reintroducing another. Instead:
+      - Identify the **underlying tension** (e.g., DRY vs. performance,
+        abstraction vs. explicitness, consistency vs. locality)
+      - Assess whether a **third approach** exists that satisfies both
+        concerns simultaneously
+      - If a hybrid solution exists, plan that instead of either suggestion
+      - If no hybrid exists, evaluate which tradeoff matters more for this
+        specific code and explain the reasoning
+      - Tag the item in the output as `[feedback loop detected]` so the
+        author knows this was a contested point
+
+   d. **Check all reviewers, not just AI.** Humans can create loops too,
+      especially across multiple review rounds or when different reviewers
+      have different style preferences. However, AI reviewers are the most
+      common source because they re-evaluate from scratch each round.
+
 ### Phase 3: Deep Codebase Analysis
 
 For each surviving comment, build thorough understanding before judging:
@@ -297,6 +350,20 @@ tiered case:
 - **Low confidence disagreement:** Flag as "possibly not beneficial" with
   brief reasoning. Suggest the user verify before dismissing.
 
+**Contradictory feedback loop awareness:**
+If Phase 2 flagged this comment as part of a feedback loop, do not plan the
+suggestion as-is. Instead:
+- Acknowledge both sides of the tension explicitly
+- Evaluate whether the current code (post-earlier-feedback) or the new
+  suggestion better serves the codebase, or whether a third approach resolves
+  both concerns
+- If planning a change, plan the hybrid/third approach — not a revert to the
+  pre-feedback state
+- Place loop items in the appropriate tier based on the *hybrid solution's*
+  merit, not the original comment's merit
+- If no hybrid exists and the current code is the better tradeoff, place the
+  comment in Declined Suggestions with the loop context as evidence
+
 ### Phase 5: Plan Generation
 
 Group comments by file. Within each file group, order by oldest comment first.
@@ -317,6 +384,7 @@ Produce the tiered plan.
 
 **Threads analyzed:** N of M total (X resolved, Y filtered CI, Z effectively resolved)
 **Outdated re-evaluated:** N threads (A still applicable, B no longer relevant)
+**Feedback loops detected:** N (comments that contradict earlier resolved feedback)
 **AI reviewers included:** <list or "none">
 
 ---
@@ -330,7 +398,7 @@ Produce the tiered plan.
 
 **Triggered by:** @<reviewer> — "<quoted comment excerpt>"
 **Comment targets:** [your change] | [pre-existing code]
-**Thread status:** [current] | [outdated but still applicable]
+**Thread status:** [current] | [outdated but still applicable] | [feedback loop detected]
 **Why this change is in the plan:** <1-3 sentences explaining the real impact
 and why this improves the code>
 **Suggested approach:** <High-level description of what to change and the
@@ -340,6 +408,9 @@ sub-agent to understand the intent and scope>
 strengthen the change, note what they should cover.>
 **AC relevance:** <If --jira was provided and this relates to an AC, note it.
 Otherwise omit this line.>
+**Loop context:** <If feedback loop detected: describe the tension between the
+earlier and current feedback, explain why the planned approach resolves both
+sides rather than picking one. Omit this line if no loop.>
 
 ---
 
@@ -388,6 +459,9 @@ Otherwise omit this line.>
   be harmful>
 - **Evidence:** <Specific codebase evidence — pattern usage, test behavior,
   existing conventions that support the current approach>
+- **Loop context:** <If feedback loop: which earlier resolved comment this
+  contradicts, what commit addressed it, and why reverting would recreate
+  the original problem. Omit if no loop.>
 - **Risk if implemented:** <What would break, degrade, or become inconsistent>
 - **What would change this assessment:** <What additional context or evidence
   would flip this from "decline" to "accept">
@@ -431,6 +505,10 @@ Otherwise omit this line.>
   conversations.
 - **Never fabricate.** Always quote original comment text. Never invent thread
   state, author information, or code behavior.
+- **Never plan a revert loop.** If a suggestion would undo a change that was
+  made in response to earlier feedback on the same PR, do not plan it as-is.
+  Either find a third approach that resolves both concerns, or decline the
+  suggestion with loop context. The goal is forward progress, not oscillation.
 - **Evidence-proportional disagreements.** High-confidence disagreements
   require codebase evidence. Low-confidence disagreements must say so.
 - **Don't over-plan.** If a comment is valid but trivial, keep the plan entry
