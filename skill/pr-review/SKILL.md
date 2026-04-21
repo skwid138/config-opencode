@@ -172,7 +172,81 @@ For each finding, provide:
 - Missing comments or documentation unless the code is genuinely unclear
 - Minor formatting (these should be caught by linters)
 
-### Step 5: AC compliance mapping (full and ac-compliance modes)
+### Step 5: SonarCloud cross-reference (all modes)
+
+If the current repository is one of the 4 SonarCloud-enabled repos
+(client-portal, kraken, polaris-api, polaris-web) and a PR exists for the
+current branch, fetch SonarCloud issues to cross-reference with the code
+quality findings from Step 4.
+
+#### Detection
+
+1. Get repo name from `git remote get-url origin`.
+2. Check if it maps to a SonarCloud project key:
+   - `client-portal` → `wpromote_client-portal`
+   - `kraken` → `wpromote_kraken`
+   - `polaris-api` → `wpromote_polaris-api`
+   - `polaris-web` → `wpromote_polaris-web`
+3. Check for a PR: `gh pr view --json number --jq '.number'`
+
+If the repo isn't SonarCloud-enabled or no PR exists, skip this step silently.
+
+#### Fetch
+
+```bash
+sonar list issues -p <project-key> --pull-request <pr-number> --format json
+```
+
+Filter to `issueStatus` of `OPEN` or `CONFIRMED` only.
+
+Check CI freshness first:
+```bash
+gh pr checks --json name,status,conclusion | cat
+```
+If the SonarCloud check is still running or hasn't run, note the staleness.
+
+#### Cross-reference
+
+Compare SonarCloud issues against the code quality findings from Step 4:
+
+- **Confirmed by both:** Issues found by both the manual review and SonarCloud.
+  Note the SonarCloud rule as supporting evidence in the existing finding.
+- **SonarCloud-only:** Issues found by SonarCloud but not in the manual review.
+  Add these to the appropriate severity tier in the output (BLOCKER/CRITICAL →
+  Critical, MAJOR → Important, MINOR/INFO → Suggestions).
+- **Review-only:** Issues found by the manual review but not by SonarCloud.
+  Keep as-is — no change needed.
+
+Strip the project key prefix from component paths for readability.
+
+#### Output
+
+Add a "SonarCloud" subsection to the report, after the Code Quality Findings:
+
+```
+### SonarCloud Findings
+
+**PR:** #<number> | **CI Status:** <completed/running/not found>
+**Open issues:** <count>
+
+| Severity | File | Line | Message | Rule | In Review? |
+|----------|------|------|---------|------|------------|
+| <severity> | <file> | <line> | <message> | <rule> | ✅ / ➕ New |
+```
+
+Mark issues already caught in Step 4 as "✅" (confirmed) and SonarCloud-only
+issues as "➕ New". If no SonarCloud issues exist, show:
+
+```
+### SonarCloud Findings
+
+No open SonarCloud issues on PR #<number>.
+```
+
+If SonarCloud is not applicable (wrong repo or no PR), omit this section
+entirely.
+
+### Step 6: AC compliance mapping (full and ac-compliance modes)
 
 For each acceptance criterion from the ticket, assess whether the diff addresses
 it. Use this classification:
@@ -187,7 +261,7 @@ it. Use this classification:
 For each criterion, explain your reasoning briefly — which files/changes satisfy
 it, or what's missing.
 
-### Step 6: Generate suggestions
+### Step 7: Generate suggestions
 
 Based on the review, provide prioritized next steps:
 

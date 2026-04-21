@@ -248,6 +248,89 @@ existing tests.
 
 ---
 
+## Phase 2.5: SonarCloud Issues (Optional)
+
+If the primary codebase is one of the 4 SonarCloud-enabled repositories
+(client-portal, kraken, polaris-api, polaris-web), and a PR exists for the
+current branch, fetch SonarCloud issues to include in the plan.
+
+### Step 1: Check if applicable
+
+1. Determine the repo name from `git remote get-url origin`.
+2. Check if it maps to a SonarCloud project:
+   - `client-portal` → `wpromote_client-portal`
+   - `kraken` → `wpromote_kraken`
+   - `polaris-api` → `wpromote_polaris-api`
+   - `polaris-web` → `wpromote_polaris-web`
+3. Check if a PR exists:
+   ```bash
+   gh pr view --json number --jq '.number'
+   ```
+
+If the repo isn't SonarCloud-enabled or no PR exists, skip this phase silently.
+Note in the plan metadata: "SonarCloud: skipped (no PR)" or "SonarCloud: N/A
+(repo not configured)".
+
+### Step 2: Check CI freshness
+
+```bash
+gh pr checks --json name,status,conclusion | cat
+```
+
+Look for a check with "sonar" in the name. If it's still running or hasn't run,
+note the staleness warning — but still proceed to fetch whatever exists.
+
+### Step 3: Fetch issues
+
+```bash
+sonar list issues -p <project-key> --pull-request <pr-number> --format json
+```
+
+Filter to issues where `issueStatus` is `OPEN` or `CONFIRMED`. Strip the
+project key prefix from component paths for readability.
+
+### Step 4: Format for planner
+
+Structure the results as a section to pass to treebeard:
+
+```
+### SonarCloud Findings
+
+<count> open issues on PR #<pr-number>
+CI Status: <completed/running/not found>
+
+BLOCKER (<count>):
+- <file>:<line> — <message> [rule: <rule>]
+
+CRITICAL (<count>):
+- <file>:<line> — <message> [rule: <rule>]
+
+MAJOR (<count>):
+- <file>:<line> — <message> [rule: <rule>]
+
+MINOR (<count>):
+- <file>:<line> — <message> [rule: <rule>]
+
+INFO (<count>):
+- <file>:<line> — <message> [rule: <rule>]
+```
+
+If zero issues remain after filtering, pass:
+```
+### SonarCloud Findings
+
+No open SonarCloud issues on PR #<pr-number>.
+```
+
+The planner should incorporate SonarCloud findings into:
+- **Risks and Open Questions** — for BLOCKER and CRITICAL issues
+- **Implementation Steps** — for MAJOR issues that should be fixed as part of
+  the ticket work
+- **Cleanup (In-Scope Only)** — for MINOR/INFO issues in files already being
+  modified
+
+---
+
 ## Phase 3: Synthesize the Plan (Delegate to Treebeard)
 
 Once all exploration summaries are collected, delegate to treebeard (planner)
@@ -283,6 +366,9 @@ with the following structured input:
 >
 > ### Companion Codebase: <repo-name>
 > <structured summary from legolas, or "not explored">
+>
+> ### SonarCloud Findings
+> <structured summary from Phase 2.5, or "not applicable">
 >
 > ## Plan Requirements
 >
