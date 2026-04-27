@@ -2,7 +2,7 @@
 model: github-copilot/claude-opus-4.7
 description: Planning and plan-review specialist for ambiguity, risk, and execution readiness
 temperature: 0.1
-mode: all
+mode: subagent
 permission:
   write: deny
   edit: deny

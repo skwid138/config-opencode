@@ -1,6 +1,18 @@
 {
     "$schema": "https://opencode.ai/config.json",
     "model": "github-copilot/claude-opus-4.7",
+    "agent": {
+        "build": {
+            "mode": "subagent",
+            "hidden": true,
+            "description": "Hidden by local config"
+        },
+        "plan": {
+            "mode": "subagent",
+            "hidden": true,
+            "description": "Hidden by local config"
+        }
+    },
     "instructions": [
         "instruction/repo-context.md",
         "instruction/codebase-map.md",
