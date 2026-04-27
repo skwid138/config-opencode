@@ -537,7 +537,7 @@ under the Figma field. Do not attempt to fetch or analyze Figma designs
 automatically.
 
 Future enhancement: use the chrome-devtools MCP to open Figma designs in a
-browser tab and delegate visual analysis to galadriel (multimodal agent).
+browser tab and use the `vision` tool to analyze screenshots or exported images.
 
 ---
 

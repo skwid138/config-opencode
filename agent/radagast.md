@@ -1,5 +1,5 @@
 ---
-model: github-copilot/claude-opus-4.6
+model: github-copilot/claude-opus-4.7
 description: External docs and OSS research specialist
 temperature: 0.1
 mode: subagent

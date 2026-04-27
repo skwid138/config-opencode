@@ -1,5 +1,5 @@
 ---
-model: github-copilot/claude-opus-4.6
+model: github-copilot/claude-opus-4.7
 description: Autonomous deep implementation worker for end-to-end execution
 temperature: 0.1
 mode: subagent

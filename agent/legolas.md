@@ -1,5 +1,5 @@
 ---
-model: github-copilot/claude-opus-4.6
+model: github-copilot/claude-opus-4.7
 description: Codebase exploration specialist for fast file and call-path discovery
 temperature: 0.1
 mode: subagent
