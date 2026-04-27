@@ -15,6 +15,19 @@ Fetch SonarCloud issues for a pull request and present them as a structured
 report. Can be used standalone or as a data source for other skills
 (ticket-plan, pr-review).
 
+## Script
+
+**Always use the script for data retrieval:**
+
+```bash
+~/code/scripts/sonar-pr-issues.sh [PR_NUMBER]
+~/code/scripts/sonar-pr-issues.sh --severity MAJOR 275
+~/code/scripts/sonar-pr-issues.sh --project wpromote_polaris-web 280
+```
+
+The script outputs JSON with keys: `project`, `pr`, `ci_status`, `total`, `issues`.
+Use `jq` to filter/format. The rest of this skill describes presentation and context.
+
 ## When to use this skill
 
 - "Check sonar for this PR"

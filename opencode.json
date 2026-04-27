@@ -6,11 +6,15 @@
     ],
     "instructions": [
         "instruction/repo-context.md",
-        "instruction/codebase-map.md"
+        "instruction/codebase-map.md",
+        "instruction/orchestration-runtime.md",
+        "instruction/chrome-devtools.md",
+        "instruction/script-usage.md"
     ],
     "permission": {
         "external_directory": {
-            "/Users/hunter/code/wpromote/*": "allow"
+            "/Users/hunter/code/wpromote/*": "allow",
+            "/Users/hunter/code/scripts/*": "allow"
         }
     }
 }

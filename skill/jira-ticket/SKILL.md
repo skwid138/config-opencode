@@ -17,10 +17,19 @@ description: >-
 Fetch Jira ticket data via the Atlassian CLI and transform it into actionable
 engineering context — whether the goal is estimation, implementation, or testing.
 
-> **Core insight:** Ticket descriptions and acceptance criteria are the
-> requirements contract. Extracting and structuring them correctly is the first
-> step of any engineering task. This skill does that extraction, then adapts its
-> output based on what the user needs next.
+## Script
+
+**Always use the script for data retrieval:**
+
+```bash
+~/code/scripts/jira-fetch-ticket.sh BIXB-18835
+~/code/scripts/jira-fetch-ticket.sh --all BIXB-18835        # includes comments, links, attachments
+~/code/scripts/jira-fetch-ticket.sh --json-fields BIXB-18835  # full structured fields
+```
+
+The script outputs JSON with keys: `ticket_id`, `plain_view`, `description`, `fields`, `comments`, `links`, `attachments`.
+Use `jq` to extract what you need. The rest of this skill describes how to
+parse and present the data based on user intent.
 
 ## When to use this skill
 

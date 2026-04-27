@@ -15,8 +15,19 @@ Retrieve all review feedback from a GitHub pull request and return it as
 structured, classified data. This skill is a reusable data layer — it fetches
 and organizes, but does not analyze or judge.
 
-> **Core principle:** Fetch everything, filter nothing, classify everything.
-> Let the consuming skill decide what to keep and what to discard.
+## Script
+
+**Always use the script for data retrieval:**
+
+```bash
+~/code/scripts/gh-pr-comments.sh [PR_REF]
+~/code/scripts/gh-pr-comments.sh --no-diff 275          # skip diff for speed
+~/code/scripts/gh-pr-comments.sh wpromote/polaris-web#275
+```
+
+The script outputs JSON with keys: `metadata`, `reviews`, `threads`, `files`, `commits`, `diff`.
+Use `jq` to extract what you need. The rest of this skill describes how to
+classify and present the data.
 
 ## When to use this skill
 

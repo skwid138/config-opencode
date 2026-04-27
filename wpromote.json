@@ -2,6 +2,21 @@
     "$schema": "./schemas/wpromote.schema.json",
     "agentNames": "lotr",
     "installMethod": "link",
+    "disable": [
+        "agent:orchestrator",
+        "agent:deepwork",
+        "agent:explorer",
+        "agent:implementer",
+        "agent:planner",
+        "agent:researcher",
+        "agent:architect",
+        "agent:analyst",
+        "agent:tdd",
+        "skill:example",
+        "mcp:chrome-devtools",
+        "mcp:context7",
+        "mcp:exa"
+    ],
     "orchestration": {
         "providerMode": "copilot",
         "features": {
