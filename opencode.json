@@ -25,5 +25,8 @@
             "/Users/hunter/code/wpromote/*": "allow",
             "/Users/hunter/code/scripts/*": "allow"
         }
-    }
+    },
+    "plugin": [
+      "@tarquinen/opencode-dcp@latest"
+    ]
 }

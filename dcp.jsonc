@@ -1,0 +1,84 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Opencode-DCP/opencode-dynamic-context-pruning/master/dcp.schema.json",
+
+  // Master switch
+  "enabled": true,
+
+  // Verbose logging during trial period; turn off after 1-2 weeks of validation.
+  // Logs go to ~/.config/opencode/logs/dcp/
+  "debug": true,
+
+  // In-chat detailed notifications so we can observe pruning behavior during trial
+  "pruneNotification": "detailed",
+  "pruneNotificationType": "chat",
+
+  // Slash commands enabled (/dcp context, /dcp stats, /dcp compress, etc.)
+  "commands": {
+    "enabled": true,
+    "protectedTools": []
+  },
+
+  // Trial in manual mode: DCP won't autonomously compress, but automatic
+  // strategies (deduplication, purgeErrors) still run as a safe net.
+  // Use /dcp compress and /dcp sweep manually to evaluate behavior.
+  // Flip "enabled": false after trial period to let DCP run autonomously.
+  "manualMode": {
+    "enabled": true,
+    "automaticStrategies": true
+  },
+
+  // No turn protection — protected tools list (task, skill, etc.) is sufficient
+  "turnProtection": {
+    "enabled": false,
+    "turns": 4
+  },
+
+  // Conservative defaults — keep subagents and custom prompts off until trial proves stable
+  "experimental": {
+    "allowSubAgents": false,
+    "customPrompts": false
+  },
+
+  // No extra file pattern protections beyond default tool protection
+  "protectedFilePatterns": [],
+
+  "compress": {
+    "mode": "range",
+    "permission": "allow",
+
+    // Show compressed content inline during trial so we can audit summaries
+    "showCompression": true,
+
+    "summaryBuffer": true,
+
+    // Tuned for GitHub Copilot models (~128K effective context).
+    // Defaults assume 200K+ windows which would over-allow context for Copilot.
+    // Above 80K → strong compression nudges. Below 40K → no reminder nudges.
+    "maxContextLimit": 80000,
+    "minContextLimit": 40000,
+
+    "nudgeFrequency": 5,
+    "iterationNudgeThreshold": 15,
+
+    // Soft nudges — sessions are long but bounded; avoid aggressive interruption
+    "nudgeForce": "soft",
+
+    // Default protected tools (task, skill, todowrite, todoread) cover orchestration outputs
+    "protectedTools": [],
+
+    // Don't preserve user messages verbatim — allows compression of large pasted content
+    "protectUserMessages": false
+  },
+
+  "strategies": {
+    "deduplication": {
+      "enabled": true,
+      "protectedTools": []
+    },
+    "purgeErrors": {
+      "enabled": true,
+      "turns": 4,
+      "protectedTools": []
+    }
+  }
+}
