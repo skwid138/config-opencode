@@ -29,8 +29,8 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orch
 ├── instruction/                 # Auto-loaded into every agent's context
 │   ├── repo-context.md, codebase-map.md, orchestration-runtime.md
 │   ├── chrome-devtools.md, script-usage.md
-├── mcp/                         # MCP server definitions
-│   ├── chrome-devtools/, context7/, exa/, figma/
+├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
+│   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.json
 ├── plugins/                     # Local TypeScript plugins
 │   ├── orchestration.ts         # Task tracking + runtime commands
 │   └── vision-tool.ts           # Large-image / PDF / video vision via Gemini
@@ -113,14 +113,18 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 
 ## MCPs
 
+MCP servers are defined inline in `opencode.json` under the top-level `mcp` key — that is the only location OpenCode reads. The `mcp/<name>/mcp.json` files in this repo are **reference snippets only** (kept for diffability and as paste-ready blocks); they are not auto-discovered. Any change must be made in `opencode.json` to take effect.
+
 | MCP | Type | Notes |
 |-----|------|-------|
 | `chrome-devtools` | local (npx) | Connects to Chrome on `127.0.0.1:9222`. Launch with `~/code/scripts/chrome_mcp.sh` |
 | `context7` | remote | `mcp.context7.com` — free, no key |
-| `exa` | remote | `mcp.exa.ai` — free tier; add `headers.x-api-key` for higher limits |
+| `exa` | remote | `mcp.exa.ai` — free tier; add `headers["x-api-key"]` for higher limits |
 | `figma` | remote | `127.0.0.1:3845` — requires Figma desktop app with Dev Mode + MCP enabled |
 
 Chrome and Figma both require local processes. The `chrome-devtools.md` instruction file teaches every agent the launch/check workflow; the `figma` skill prefers the desktop MCP and falls back to navigating Figma in Chrome.
+
+Verify registration after edits with `opencode mcp list`.
 
 ## Plugins
 
@@ -210,7 +214,7 @@ Things that are intentionally pending or under iteration:
 - **Radagast model parity** — re-evaluate whether Claude Opus catches up to GPT-5.5 xhigh on web-research quality; consolidate to a single model if so.
 - **Orchestration plugin features** — tmux integration, persistent task storage, provider fallback, and notification buffering were intentionally stripped from the local rewrite. Re-add only if a real need surfaces.
 - **Subagent context pruning** — `experimental.allowSubAgents` is off until DCP behavior on the primary thread is fully trusted.
-- **MCP key rotation** — Exa is currently on the free tier; add an API key via `mcp/exa/mcp.json` `headers.x-api-key` if rate limits start hurting.
+- **MCP key rotation** — Exa is currently on the free tier; add an API key via `opencode.json` → `mcp.exa.headers["x-api-key"]` if rate limits start hurting.
 
 ## Adding Personal Assets
 
@@ -220,7 +224,7 @@ Things that are intentionally pending or under iteration:
 | Command | `command/<name>.md` | Frontmatter `description` is shown in the slash menu; body is the prompt |
 | Agent | `agent/<name>.md` | Frontmatter: `model`, `description`, `temperature`, `mode` (`primary`/`subagent`), optional `permission` |
 | Instruction | `instruction/<name>.md` + entry in `opencode.json` `instructions[]` | Loaded into every agent's context — keep them short and high-signal |
-| MCP | `mcp/<name>/mcp.json` | `type: "local"` (with `command`) or `"remote"` (with `url`) |
+| MCP | `opencode.json` `mcp.<name>` | Add inline under the `mcp` key. `type: "local"` (with `command`) or `"remote"` (with `url`). Optionally drop a reference snippet at `mcp/<name>/mcp.json` for diffability — but the inline entry is what OpenCode actually loads. |
 | Plugin | `plugins/<name>.ts` | Import from `@opencode-ai/plugin`; export default a Plugin function |
 
 Per-project overrides go in `<repo>/.opencode/` and "local wins" — a local skill/command of the same name supersedes the global one.
