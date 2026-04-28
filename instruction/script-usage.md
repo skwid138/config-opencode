@@ -18,6 +18,7 @@ Prefer calling these over reimplementing their logic in prompts.
 | `gh-pr-comments.sh` | Fetch PR review comments as JSON | `gh-pr-comments.sh [PR_REF]` |
 | `sonar-pr-issues.sh` | Fetch SonarCloud issues as JSON | `sonar-pr-issues.sh [--severity LEVEL] [PR_NUMBER]` |
 | `jira-fetch-ticket.sh` | Fetch Jira ticket data as JSON | `jira-fetch-ticket.sh [--all] TICKET-ID` |
+| `gke-logs.sh` | Read GKE container logs for a Wpromote service (dev/test) | `gke-logs.sh <repo> <env> [--freshness 1h] [--container NAME] [--filter EXPR]` |
 
 ## Library (`~/code/scripts/lib/`)
 
