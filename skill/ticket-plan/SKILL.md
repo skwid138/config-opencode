@@ -264,7 +264,7 @@ current branch, fetch SonarCloud issues to include in the plan.
    - `polaris-web` → `wpromote_polaris-web`
 3. Check if a PR exists:
    ```bash
-   gh pr view --json number --jq '.number'
+   ~/code/scripts/agent/gh-current-pr.sh
    ```
 
 If the repo isn't SonarCloud-enabled or no PR exists, skip this phase silently.

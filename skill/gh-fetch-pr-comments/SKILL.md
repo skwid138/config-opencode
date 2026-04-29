@@ -51,7 +51,7 @@ Accept PR references in any of these forms:
 If no PR reference is provided, detect the current branch's open PR:
 
 ```bash
-gh pr view --json number,url --jq '.number' 2>/dev/null
+~/code/scripts/agent/gh-current-pr.sh
 ```
 
 If that fails, ask the user for a PR reference.

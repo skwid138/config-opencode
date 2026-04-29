@@ -187,7 +187,7 @@ quality findings from Step 4.
    - `kraken` → `wpromote_kraken`
    - `polaris-api` → `wpromote_polaris-api`
    - `polaris-web` → `wpromote_polaris-web`
-3. Check for a PR: `gh pr view --json number --jq '.number'`
+3. Check for a PR: `~/code/scripts/agent/gh-current-pr.sh`
 
 If the repo isn't SonarCloud-enabled or no PR exists, skip this step silently.
 

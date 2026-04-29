@@ -113,7 +113,7 @@ If the user provided a project key explicitly, use that instead.
 If no PR number was provided:
 
 ```bash
-gh pr view --json number --jq '.number'
+~/code/scripts/agent/gh-current-pr.sh
 ```
 
 If this fails (no PR for the current branch), stop and inform the user:
