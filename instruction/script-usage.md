@@ -32,20 +32,24 @@ Prefer calling these over reimplementing their logic in prompts.
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
-| `~/code/wpromote/scripts/gke-logs.sh` | Read GKE container logs for a Wpromote service (dev/test) | `gke-logs.sh <repo> <env> [--freshness 1h] [--container NAME] [--filter EXPR]` |
+| `~/code/wpromote/scripts/agent/gke-logs.sh` | Read GKE container logs for a Wpromote service (dev/test) | `gke-logs.sh <repo> <env> [--freshness 1h] [--container NAME] [--filter EXPR]` |
 
 ## Library (`~/code/scripts/lib/`)
 
 | File | Contents |
 |------|----------|
-| `common.sh` | `die()`, `warn()`, `info()`, `require_cmd()`, `require_auth()` |
+| `common.sh` | `die()` (exit 1), `die_usage()` (2), `die_missing_dep()` (3), `die_unauthed()` (4), `die_upstream()` (5); `warn()`, `info()`, `debug()`; `require_cmd()`, `require_auth()`, `json_error()`. See `docs/EXIT-CODES.md` for the full convention. |
 | `keychain.sh` | `keychain_get()`, `keychain_set()`, `keychain_exists()` |
-| `detect.sh` | `detect_branch()`, `detect_ticket_from_branch()`, `detect_pr_number()`, `detect_owner_repo()`, `detect_repo_name()` |
+| `detect.sh` | `detect_branch()`, `detect_ticket_from_branch()`, `detect_pr_number()`, `detect_owner_repo()`, `detect_repo_name()`, `detect_owner()`, `parse_pr_ref()` |
 
 ## Conventions
 
 - All scripts accept `-h`/`--help` for usage.
-- All scripts exit non-zero on error with a clear message to stderr.
+- All scripts exit non-zero on error with a clear message to stderr (see `~/code/scripts/docs/EXIT-CODES.md` for the categorized convention).
 - Data scripts output JSON to stdout.
 - Scripts never commit, push, deploy, delete, or mutate remote systems.
 - Scripts check their own dependencies and report missing tools clearly.
+
+## Where does a new agent script go?
+
+A script lives in **public `~/code/scripts/agent/`** if its source is publishable as-is — i.e. no Wpromote-specific identifiers (cluster names, project IDs, internal endpoints, repo→resource maps). It lives in **private `~/code/wpromote/scripts/agent/`** if the body itself encodes Wpromote infrastructure inventory. Wrappers are not used. Skills reference both repos by absolute path; visibility doesn't constrain agent-callability.
