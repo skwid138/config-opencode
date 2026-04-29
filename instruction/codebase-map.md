@@ -28,16 +28,18 @@ All Wpromote repositories live under `~/code/wpromote/`. When working on a task 
 
 ### Repository Map
 
-| Repository | Path | Role | Layer |
-|-----------|------|------|-------|
-| polaris-web | `~/code/wpromote/polaris-web` | Polaris SPA frontend (main user-facing app) | Frontend |
-| client-portal | `~/code/wpromote/client-portal` | Client-facing portal (independent frontend) | Frontend |
-| polaris-api | `~/code/wpromote/polaris-api` | Backend API serving both frontends | Backend |
-| cube | `~/code/wpromote/cube` | Cube.js semantic layer for analytics queries | Data |
-| kraken | `~/code/wpromote/kraken` | Data pipeline, interacts with polaris-api | Data |
-| polaris-apps | `~/code/wpromote/polaris-apps` | Independent GCP-hosted applications | Services |
-| wp-sdk | `~/code/wpromote/wp-sdk` | Shared CLI tool for the engineering team | Tooling |
-| opencode-config | `~/code/wpromote/opencode-config` | Team OpenCode plugin (agents, skills, commands) | Tooling |
+| Repository | Path | Role | Layer | Local dev URL |
+|-----------|------|------|-------|---------------|
+| polaris-web | `~/code/wpromote/polaris-web` | Polaris SPA frontend (main user-facing app) | Frontend | `https://polaris.local` |
+| client-portal | `~/code/wpromote/client-portal` | Client-facing portal (Polaris IQ — independent frontend) | Frontend | `https://polarisiq.local` |
+| polaris-api | `~/code/wpromote/polaris-api` | Backend API serving both frontends | Backend | `https://api.polaris.local` |
+| cube | `~/code/wpromote/cube` | Cube.js semantic layer for analytics queries | Data | — |
+| kraken | `~/code/wpromote/kraken` | Data pipeline, interacts with polaris-api | Data | — |
+| polaris-apps | `~/code/wpromote/polaris-apps` | Independent GCP-hosted applications | Services | — |
+| wp-sdk | `~/code/wpromote/wp-sdk` | Shared CLI tool for the engineering team | Tooling | — |
+| opencode-config | `~/code/wpromote/opencode-config` | Team OpenCode plugin (agents, skills, commands) | Tooling | — |
+
+All three local URLs are served via OrbStack (HTTPS). If unreachable, run `wp dev up` first.
 
 ### Dependency Relationships
 

@@ -22,13 +22,13 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orch
 │   ├── ticket.md, plan.md, ac-quality.md, impl-plan.md
 │   ├── review.md, check-ac.md, review-plan.md, sonar.md
 │   └── bug-hunt.md
-├── skill/                       # Local skill library (10 skills)
-│   ├── bug-hunter/, figma/, gh-fetch-pr-comments/, github-review-analyzer/
-│   ├── jira-enhance/, jira-ticket/, pr-review/, sonarcloud/
-│   ├── tdd/, ticket-plan/
+├── skill/                       # Local skill library (11 skills)
+│   ├── bug-hunter/, chrome-devtools/, figma/, gh-fetch-pr-comments/
+│   ├── github-review-analyzer/, jira-enhance/, jira-ticket/, pr-review/
+│   ├── sonarcloud/, tdd/, ticket-plan/
 ├── instruction/                 # Auto-loaded into every agent's context
 │   ├── repo-context.md, codebase-map.md, orchestration-runtime.md
-│   ├── chrome-devtools.md, script-usage.md
+│   ├── script-usage.md
 ├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
 │   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.json
 ├── plugins/                     # Local TypeScript plugins
@@ -101,6 +101,7 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 | Skill | Triggers on |
 |-------|-------------|
 | `bug-hunter` | "hunt for bugs", null-safety audits, defensive coding scans |
+| `chrome-devtools` | "open the page", UI debugging, browser-driven inspection, Lighthouse, Figma-in-browser fallback |
 | `figma` | Figma URLs, design implementation, design-token extraction |
 | `gh-fetch-pr-comments` | Raw PR review comment retrieval (data layer for analyzer) |
 | `github-review-analyzer` | "triage PR comments", deep PR review analysis with codebase context |
@@ -122,7 +123,7 @@ MCP servers are defined inline in `opencode.json` under the top-level `mcp` key 
 | `exa` | remote | `mcp.exa.ai` — free tier; add `headers["x-api-key"]` for higher limits |
 | `figma` | remote | `127.0.0.1:3845` — requires Figma desktop app with Dev Mode + MCP enabled |
 
-Chrome and Figma both require local processes. The `chrome-devtools.md` instruction file teaches every agent the launch/check workflow; the `figma` skill prefers the desktop MCP and falls back to navigating Figma in Chrome.
+Chrome and Figma both require local processes. The `chrome-devtools` skill teaches the launch/check workflow on demand (auto-running `~/code/scripts/chrome_mcp.sh` when needed); the `figma` skill prefers the desktop MCP and falls back to navigating Figma in Chrome.
 
 Verify registration after edits with `opencode mcp list`.
 
@@ -176,9 +177,8 @@ Tuned for GitHub Copilot's ~128K effective context (defaults assume 200K+):
 | File | What it injects |
 |------|-----------------|
 | `repo-context.md` | "Read the project's `AGENTS.md` and `.agents/skills/` if present" — silently no-ops when absent |
-| `codebase-map.md` | Wpromote repo topology: `polaris-web`, `client-portal`, `polaris-api`, `cube`, `kraken`, `polaris-apps`, `wp-sdk`. Frontend → API → Cube/Kraken/BigQuery dependency map and Jira component → repo mapping |
+| `codebase-map.md` | Wpromote repo topology incl. local dev URLs (`polaris.local`, `polarisiq.local`, `api.polaris.local`): `polaris-web`, `client-portal`, `polaris-api`, `cube`, `kraken`, `polaris-apps`, `wp-sdk`. Frontend → API → Cube/Kraken/BigQuery dependency map and Jira component → repo mapping |
 | `orchestration-runtime.md` | `/continue`/`/stop` semantics, delegation discipline, long-running command policy (Stryker, full test suites) |
-| `chrome-devtools.md` | When to launch Chrome via `chrome_mcp.sh`, Figma fallback workflow |
 | `script-usage.md` | Reference for `~/code/scripts/` utilities (`branch-to-ticket.sh`, `gh-current-pr.sh`, `gh-pr-comments.sh`, `sonar-pr-issues.sh`, `jira-fetch-ticket.sh`, plus the `lib/` helpers) |
 
 ## Configuration Choices
