@@ -1,0 +1,11 @@
+node_modules
+
+# OpenCode remote skills plugin
+skill/_plugins/
+
+# Used by DCP
+logs/
+logs/**/*
+logs/**/**/*
+
+SHELL-LAYER-PLAN.md

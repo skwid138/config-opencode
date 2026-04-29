@@ -26,12 +26,12 @@
         }
     },
     "plugin": [
-      "@tarquinen/opencode-dcp@latest"
+      "@tarquinen/opencode-dcp@3.1.9"
     ],
     "mcp": {
         "chrome-devtools": {
             "type": "local",
-            "command": ["npx", "-y", "chrome-devtools-mcp@latest", "--browserUrl", "http://127.0.0.1:9222"],
+            "command": ["npx", "-y", "chrome-devtools-mcp@0.23.0", "--browserUrl", "http://127.0.0.1:9222"],
             "enabled": true
         },
         "context7": {

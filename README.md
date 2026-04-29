@@ -10,7 +10,9 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orch
 ~/.config/opencode/
 ├── opencode.json                # Model, instructions, hidden agents, permissions, npm plugins
 ├── dcp.jsonc                    # Dynamic Context Pruning config (currently in trial/manual mode)
-├── package.json                 # npm deps (@opencode-ai/plugin)
+├── package.json                 # npm deps (@opencode-ai/plugin) — Node 24+, npm 11.x
+├── package-lock.json            # tracked for reproducible installs
+├── .nvmrc                       # pins Node version (24)
 ├── agent/                       # Local agent definitions (LOTR-named)
 │   ├── gandalf.md               # Primary orchestrator
 │   ├── legolas.md               # Codebase exploration subagent
@@ -21,7 +23,8 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orch
 ├── command/                     # Slash commands that drive skills
 │   ├── ticket.md, plan.md, ac-quality.md, impl-plan.md
 │   ├── review.md, check-ac.md, review-plan.md, sonar.md
-│   └── bug-hunt.md
+│   ├── bug-hunt.md
+│   └── update-opencode-deps.md  # check & update opencode config deps
 ├── skill/                       # Local skill library (11 skills)
 │   ├── bug-hunter/, chrome-devtools/, figma/, gh-fetch-pr-comments/
 │   ├── github-review-analyzer/, jira-enhance/, jira-ticket/, pr-review/
@@ -78,6 +81,11 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 | Command | Skill | What it does |
 |---------|-------|-------------|
 | `/bug-hunt <scope> [--mode boundary\|trace]` | bug-hunter | Read-only scan for null/guard gaps at system boundaries |
+
+### Config maintenance
+| Command | Backed by | What it does |
+|---------|-----------|-------------|
+| `/update-opencode-deps` | `~/code/scripts/opencode-deps-check.sh` | Audit and update OpenCode config dependencies (`package.json`, `opencode.json` plugins, MCP package refs) |
 
 ### Orchestration runtime (provided by `plugins/orchestration.ts`)
 | Command | What it does |
@@ -198,12 +206,43 @@ Tuned for GitHub Copilot's ~128K effective context (defaults assume 200K+):
 | Task | Command |
 |------|---------|
 | Bump default model | `opencode models` → edit `opencode.json` |
-| Update DCP plugin | `npm update @tarquinen/opencode-dcp` |
-| Update OpenCode plugin SDK | `npm update @opencode-ai/plugin` |
+| Audit & update all config deps | `/update-opencode-deps` (or `~/code/scripts/opencode-deps-check.sh` for read-only check) |
 | Add a provider | `opencode auth login` |
 | Tail DCP logs | `tail -f ~/.config/opencode/logs/dcp/*.log` |
 | Inspect tasks | `/tasks`, then `/task <id>` |
 | Health check | `/diagnostics` |
+
+## Setup (fresh machine)
+
+This config uses **npm** (not Bun) and pins all dependency versions for reproducibility. Recent OpenCode versions install plugin/config dependencies via npm/Arborist internally, so npm is the right tool here.
+
+```bash
+# 1. Install Node 24 (LTS) via nvm
+nvm install --lts          # installs 24
+cd ~/.config/opencode
+nvm use                    # picks up .nvmrc
+
+# 2. Enable Corepack (one-time, system-level) so the packageManager field takes effect
+corepack enable
+
+# 3. Install dependencies
+npm install
+```
+
+`engines.node` requires Node 24+ and `packageManager` pins npm to `11.12.1`. Corepack will shim the right npm version automatically once enabled.
+
+### Pinned vs floating versions
+
+All external packages are pinned to exact versions:
+- `package.json` → `@opencode-ai/plugin` (the plugin SDK)
+- `opencode.json` → `@tarquinen/opencode-dcp` (DCP plugin)
+- `opencode.json` → `chrome-devtools-mcp` (in the MCP `command` array)
+
+Floating `@latest` references were intentionally removed — historical Bun-era issues (e.g. cache-induced stale resolution of `@latest`) and current Arborist install failures are both avoided by pinning. To check for and apply updates use `/update-opencode-deps`.
+
+### Known upstream advisories
+
+`npm audit` currently flags 3 moderate severity vulnerabilities transitively from `@opencode-ai/plugin` (`uuid` < 14, via `effect`). The `audit fix --force` path downgrades the plugin to a pre-1.4.5 release, which is worse than current. Leave as-is until upstream publishes a patched plugin release.
 
 ## Roadmap / Open Threads
 

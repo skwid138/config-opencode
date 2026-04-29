@@ -19,6 +19,7 @@ Prefer calling these over reimplementing their logic in prompts.
 | `sonar-pr-issues.sh` | Fetch SonarCloud issues as JSON | `sonar-pr-issues.sh [--severity LEVEL] [PR_NUMBER]` |
 | `jira-fetch-ticket.sh` | Fetch Jira ticket data as JSON | `jira-fetch-ticket.sh [--all] TICKET-ID` |
 | `gke-logs.sh` | Read GKE container logs for a Wpromote service (dev/test) | `gke-logs.sh <repo> <env> [--freshness 1h] [--container NAME] [--filter EXPR]` |
+| `opencode-deps-check.sh` | Check OpenCode config deps (package.json + opencode.json) for outdated/unpinned versions | `opencode-deps-check.sh [--human\|--json]` |
 
 ## Library (`~/code/scripts/lib/`)
 
