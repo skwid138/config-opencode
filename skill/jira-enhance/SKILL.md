@@ -51,10 +51,21 @@ If the user's intent is ambiguous, ask which mode they want.
 | URL | `https://wpromote.atlassian.net/browse/BIXB-18835` | Extract ID from path |
 
 **Branch → Ticket conversion:**
-- Branch: `bixb_18835` → Ticket: `BIXB-18835`
-- Pattern: uppercase project prefix, replace `_` with `-`
 
-If the branch doesn't match and no ticket ID provided, ask the user.
+When no ticket ID is provided, run:
+
+```bash
+~/code/scripts/agent/branch-to-ticket.sh
+```
+
+It searches the current branch for a `PREFIX-NUMBER` / `PREFIX_NUMBER`
+pattern (anywhere in the branch), uppercases the prefix, and normalizes
+the separator to `-`. Examples: `bixb_18835` → `BIXB-18835`,
+`feature/bixb-18835-foo` → `BIXB-18835`, `chore/some-fix-bixb-18835`
+→ `BIXB-18835`.
+
+If the script exits non-zero (no recognizable ticket ID in the branch)
+and no ticket ID was provided, ask the user.
 
 ## Preflight
 

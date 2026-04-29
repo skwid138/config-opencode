@@ -47,10 +47,28 @@ Do **not** use this skill for:
 | With flags | `BIXB-18835 --post-jira` | Parse flags separately |
 
 **Branch to ticket conversion:**
-- Branch: `bixb_18835` or `bixb-18835-some-description` -> Ticket: `BIXB-18835`
-- Pattern: uppercase project prefix, extract numeric ID
 
-If the branch doesn't match and no ticket ID provided, ask the user.
+When no ticket ID or URL is provided, run:
+
+```bash
+~/code/scripts/agent/branch-to-ticket.sh
+```
+
+This searches the current branch name for a `PREFIX-NUMBER` or `PREFIX_NUMBER`
+pattern (anywhere in the branch, not just the start), uppercases the prefix,
+and normalizes the separator to `-`. Examples:
+
+| Branch | Resolved ticket |
+|---|---|
+| `bixb_18835` | `BIXB-18835` |
+| `bixb-18835-some-description` | `BIXB-18835` |
+| `feature/bixb_123` | `BIXB-123` |
+| `chore/some-fix-bixb-18835` | `BIXB-18835` |
+| `bug/2024-q3/bixb-18835` | `BIXB-18835` |
+
+The script exits with a friendly error (exit 1) if no recognizable ticket
+ID is found in the branch. If that happens and no ticket ID was provided,
+ask the user.
 
 **Optional flags:**
 
