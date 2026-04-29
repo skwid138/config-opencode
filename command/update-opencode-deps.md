@@ -2,11 +2,11 @@
 description: Check OpenCode config dependencies for outdated/unpinned packages and apply updates
 ---
 
-Use the `~/code/scripts/opencode-deps-check.sh` script to check the user's OpenCode configuration for outdated or unpinned dependencies.
+Use the `~/code/scripts/agent/opencode-deps-check.sh` script to check the user's OpenCode configuration for outdated or unpinned dependencies.
 
 ## Workflow
 
-1. **Check**: Run `~/code/scripts/opencode-deps-check.sh --json` and parse the JSON output. The script reports on:
+1. **Check**: Run `~/code/scripts/agent/opencode-deps-check.sh --json` and parse the JSON output. The script reports on:
    - `~/.config/opencode/package.json` dependencies
    - `~/.config/opencode/opencode.json` `plugin` array entries
    - `~/.config/opencode/opencode.json` MCP `command` arrays referencing npm packages
@@ -25,7 +25,7 @@ Use the `~/code/scripts/opencode-deps-check.sh` script to check the user's OpenC
    - For `opencode.json` `plugin` entries: edit the version suffix in the matching `"<pkg>@<version>"` string. Preserve the rest of the file (it's JSONC — keep any comments untouched).
    - For `opencode.json` MCP `command` arrays: edit the version suffix in the matching token. Same JSONC-preservation rule.
 
-6. **Verify**: After edits, re-run `~/code/scripts/opencode-deps-check.sh` (no flag — human table) and show the new state. Confirm everything is `ok`.
+6. **Verify**: After edits, re-run `~/code/scripts/agent/opencode-deps-check.sh` (no flag — human table) and show the new state. Confirm everything is `ok`.
 
 7. **Hand off**: Summarize what changed, list the modified files, and remind the user to commit. Do NOT commit on the user's behalf.
 

@@ -33,7 +33,7 @@ inspect panel. Let me know when ready."
 When the Figma desktop MCP is unavailable (e.g., user only has web access):
 
 ```bash
-~/code/scripts/chrome_mcp.sh --url "https://www.figma.com/design/FILE_KEY/..."
+~/code/scripts/agent/chrome_mcp.sh --url "https://www.figma.com/design/FILE_KEY/..."
 ```
 
 Then use Chrome DevTools MCP tools to navigate and inspect design values.

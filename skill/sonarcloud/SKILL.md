@@ -20,9 +20,9 @@ report. Can be used standalone or as a data source for other skills
 **Always use the script for data retrieval:**
 
 ```bash
-~/code/scripts/sonar-pr-issues.sh [PR_NUMBER]
-~/code/scripts/sonar-pr-issues.sh --severity MAJOR 275
-~/code/scripts/sonar-pr-issues.sh --project wpromote_polaris-web 280
+~/code/scripts/agent/sonar-pr-issues.sh [PR_NUMBER]
+~/code/scripts/agent/sonar-pr-issues.sh --severity MAJOR 275
+~/code/scripts/agent/sonar-pr-issues.sh --project wpromote_polaris-web 280
 ```
 
 The script outputs JSON with keys: `project`, `pr`, `ci_status`, `total`, `issues`.

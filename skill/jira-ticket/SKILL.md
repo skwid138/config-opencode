@@ -22,9 +22,9 @@ engineering context — whether the goal is estimation, implementation, or testi
 **Always use the script for data retrieval:**
 
 ```bash
-~/code/scripts/jira-fetch-ticket.sh BIXB-18835
-~/code/scripts/jira-fetch-ticket.sh --all BIXB-18835        # includes comments, links, attachments
-~/code/scripts/jira-fetch-ticket.sh --json-fields BIXB-18835  # full structured fields
+~/code/scripts/agent/jira-fetch-ticket.sh BIXB-18835
+~/code/scripts/agent/jira-fetch-ticket.sh --all BIXB-18835        # includes comments, links, attachments
+~/code/scripts/agent/jira-fetch-ticket.sh --json-fields BIXB-18835  # full structured fields
 ```
 
 The script outputs JSON with keys: `ticket_id`, `plain_view`, `description`, `fields`, `comments`, `links`, `attachments`.

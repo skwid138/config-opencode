@@ -20,9 +20,9 @@ and organizes, but does not analyze or judge.
 **Always use the script for data retrieval:**
 
 ```bash
-~/code/scripts/gh-pr-comments.sh [PR_REF]
-~/code/scripts/gh-pr-comments.sh --no-diff 275          # skip diff for speed
-~/code/scripts/gh-pr-comments.sh wpromote/polaris-web#275
+~/code/scripts/agent/gh-pr-comments.sh [PR_REF]
+~/code/scripts/agent/gh-pr-comments.sh --no-diff 275          # skip diff for speed
+~/code/scripts/agent/gh-pr-comments.sh wpromote/polaris-web#275
 ```
 
 The script outputs JSON with keys: `metadata`, `reviews`, `threads`, `files`, `commits`, `diff`.

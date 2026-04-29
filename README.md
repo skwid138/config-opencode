@@ -85,7 +85,7 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 ### Config maintenance
 | Command | Backed by | What it does |
 |---------|-----------|-------------|
-| `/update-opencode-deps` | `~/code/scripts/opencode-deps-check.sh` | Audit and update OpenCode config dependencies (`package.json`, `opencode.json` plugins, MCP package refs) |
+| `/update-opencode-deps` | `~/code/scripts/agent/opencode-deps-check.sh` | Audit and update OpenCode config dependencies (`package.json`, `opencode.json` plugins, MCP package refs) |
 
 ### Orchestration runtime (provided by `plugins/orchestration.ts`)
 | Command | What it does |
@@ -126,12 +126,12 @@ MCP servers are defined inline in `opencode.json` under the top-level `mcp` key 
 
 | MCP | Type | Notes |
 |-----|------|-------|
-| `chrome-devtools` | local (npx) | Connects to Chrome on `127.0.0.1:9222`. Launch with `~/code/scripts/chrome_mcp.sh` |
+| `chrome-devtools` | local (npx) | Connects to Chrome on `127.0.0.1:9222`. Launch with `~/code/scripts/agent/chrome_mcp.sh` |
 | `context7` | remote | `mcp.context7.com` — free, no key |
 | `exa` | remote | `mcp.exa.ai` — free tier; add `headers["x-api-key"]` for higher limits |
 | `figma` | remote | `127.0.0.1:3845` — requires Figma desktop app with Dev Mode + MCP enabled |
 
-Chrome and Figma both require local processes. The `chrome-devtools` skill teaches the launch/check workflow on demand (auto-running `~/code/scripts/chrome_mcp.sh` when needed); the `figma` skill prefers the desktop MCP and falls back to navigating Figma in Chrome.
+Chrome and Figma both require local processes. The `chrome-devtools` skill teaches the launch/check workflow on demand (auto-running `~/code/scripts/agent/chrome_mcp.sh` when needed); the `figma` skill prefers the desktop MCP and falls back to navigating Figma in Chrome.
 
 Verify registration after edits with `opencode mcp list`.
 
@@ -187,7 +187,7 @@ Tuned for GitHub Copilot's ~128K effective context (defaults assume 200K+):
 | `repo-context.md` | "Read the project's `AGENTS.md` and `.agents/skills/` if present" — silently no-ops when absent |
 | `codebase-map.md` | Wpromote repo topology incl. local dev URLs (`polaris.local`, `polarisiq.local`, `api.polaris.local`): `polaris-web`, `client-portal`, `polaris-api`, `cube`, `kraken`, `polaris-apps`, `wp-sdk`. Frontend → API → Cube/Kraken/BigQuery dependency map and Jira component → repo mapping |
 | `orchestration-runtime.md` | `/continue`/`/stop` semantics, delegation discipline, long-running command policy (Stryker, full test suites) |
-| `script-usage.md` | Reference for `~/code/scripts/` utilities (`branch-to-ticket.sh`, `gh-current-pr.sh`, `gh-pr-comments.sh`, `sonar-pr-issues.sh`, `jira-fetch-ticket.sh`, plus the `lib/` helpers) |
+| `script-usage.md` | Reference for `~/code/scripts/` utilities — `agent/` (`branch-to-ticket.sh`, `gh-current-pr.sh`, `gh-pr-comments.sh`, `sonar-pr-issues.sh`, `jira-fetch-ticket.sh`) and `lib/` helpers |
 
 ## Configuration Choices
 
@@ -206,7 +206,7 @@ Tuned for GitHub Copilot's ~128K effective context (defaults assume 200K+):
 | Task | Command |
 |------|---------|
 | Bump default model | `opencode models` → edit `opencode.json` |
-| Audit & update all config deps | `/update-opencode-deps` (or `~/code/scripts/opencode-deps-check.sh` for read-only check) |
+| Audit & update all config deps | `/update-opencode-deps` (or `~/code/scripts/agent/opencode-deps-check.sh` for read-only check) |
 | Add a provider | `opencode auth login` |
 | Tail DCP logs | `tail -f ~/.config/opencode/logs/dcp/*.log` |
 | Inspect tasks | `/tasks`, then `/task <id>` |

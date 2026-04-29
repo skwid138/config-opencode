@@ -11,8 +11,8 @@ The chrome-devtools MCP connects to Chrome on `127.0.0.1:9222`. Chrome must be r
 
 Before your FIRST `chrome-devtools_*` tool call in a session, OR if any `chrome-devtools_*` tool fails with a connection error:
 
-1. Check: `~/code/scripts/chrome_mcp.sh --check` (exit 0 = running, 1 = not running)
-2. If not running, launch it: `~/code/scripts/chrome_mcp.sh` — or with `--url <URL>` to open a target page directly.
+1. Check: `~/code/scripts/agent/chrome_mcp.sh --check` (exit 0 = running, 1 = not running)
+2. If not running, launch it: `~/code/scripts/agent/chrome_mcp.sh` — or with `--url <URL>` to open a target page directly.
 3. Then proceed with the MCP tool call.
 
 Do NOT report "the MCP isn't running" and stop. The script exists for this exact purpose — run it.
