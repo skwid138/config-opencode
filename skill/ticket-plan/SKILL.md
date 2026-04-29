@@ -274,11 +274,12 @@ Note in the plan metadata: "SonarCloud: skipped (no PR)" or "SonarCloud: N/A
 ### Step 2: Check CI freshness
 
 ```bash
-gh pr checks --json name,status,conclusion | cat
+~/code/scripts/agent/gh-pr-checks-summary.sh --filter sonar --status
 ```
 
-Look for a check with "sonar" in the name. If it's still running or hasn't run,
-note the staleness warning — but still proceed to fetch whatever exists.
+Output is one word: `passed | failed | running | not_found | unknown`.
+If it's `running` or `not_found`, note the staleness warning in the plan
+metadata — but still proceed to fetch whatever exists.
 
 ### Step 3: Fetch issues
 

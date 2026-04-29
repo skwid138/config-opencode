@@ -201,9 +201,10 @@ Filter to `issueStatus` of `OPEN` or `CONFIRMED` only.
 
 Check CI freshness first:
 ```bash
-gh pr checks --json name,status,conclusion | cat
+~/code/scripts/agent/gh-pr-checks-summary.sh --filter sonar --status
 ```
-If the SonarCloud check is still running or hasn't run, note the staleness.
+Output is one word: `passed | failed | running | not_found | unknown`.
+If it's `running` or `not_found`, note the staleness in the review.
 
 #### Cross-reference
 

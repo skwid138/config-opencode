@@ -125,17 +125,18 @@ If this fails (no PR for the current branch), stop and inform the user:
 Before fetching issues, check whether SonarCloud analysis has run on the PR:
 
 ```bash
-gh pr checks --json name,status,conclusion | cat
+~/code/scripts/agent/gh-pr-checks-summary.sh --filter sonar --status
 ```
 
-Look for a check with "sonar" in the name (case-insensitive). Assess the state:
+The script prints a single status word. Map it to action:
 
-| State | Action |
-|-------|--------|
-| Check completed successfully | Proceed normally |
-| Check completed with failure | Proceed, but note: "SonarCloud analysis completed with failures — results may be incomplete" |
-| Check still running | Warn: "SonarCloud analysis is still running — results may not reflect the latest push" |
-| No sonar check found | Warn: "No SonarCloud check found on this PR — analysis may not have run yet" |
+| Output       | Meaning                              | Action |
+|--------------|--------------------------------------|--------|
+| `passed`     | SonarCloud check completed successfully | Proceed normally |
+| `failed`     | SonarCloud check completed with failure | Proceed, but note: "SonarCloud analysis completed with failures — results may be incomplete" |
+| `running`    | SonarCloud check still running        | Warn: "SonarCloud analysis is still running — results may not reflect the latest push" |
+| `not_found`  | No sonar check exists on the PR       | Warn: "No SonarCloud check found on this PR — analysis may not have run yet" |
+| `unknown`    | Could not determine state             | Treat the same as `not_found` |
 
 Do not block on CI status. Always proceed to fetch whatever issues exist, but
 include the warning in the output so the user knows the data freshness.
