@@ -110,8 +110,11 @@ Quick examples:
 - **GKE workloads run in `prj-npd-ek8s-lpqx`, NOT in the per-app `-base-` projects.**
   Every non-prod service shares this cluster; logs live there. The `-base-` projects
   (e.g. `prj-npd-plrs-dev-base-yzaf`) host IAM/Workload Identity GSAs only.
-- **Container name ≠ repo name.** `polaris-api`'s pod has containers `api`, `worker`,
-  `pgbouncer`. Use `gcp-project-map.sh --container <env> <repo>` to resolve.
+- **Container name ≠ repo name.** `polaris-api`'s pod has containers `api` + `nginx`
+  (initContainer: `move-staticfiles`). `polaris-web` and `client-portal` use container
+  name `app`. Celery is split into separate deployments: `polaris-celery-worker`,
+  `polaris-celery-beat`, `polaris-celery-flower` (containers named `worker`/`beat`/`flower`).
+  Use `gcp-project-map.sh --container <env> <repo>` to resolve.
 - **`kraken_metadata` is the dataset name**, not `metadata`. Easy to miss from a
   generic dbt-style guess.
 - **Non-prod kraken/cube → `prj-npd-plrs-<env>-data-*`, NOT `wpro-kraken-qa`.**
@@ -119,7 +122,13 @@ Quick examples:
   see fresh data in the legacy project, double-check — it may be stale.
 - **Cube's BQ project for non-prod** is the same per-env data project as kraken,
   configured in Cube Cloud env vars (`CUBEJS_DB_BQ_PROJECT_ID`), not in the cube repo.
-- **Prod GKE cluster/project is separate from non-prod — TBD, confirm before assuming.**
+- **`cube` and `kraken` are NOT GKE workloads.** They don't run as pods on any cluster
+  (npd / prd / sbx). `cnpg-kraken-*` pods on npd are the postgres database for kraken,
+  not the kraken app itself. Cube runs in Cube Cloud; kraken runs as Airflow jobs.
+- **Prod GKE cluster ≠ home of all prod services.** `gke-prd-ek8s-primary` only hosts
+  `client-portal` (deployment named `portal`), `storybook`, and Airbyte. `polaris-api`,
+  `polaris-web`, and `polaris-celery-*` on prd run on different infrastructure (likely
+  Cloud Run / GAE) — confirm the deploy target before assuming GKE-prd.
 - **Deploy flow (polaris-* repos):** CI builds image → `kustomize edit set image`
   in `gitops-polaris/apps/<app>/overlays/<env>/kustomization.yaml` → direct push as
   `wpromote-github-writer[bot]` (no PR) → Argo CD auto-syncs (selfHeal=true,
