@@ -7,7 +7,7 @@ Prefer calling these over reimplementing their logic in prompts.
 
 - **`~/code/scripts/agent/`** — opencode-coupled tools (data retrieval for skills, helpers for commands).
 - **`~/code/scripts/lib/`** — sourced helpers shared by agent/ and shell/ scripts.
-- **`~/code/scripts/shell/`** — interactive-shell setup (sourced by `.zshrc`); not directly invoked.
+- **`~/code/scripts/shell/`** — interactive-shell setup, sourced via the three-barrel init: `init_env.zsh` from `.zshenv`, `init_profile.zsh` from `.zprofile`, `init_rc.zsh` from `.zshrc`. Not directly invoked.
 - **`~/code/scripts/personal/`** — personal utilities not used by opencode.
 - **`~/code/wpromote/scripts/`** — Wpromote-internal (cluster names, project IDs, etc.).
 
