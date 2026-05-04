@@ -1,0 +1,38 @@
+---
+description: >-
+  Generate (and optionally push) a Jira QA subtask description. Reads parent
+  ticket AC + peer corpus, renders via the vendored ADF template, previews
+  by default, pushes to Jira only with --push.
+---
+Use the `qa-subtask` skill to produce a QA subtask description for a Jira
+story.
+
+**Default behavior:** read-only preview. The skill renders the description
+via `jira-qa-render.sh` and shows the plain-text preview + path to the saved
+render envelope. No Jira mutation occurs unless explicitly requested.
+
+**Push gate:** pass `--push` to create the subtask in Jira via
+`jira-create-subtask.sh` after preview. Without `--push`, the user pastes
+the preview manually or re-invokes with `--push` to confirm.
+
+**Common invocations:**
+- `/qa-subtask BIXB-16803` — preview only
+- `/qa-subtask BIXB-16803 --push` — preview then create the subtask
+- `/qa-subtask BIXB-16803 --no-scope --no-input` — drop SCOPE + INPUT rows
+- `/qa-subtask BIXB-16803 --keep-helpers` — retain the right-column italic
+  helper text (default is to drop it, matching peer corpus)
+- `/qa-subtask` — auto-detect ticket ID from the current branch
+
+**Flag passthrough to the skill:**
+- `--env <code>` — target env: `dev` or `tst` (default `tst`)
+- `--client <id>` — suggested test client ID for SOURCE url
+- `--samples <n>` — peer QA subtasks to sample for style (default 5)
+- `--pr <number>` — implementing PR (otherwise auto-detect from branch)
+- `--no-scope` / `--no-input` — drop the corresponding rows
+- `--keep-helpers` — keep right-column italic helper text
+- `--push` — create the subtask in Jira after preview
+
+Stay read-only by default. Only mutate Jira when `--push` is present or the
+user explicitly confirms a follow-up push.
+
+{{$arguments}}
