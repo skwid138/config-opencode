@@ -35,6 +35,8 @@ Prefer calling these over reimplementing their logic in prompts.
 | `~/code/wpromote/scripts/agent/gke-logs.sh` | Read GKE container logs for a Wpromote service (dev/test) | `gke-logs.sh <repo> <env> [--freshness 1h] [--container NAME] [--filter EXPR]` |
 | `~/code/wpromote/scripts/agent/jira-qa-render.sh` | Render a Jira QA-subtask description (ADF + plain text) from AC/source/steps/notes inputs, using the vendored team template | `jira-qa-render.sh --ac-file PATH --source URL --steps-file PATH [--notes-file PATH] [--no-scope] [--no-input] [--keep-helpers] [--format adf\|text\|both]` |
 | `~/code/wpromote/scripts/agent/jira-create-subtask.sh` | Create a Jira subtask via `acli` from a render envelope (or bare ADF doc). Pure mutation — pair with `jira-qa-render.sh` | `jira-create-subtask.sh --parent KEY --summary TEXT --description-file PATH [--type NAME] [--project KEY] [--dry-run]` |
+| `~/code/wpromote/scripts/agent/jira-find-qa-subtask.sh` | List QA child subtasks of a parent story; flags each with `is_template:bool` (auto-template default state vs. human-filled) | `jira-find-qa-subtask.sh --parent KEY [--type NAME] [--skip-template-check]` |
+| `~/code/wpromote/scripts/agent/jira-update-subtask.sh` | Update an existing QA subtask's description (and optionally summary) via `acli edit --from-json`. Refuses non-template descriptions without `--force` (exit 6). Pair with `jira-qa-render.sh` | `jira-update-subtask.sh --ticket KEY --description-file PATH [--summary TEXT] [--type NAME] [--force] [--dry-run]` |
 
 ## Library (`~/code/scripts/lib/`)
 

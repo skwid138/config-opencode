@@ -9,7 +9,8 @@ description: >-
   produce QA test instructions for a ticket — even if they don't explicitly say
   "QA subtask." Output is a ready-to-paste subtask description matching the
   team's existing format. Defaults to read-only preview; pass `--push` to
-  create the subtask in Jira via the vendored render + create scripts.
+  update the existing QA subtask (or `--create` to create a new one) via the
+  vendored render + find + update + create scripts.
 ---
 
 # QA Subtask Generator
@@ -21,6 +22,13 @@ then applies that style to the target story.
 Peer QA tickets are the spec — the shape of a good QA subtask is whatever the
 team's recently-shipped subtasks look like, not a generic template. Always
 sample the corpus before writing.
+
+**Important:** when a story is created in Jira, the team's automation
+**already creates an empty QA subtask** in default-template state (italic
+helper text in every cell). The default mutation path is therefore to
+**update** that existing subtask, not create a new one. Use `--create`
+explicitly only when no QA subtask exists yet (or when the team needs an
+additional one).
 
 ## When to use this skill
 
@@ -56,7 +64,10 @@ Optional flags:
 | `--no-scope` | Drop the `SCOPE:` row from the output (passes through to renderer) |
 | `--no-input` | Drop the `INPUT DATA/EXPECTED OUTPUT` row from the output |
 | `--keep-helpers` | Keep the right-column italic helper text in each row (default is to drop it, matching peer corpus) |
-| `--push` | After generating, create the subtask in Jira via `jira-create-subtask.sh` instead of stopping at preview. Without this flag, the skill **previews and asks** before any mutation. |
+| `--push` | After generating, mutate Jira: update the existing QA subtask if one is found, otherwise refuse and require `--create`. Without this flag, the skill **previews and stops**. |
+| `--create` | Force the create path even when an existing QA subtask is found (e.g. team needs a second QA subtask for a story). Implies `--push`. |
+| `--update <KEY>` | Skip auto-discovery and update the named QA subtask explicitly. Implies `--push`. |
+| `--force` | Pass through to `jira-update-subtask.sh --force` so the update overwrites a non-template (already-filled) description. Use sparingly. |
 
 ### Resolving the SOURCE base URL
 
@@ -101,6 +112,34 @@ QA tester should target before resolving the URL.
 3. If AC are vague, missing, or marked as boilerplate placeholder text (e.g.
    `*Defines the boundaries...`), stop and warn the user that AC need to be
    filled in first — do not invent AC.
+
+### Phase 1.5: Discover existing QA subtask
+
+The team's automation creates a default-template QA subtask under every new
+story. Before deciding whether to create or update, find out what already
+exists:
+
+```bash
+~/code/wpromote/scripts/agent/jira-find-qa-subtask.sh --parent <STORY-KEY>
+```
+
+The script returns
+`{version:1, parent, count, qa_subtasks:[{key, summary, status, is_template}]}`.
+The `is_template` flag tells you whether the existing subtask is still in
+default auto-template state (safe to overwrite) or whether a human has
+already filled it in (confirm before overwriting).
+
+Decision matrix (used in Phase 7 when `--push` is in play):
+
+| `count` | `is_template` of any | Action when `--push` is passed |
+|---|---|---|
+| 0 | n/a | Refuse to push silently. Tell the user no QA subtask exists for the story and offer `--create`. |
+| 1 | `true` | Update that subtask (default). |
+| 1 | `false` | Confirm with the user — describe what's already there and ask whether to overwrite (`--force`), create a new one (`--create`), or stop. |
+| >1 | mixed | List all candidates with their `is_template` flag and ask the user which to update (or `--create` for a new one). |
+
+Override the matrix with `--update <KEY>` (explicit target) or `--create`
+(force create even when a candidate exists).
 
 ### Phase 2: Sample peer QA subtasks for house style
 
@@ -245,33 +284,61 @@ Show the user:
 
 ### Phase 7: Push (gated)
 
-If `--push` was passed, create the subtask:
+If `--push` was **not** passed, stop after Phase 6. Do not call any mutation
+script. The user can paste the preview into Jira manually, or re-invoke with
+`--push` to confirm.
+
+If `--push` is passed, route based on Phase 1.5's discovery + the user's
+explicit overrides:
+
+**Update path (default when an existing template-state subtask is found):**
+
+```bash
+~/code/wpromote/scripts/agent/jira-update-subtask.sh \
+  --ticket <DISCOVERED-OR-EXPLICIT-KEY> \
+  --summary "<suggested summary>" \
+  --description-file <render-envelope-path> \
+  [--force]   # only when overwriting a non-template description
+```
+
+Returns `{version:1, ticket_id, url, was_template}`. Surface those to the
+user.
+
+The script's exit-6 ("refusing to overwrite non-template description") is a
+safety rail. If you hit it, surface the message and ask the user whether to
+re-run with `--force` (pass through `--force`).
+
+**Create path (only when explicitly requested or no subtask exists):**
 
 ```bash
 ~/code/wpromote/scripts/agent/jira-create-subtask.sh \
-  --parent <PARENT-KEY> \
+  --parent <STORY-KEY> \
   --summary "<suggested summary>" \
   --description-file <render-envelope-path>
 ```
 
-Returns `{version:1, ticket_id:"BIXB-XXXX", url:"https://..."}`. Surface the
-new key + URL to the user.
+Returns `{version:1, ticket_id, url}`. Surface to user.
 
-If `--push` was **not** passed, stop after Phase 6. Do not call the create
-script. The user can either:
-- Paste the preview into Jira manually, or
-- Confirm and ask the skill to push, which then runs the create script.
+**Routing rules** (apply in this order):
+1. `--update <KEY>` was passed → update path with that key. Skip discovery.
+2. `--create` was passed → create path. Skip discovery, even if a subtask exists.
+3. Discovery `count == 0` → refuse silently. Tell the user "no existing QA
+   subtask found for <story>; pass `--create` to make a new one."
+4. Discovery `count == 1` and `is_template == true` → update that key.
+5. Discovery `count == 1` and `is_template == false` → ask. Do not auto-update.
+6. Discovery `count > 1` → ask which one to update.
 
-Before calling `jira-create-subtask.sh`, optionally dry-run first:
+Before calling any mutation script, optionally dry-run first:
 
 ```bash
+~/code/wpromote/scripts/agent/jira-update-subtask.sh \
+  --ticket <KEY> --description-file <envelope> --dry-run
+# or
 ~/code/wpromote/scripts/agent/jira-create-subtask.sh \
-  --parent <PARENT-KEY> --summary "..." \
-  --description-file <envelope> --dry-run
+  --parent <KEY> --summary "..." --description-file <envelope> --dry-run
 ```
 
-This is useful when the skill is uncertain about the parent key, project, or
-issue type.
+Useful when uncertain about the target, summary, or issue type.
 
 ## Output format
 
@@ -352,5 +419,9 @@ With `--push`: subtask created at <url>.
 | PR cannot be detected | Warn, generate from AC alone. Note the limitation. |
 | Codebase route lookup fails | Warn, leave SOURCE url placeholder for user to fill in. |
 | `jira-qa-render.sh` exits non-zero | Surface the script's stderr; do not attempt to hand-write ADF as a fallback. |
-| `jira-create-subtask.sh` exits 4 (auth) | Stop. Tell the user to run `acli auth login` and re-invoke with `--push`. |
-| `jira-create-subtask.sh` exits 5 (upstream Jira error) | Stop. Surface the script's stderr verbatim. The render envelope is preserved for retry. |
+| `jira-find-qa-subtask.sh` exits 4 (auth) | Stop. Tell the user to run `acli auth login`. |
+| `jira-find-qa-subtask.sh` exits 5 | Surface the script's stderr (parent ticket missing, etc.). |
+| `jira-create-subtask.sh` / `jira-update-subtask.sh` exits 4 (auth) | Stop. Tell the user to run `acli auth login` and re-invoke. |
+| `jira-create-subtask.sh` / `jira-update-subtask.sh` exits 5 (upstream Jira error) | Stop. Surface the script's stderr verbatim. The render envelope is preserved for retry. |
+| `jira-update-subtask.sh` exits 1 with "expected issue type" | Target ticket isn't a QA. Either the user named the wrong key or the team's type changed. Stop and report. |
+| `jira-update-subtask.sh` exits 6 (non-template guard) | Confirm with the user; if they want to overwrite anyway, re-invoke with `--force`. |
