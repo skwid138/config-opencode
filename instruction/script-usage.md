@@ -33,6 +33,8 @@ Prefer calling these over reimplementing their logic in prompts.
 | Script | Purpose | Usage |
 |--------|---------|-------|
 | `~/code/wpromote/scripts/agent/gke-logs.sh` | Read GKE container logs for a Wpromote service (dev/test) | `gke-logs.sh <repo> <env> [--freshness 1h] [--container NAME] [--filter EXPR]` |
+| `~/code/wpromote/scripts/agent/jira-qa-render.sh` | Render a Jira QA-subtask description (ADF + plain text) from AC/source/steps/notes inputs, using the vendored team template | `jira-qa-render.sh --ac-file PATH --source URL --steps-file PATH [--notes-file PATH] [--no-scope] [--no-input] [--keep-helpers] [--format adf\|text\|both]` |
+| `~/code/wpromote/scripts/agent/jira-create-subtask.sh` | Create a Jira subtask via `acli` from a render envelope (or bare ADF doc). Pure mutation — pair with `jira-qa-render.sh` | `jira-create-subtask.sh --parent KEY --summary TEXT --description-file PATH [--type NAME] [--project KEY] [--dry-run]` |
 
 ## Library (`~/code/scripts/lib/`)
 

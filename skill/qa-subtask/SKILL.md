@@ -8,8 +8,8 @@ description: >-
   BIXB-XXXX", "what should QA test", "pare down my QA notes", or any request to
   produce QA test instructions for a ticket — even if they don't explicitly say
   "QA subtask." Output is a ready-to-paste subtask description matching the
-  team's existing format. Stays read-only; does not create or modify Jira
-  issues.
+  team's existing format. Defaults to read-only preview; pass `--push` to
+  create the subtask in Jira via the vendored render + create scripts.
 ---
 
 # QA Subtask Generator
@@ -53,6 +53,10 @@ Optional flags:
 | `--client <id>` | Suggested test client ID for SOURCE url |
 | `--samples <n>` | How many peer QA subtasks to sample for style (default: 5) |
 | `--pr <number>` | PR number for the implementation (otherwise auto-detect from branch) |
+| `--no-scope` | Drop the `SCOPE:` row from the output (passes through to renderer) |
+| `--no-input` | Drop the `INPUT DATA/EXPECTED OUTPUT` row from the output |
+| `--keep-helpers` | Keep the right-column italic helper text in each row (default is to drop it, matching peer corpus) |
+| `--push` | After generating, create the subtask in Jira via `jira-create-subtask.sh` instead of stopping at preview. Without this flag, the skill **previews and asks** before any mutation. |
 
 ### Resolving the SOURCE base URL
 
@@ -168,28 +172,38 @@ share the same feature area (e.g., other GP subtasks for a GP story).
 4. Identify the **route/page** the user must navigate to. Search the codebase
    for the relevant route definition rather than guessing.
 
-### Phase 4: Generate the QA description
+### Phase 4: Generate the QA description (render via script)
 
-Produce output matching the **observed peer style**, not a hardcoded template.
-The structure below is typical but adapt to the samples.
+The team's QA subtasks live in Jira as ADF tables (Atlassian Document Format),
+not plain text. Hand-rolling ADF in the model is brittle and lossy. Use the
+**vendored renderer**:
 
-**Standard skeleton (from peer corpus):**
-
+```bash
+~/code/wpromote/scripts/agent/jira-qa-render.sh \
+  --ac-file <path-to-ac.txt> \
+  --source <resolved-source-url> \
+  --steps-file <path-to-steps.txt> \
+  [--notes-file <path-to-notes.txt>] \
+  [--no-scope] [--no-input] [--keep-helpers] \
+  --format both
 ```
-ACCEPTANCE CRITERIA:
-<Verbatim or near-verbatim from parent ticket, numbered>
 
-SOURCE:
-<Direct URL into the test env on the suggested test client>
+The script returns a JSON envelope `{version:1, adf:{...}, text:"..."}`:
+- `.adf` is the ADF document Jira expects.
+- `.text` is a plain-text rendering you can show the user as a preview.
 
-TEST STEPS TO VERIFY:
-<One or more grouped tests. Use "Test 1 — <intent>" headers ONLY if peer
-samples use them. Otherwise flat numbered steps.>
+Inputs you produce as the model:
+- **AC content**: extract numbered AC verbatim from the parent (one per line).
+- **Steps content**: distilled per Phase 5 calibration (one step per line; the
+  renderer numbers them automatically).
+- **Notes content** (optional): 1–3 short bullets for gotchas/prerequisites.
+- **Source URL**: resolved per "Resolving the SOURCE base URL".
 
-ADDITIONAL NOTES/ATTACHMENTS:
-<Gotchas, prerequisites, side-effects, feature flag requirements, "this only
-applies if X" caveats. Keep to 1–3 bullets.>
-```
+Defaults match the peer corpus (BIXB-19719 shape): all 6 rows kept, helper
+italic column dropped. Pass `--no-scope --no-input` only if the parent ticket
+type or peer samples justify dropping those rows.
+
+Save the renderer's output to a temp file — the next phases read it.
 
 **Suggested QA subtask summary:**
 
@@ -216,17 +230,48 @@ Use this checklist before finalizing:
 - [ ] Feature-flag, permission, or test-data prerequisites are surfaced
 - [ ] Route URL in SOURCE is verified against codebase, not guessed
 
-### Phase 6: Output
+### Phase 6: Preview
 
-Print:
+Show the user:
 
 1. **Suggested subtask summary** (one line)
-2. **Description body** in a fenced code block, ready to paste
+2. **Plain-text preview** — the `.text` field from the renderer envelope, in
+   a fenced code block so the user can read the full structure
 3. **What changed from the user's draft** (if a draft was provided) — a short
    table mapping verbose → pared-down so the user can sanity-check the
    compression
+4. **Path to the saved render envelope** (e.g. `/tmp/qa-render-BIXB-XXXXX.json`)
+   so subsequent calls can re-use it
 
-Do **not** post to Jira. The user pastes the output themselves.
+### Phase 7: Push (gated)
+
+If `--push` was passed, create the subtask:
+
+```bash
+~/code/wpromote/scripts/agent/jira-create-subtask.sh \
+  --parent <PARENT-KEY> \
+  --summary "<suggested summary>" \
+  --description-file <render-envelope-path>
+```
+
+Returns `{version:1, ticket_id:"BIXB-XXXX", url:"https://..."}`. Surface the
+new key + URL to the user.
+
+If `--push` was **not** passed, stop after Phase 6. Do not call the create
+script. The user can either:
+- Paste the preview into Jira manually, or
+- Confirm and ask the skill to push, which then runs the create script.
+
+Before calling `jira-create-subtask.sh`, optionally dry-run first:
+
+```bash
+~/code/wpromote/scripts/agent/jira-create-subtask.sh \
+  --parent <PARENT-KEY> --summary "..." \
+  --description-file <envelope> --dry-run
+```
+
+This is useful when the skill is uncertain about the parent key, project, or
+issue type.
 
 ## Output format
 
@@ -235,7 +280,7 @@ Do **not** post to Jira. The user pastes the output themselves.
 
 **Summary:** `QA | <prefix> | <short title>`
 
-**Description:**
+**Preview** (from `jira-qa-render.sh --format both`):
 
 ```
 ACCEPTANCE CRITERIA:
@@ -246,11 +291,6 @@ SOURCE:
 https://<env>/client/<id>/<path>
 
 TEST STEPS TO VERIFY:
-Test 1 — <intent>
-1. ...
-2. ...
-
-Test 2 — <intent>
 1. ...
 2. ...
 
@@ -258,17 +298,28 @@ ADDITIONAL NOTES/ATTACHMENTS:
 - ...
 ```
 
+**Render envelope:** `/tmp/qa-render-<TICKET>.json` (contains both ADF + text)
+
 ### What changed from the draft (if applicable)
 
 | Original | Pared-down |
 |---|---|
 | ... | ... |
+
+### Next step
+
+Without `--push`: paste the preview into a new QA subtask in Jira manually,
+or re-invoke with `--push` to create it via `jira-create-subtask.sh`.
+
+With `--push`: subtask created at <url>.
 ````
 
 ## Guardrails
 
-- **Read-only.** Do not create, edit, transition, or comment on any Jira
-  issue. The user pastes the output themselves.
+- **Mutation is opt-in.** Without `--push`, the skill is read-only: it
+  produces a preview + render envelope and stops. The push step requires
+  explicit confirmation, either via the `--push` flag or a follow-up "yes,
+  push it" from the user.
 - **Never invent AC.** If the parent ticket's AC are missing or boilerplate,
   warn the user and stop. AC quality is a `jira-enhance` problem, not a QA
   generation problem.
@@ -283,6 +334,9 @@ ADDITIONAL NOTES/ATTACHMENTS:
 - **Surface side-effects, not feelings.** If the implementation changes
   something the AC doesn't mention (e.g. slider position scales), include it
   as a note. Subjective UX impressions are not pass/fail tests.
+- **Render through the script.** Do not hand-write ADF JSON in the model. The
+  vendored template + `jira-qa-render.sh` are the source of truth for
+  Jira-compatible output.
 
 ## Error handling
 
@@ -297,3 +351,6 @@ ADDITIONAL NOTES/ATTACHMENTS:
 | `gcp-project-map.sh --url` fails for the resolved component | Warn and leave a `<TODO: SOURCE>` placeholder. |
 | PR cannot be detected | Warn, generate from AC alone. Note the limitation. |
 | Codebase route lookup fails | Warn, leave SOURCE url placeholder for user to fill in. |
+| `jira-qa-render.sh` exits non-zero | Surface the script's stderr; do not attempt to hand-write ADF as a fallback. |
+| `jira-create-subtask.sh` exits 4 (auth) | Stop. Tell the user to run `acli auth login` and re-invoke with `--push`. |
+| `jira-create-subtask.sh` exits 5 (upstream Jira error) | Stop. Surface the script's stderr verbatim. The render envelope is preserved for retry. |
