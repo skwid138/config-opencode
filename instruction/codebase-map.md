@@ -103,6 +103,9 @@ Quick examples:
     gcp-project-map.sh --bq tst                  # BQ project for kraken/cube in tst
     gcp-project-map.sh --container tst polaris-api  # default container for polaris-api in tst
     gcp-project-map.sh --gke tst                 # cluster/project/region/namespace
+    gcp-project-map.sh --url tst polaris-api     # public URL (e.g. https://test.api.polaris.wpro.sh)
+    gcp-project-map.sh --env-code app test       # translate env codes (test → tst, nonprod → npd, etc.)
+    gcp-project-map.sh --support nonprod argocd  # ops/support URLs (argocd, grafana, cloudbeaver)
     gcp-project-map.sh --markdown                # render the full table block
 
 #### Critical gotchas (prose — kept inline because gotchas aren't data)
