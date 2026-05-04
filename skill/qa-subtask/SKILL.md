@@ -49,26 +49,25 @@ Optional flags:
 
 | Flag | Purpose |
 |------|---------|
-| `--env <code>` | Target env code: `dev` or `tst` (default: `tst`). Resolves to a real URL via `gcp-project-map.sh --url <env> <service>` based on the parent ticket's component (e.g. `tst` + `client-portal` → `https://test.polarisiq.wpro.sh`; `tst` + `polaris-web` → `https://test.polaris.wpro.sh`). |
+| `--env <code>` | Target env code: `dev` or `tst` (default: `tst`). Resolves to a real URL via `gcp-project-map.sh --url <env> <service>` based on the parent ticket's component. `prd` should not appear in QA subtasks. |
 | `--client <id>` | Suggested test client ID for SOURCE url |
 | `--samples <n>` | How many peer QA subtasks to sample for style (default: 5) |
 | `--pr <number>` | PR number for the implementation (otherwise auto-detect from branch) |
 
 ### Resolving the SOURCE base URL
 
-Do NOT hardcode hostnames. Pick the correct base URL by combining the parent
-ticket's Jira **Component** with the requested env code, then ask
-`gcp-project-map.sh` to resolve it:
+Do NOT hardcode hostnames. Pick the correct **service key** from the parent
+ticket's Jira **Component**, then resolve via `gcp-project-map.sh --url`
+(documented in the always-loaded codebase-map instructions):
 
-| Jira Component | Service key for `--url` | tst URL (verify with command) |
-|---|---|---|
-| Web App | `polaris-web` | `gcp-project-map.sh --url tst polaris-web` |
-| Client Portal | `client-portal` | `gcp-project-map.sh --url tst client-portal` |
-| API | `polaris-api` | `gcp-project-map.sh --url tst polaris-api` |
+| Jira Component | Service key |
+|---|---|
+| Web App | `polaris-web` |
+| Client Portal | `client-portal` |
+| API | `polaris-api` |
 
-If the ticket lacks a component or has multiple, ask the user which one the
-QA tester should target. `dev` is also valid; `prd` should not appear in QA
-subtasks.
+If the ticket has no component or has multiple, ask the user which one the
+QA tester should target before resolving the URL.
 
 ## Preflight
 
