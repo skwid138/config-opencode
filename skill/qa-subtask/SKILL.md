@@ -233,12 +233,20 @@ The script returns a JSON envelope `{version:1, adf:{...}, text:"..."}`:
 
 Inputs you produce as the model:
 - **AC content**: extract numbered AC verbatim from the parent (one per line).
-- **Steps content**: distilled per Phase 5 calibration (one step per line; the
-  renderer numbers them automatically).
+- **Steps content**: distilled per Phase 5 calibration. **Tests-mode grammar**:
+  - `# Test N — Header` — bold test header (one per logical test group)
+  - `- bullet` — top-level step within the current test
+  - `  - sub-bullet` — two-space-indented sub-step (e.g. KPI variants)
+  - blank line — ends the current test (renderer inserts a separator)
+
+  Steps files **must** contain at least one `# ` header; bullets before the
+  first header are rejected with exit 2. Group related verifications under
+  one test header rather than emitting one big flat list — this matches the
+  canonical BIXB-19749 corpus shape that the renderer emits.
 - **Notes content** (optional): 1–3 short bullets for gotchas/prerequisites.
 - **Source URL**: resolved per "Resolving the SOURCE base URL".
 
-Defaults match the peer corpus (BIXB-19719 shape): all 6 rows kept, helper
+Defaults match the canonical BIXB-19749 corpus shape: all 6 rows kept, helper
 italic column dropped. Pass `--no-scope --no-input` only if the parent ticket
 type or peer samples justify dropping those rows.
 
@@ -358,8 +366,13 @@ SOURCE:
 https://<env>/client/<id>/<path>
 
 TEST STEPS TO VERIFY:
-1. ...
-2. ...
+Test 1 — <header>
+- ...
+- ...
+  - <sub-bullet>
+
+Test 2 — <header>
+- ...
 
 ADDITIONAL NOTES/ATTACHMENTS:
 - ...
