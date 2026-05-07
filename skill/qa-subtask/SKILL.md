@@ -57,7 +57,7 @@ Optional flags:
 
 | Flag | Purpose |
 |------|---------|
-| `--env <code>` | Target env code: `dev` or `tst` (default: `tst`). Resolves to a real URL via `gcp-project-map.sh --url <env> <service>` based on the parent ticket's component. `prd` should not appear in QA subtasks. |
+| `--env <code>` | Target env code: `dev` or `tst` (default: `tst`). Resolves to a real URL via `~/code/wpromote/scripts/agent/gcp-project-map.sh --url <env> <service>` based on the parent ticket's component. `prd` should not appear in QA subtasks. |
 | `--client <id>` | Suggested test client ID for SOURCE url |
 | `--samples <n>` | How many peer QA subtasks to sample for style (default: 5) |
 | `--pr <number>` | PR number for the implementation (otherwise auto-detect from branch) |
@@ -72,8 +72,11 @@ Optional flags:
 ### Resolving the SOURCE base URL
 
 Do NOT hardcode hostnames. Pick the correct **service key** from the parent
-ticket's Jira **Component**, then resolve via `gcp-project-map.sh --url`
-(documented in the always-loaded codebase-map instructions):
+ticket's Jira **Component**, then resolve via
+`~/code/wpromote/scripts/agent/gcp-project-map.sh --url <env> <service>`.
+The other QA helper scripts (`jira-find-qa-subtask.sh`, `jira-qa-render.sh`,
+`jira-update-subtask.sh`, `jira-create-subtask.sh`) live in the same
+`~/code/wpromote/scripts/agent/` directory.
 
 | Jira Component | Service key |
 |---|---|
@@ -242,13 +245,14 @@ Inputs you produce as the model:
   Steps files **must** contain at least one `# ` header; bullets before the
   first header are rejected with exit 2. Group related verifications under
   one test header rather than emitting one big flat list — this matches the
-  canonical BIXB-19749 corpus shape that the renderer emits.
+  test-grouping pattern in BIXB-19749 that tests-mode is designed to render.
 - **Notes content** (optional): 1–3 short bullets for gotchas/prerequisites.
 - **Source URL**: resolved per "Resolving the SOURCE base URL".
 
-Defaults match the canonical BIXB-19749 corpus shape: all 6 rows kept, helper
-italic column dropped. Pass `--no-scope --no-input` only if the parent ticket
-type or peer samples justify dropping those rows.
+Defaults preserve all 6 rows (SCOPE, ACCEPTANCE CRITERIA, SOURCE, INPUT DATA,
+TEST STEPS, ADDITIONAL NOTES) with the helper italic column dropped. To match
+the BIXB-19749 4-row shape (the most common shape for filled-in web-app QA
+subtasks), pass `--no-scope --no-input`.
 
 Save the renderer's output to a temp file — the next phases read it.
 
