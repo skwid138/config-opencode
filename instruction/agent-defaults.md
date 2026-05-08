@@ -44,3 +44,17 @@ Detection precedence:
 3. Otherwise, prefer `grill-me`.
 
 The skills' descriptions trigger on overlapping vocabulary; this instruction is the tiebreaker.
+
+## Bug investigation
+
+When the user reports a bug, regression, or unexpected behavior — "X is broken," "this throws," "Y started failing," "performance got worse," "diagnose this," "debug this" — prefer the `diagnose` skill. It enforces a disciplined loop (build feedback signal → reproduce → hypothesise → instrument → propose fix + regression test → hand off) instead of letting the agent dive straight into code-poking.
+
+The skill is read-only investigation: it produces a diagnosis package and a recommended fix, but does not apply the fix. Implementation hands off to the user or to a write-capable agent.
+
+For *proactive* bug-finding ("audit this for bugs," "find runtime errors," "check for null safety") prefer the `bug-hunter` skill instead — it's a defensive scan, not a reactive debugging loop.
+
+Detection precedence:
+1. Explicit user invocation always wins.
+2. If the user reports a specific bug or regression to investigate, prefer `diagnose`.
+3. If the user wants proactive defensive scanning, prefer `bug-hunter`.
+4. If the request is ambiguous between the two, ask which posture they want.
