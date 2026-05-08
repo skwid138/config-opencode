@@ -35,7 +35,6 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orch
 ├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
 │   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.json
 ├── plugins/                     # Local TypeScript plugins
-│   ├── orchestration.ts         # Task tracking + runtime commands
 │   └── vision-tool.ts           # Large-image / PDF / video vision via Gemini
 └── logs/                        # DCP debug logs (gitignored)
 ```
@@ -87,15 +86,6 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 |---------|-----------|-------------|
 | `/update-opencode-deps` | `~/code/scripts/agent/opencode-deps-check.sh` | Audit and update OpenCode config dependencies (`package.json`, `opencode.json` plugins, MCP package refs) |
 
-### Orchestration runtime (provided by `plugins/orchestration.ts`)
-| Command | What it does |
-|---------|-------------|
-| `/tasks` | List active/recent subagent tasks |
-| `/task <id>` | Show one task record |
-| `/diagnostics` | Orchestration health check |
-| `/continue` | Sustained orchestration loop |
-| `/stop` | Halt loop and queued work |
-
 ### Dynamic Context Pruning (provided by `@tarquinen/opencode-dcp`)
 | Command | What it does |
 |---------|-------------|
@@ -137,14 +127,7 @@ Verify registration after edits with `opencode mcp list`.
 
 ## Plugins
 
-Three plugins are loaded — two local TypeScript files and one npm package.
-
-### `plugins/orchestration.ts` (local)
-Lightweight task tracking and timeout enforcement for subagent work. Provides the `/tasks`, `/task`, `/diagnostics`, `/continue`, `/stop` runtime commands. Configuration is inline in the file:
-- `TASK_TIMEOUT_MS = 180_000` (3 minutes per subagent task)
-- `MAX_TRACKED_TASKS = 50` (in-memory ring buffer)
-
-This is a stripped-down replacement for the old Wpromote orchestration plugin — intentionally omits tmux integration, persistent storage, provider fallback, and notification buffering. Add back as needed.
+Two plugins are loaded — one local TypeScript file and one npm package.
 
 ### `plugins/vision-tool.ts` (local)
 Exposes a `vision` tool that bypasses Claude's 8000px image limit by routing files to a Gemini agent. Supports JPEG/PNG/GIF/WebP/HEIC/BMP, PDFs, MP4/MOV/AVI/WebM, and WAV/MP3/OGG. Use it instead of `read` for any media file.
