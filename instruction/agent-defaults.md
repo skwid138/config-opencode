@@ -31,3 +31,16 @@ In short: even outside strict TDD, the principles in the `tdd` skill define what
 ### When in doubt
 
 If it is unclear whether a change is "executable code" (e.g. a config file with embedded logic, a build script, a migration), default to writing tests. The cost of an unnecessary test is small; the cost of an untested regression is large.
+
+## Planning conversations
+
+When the user wants to stress-test a plan, pressure-test an idea, or "make sure we're on the same page," prefer the `grill-me` skill (relentless one-question-at-a-time grilling, terminology disambiguation, search-before-ask).
+
+If the project being discussed has a `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/` directory — or if the user explicitly invokes documentation (e.g. "stress-test against the glossary," "update CONTEXT.md") — prefer the `grill-with-docs` skill instead. It applies the same grilling discipline plus persists resolved terminology to `CONTEXT.md` and architecture decisions to `docs/adr/`.
+
+Detection precedence:
+1. Explicit user invocation always wins.
+2. Otherwise, check the project root for `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/`. If any exists, prefer `grill-with-docs`.
+3. Otherwise, prefer `grill-me`.
+
+The skills' descriptions trigger on overlapping vocabulary; this instruction is the tiebreaker.
