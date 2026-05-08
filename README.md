@@ -30,8 +30,8 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orch
 │   ├── github-review-analyzer/, jira-enhance/, jira-ticket/, pr-review/
 │   ├── sonarcloud/, tdd/, ticket-plan/
 ├── instruction/                 # Auto-loaded into every agent's context
-│   ├── repo-context.md, codebase-map.md, orchestration-runtime.md
-│   ├── script-usage.md
+│   ├── repo-context.md, codebase-map.md, script-usage.md
+│   ├── agent-defaults.md
 ├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
 │   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.json
 ├── plugins/                     # Local TypeScript plugins
@@ -186,8 +186,8 @@ Tuned for GitHub Copilot's ~128K effective context (defaults assume 200K+):
 |------|-----------------|
 | `repo-context.md` | "Read the project's `AGENTS.md` and `.agents/skills/` if present" — silently no-ops when absent |
 | `codebase-map.md` | Wpromote repo topology incl. local dev URLs (`polaris.local`, `polarisiq.local`, `api.polaris.local`): `polaris-web`, `client-portal`, `polaris-api`, `cube`, `kraken`, `polaris-apps`, `wp-sdk`. Frontend → API → Cube/Kraken/BigQuery dependency map and Jira component → repo mapping |
-| `orchestration-runtime.md` | `/continue`/`/stop` semantics, delegation discipline, long-running command policy (Stryker, full test suites) |
 | `script-usage.md` | Reference for `~/code/scripts/` utilities — `agent/` (`branch-to-ticket.sh`, `gh-current-pr.sh`, `gh-pr-comments.sh`, `sonar-pr-issues.sh`, `jira-fetch-ticket.sh`) and `lib/` helpers |
+| `agent-defaults.md` | Standing engineering defaults — TDD posture, planning conversation routing, bug investigation routing, architecture review routing, long-running command discipline (Stryker, full test suites, broad scans) |
 
 ## Configuration Choices
 

@@ -16,7 +16,6 @@
     "instructions": [
         "instruction/repo-context.md",
         "instruction/codebase-map.md",
-        "instruction/orchestration-runtime.md",
         "instruction/script-usage.md",
         "instruction/agent-defaults.md"
     ],

@@ -44,12 +44,6 @@ Task and progress discipline:
 - Emit concise milestone updates with concrete details.
 - Track completions continuously, do not batch status changes.
 
-Runtime controls:
-
-- Use `/continue` for sustained orchestration loops.
-- Use `/stop` to halt loop and queued orchestration work.
-- Run `/diagnostics` when runtime health, delegation, or task tracking appears unhealthy.
-
 Constraints:
 
 - Avoid speculative over-engineering.
