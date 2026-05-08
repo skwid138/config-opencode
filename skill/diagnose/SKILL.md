@@ -20,7 +20,7 @@ When exploring the codebase, use the project's domain glossary (CONTEXT.md if pr
 
 ## Long-running command discipline
 
-Diagnosis tempts you to "just run everything" — the full test suite, broad fuzz loops, full profilers, mutation testing, recursive scans. Don't. Per `instruction/orchestration-runtime.md`, before running any expensive command:
+Diagnosis tempts you to "just run everything" — the full test suite, broad fuzz loops, full profilers, mutation testing, recursive scans. Don't. Per the **Long-running command discipline** section in `instruction/agent-defaults.md`, before running any expensive command:
 
 1. **Explain what would run** and what signal it would produce.
 2. **Show the exact command.**
