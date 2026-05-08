@@ -15,7 +15,6 @@
     },
     "instructions": [
         "instruction/repo-context.md",
-        "instruction/codebase-map.md",
         "instruction/script-usage.md",
         "instruction/agent-defaults.md"
     ],

@@ -1,7 +1,11 @@
 # Available Scripts
 
-Shell scripts in `~/code/scripts/` (public) and `~/code/wpromote/scripts/` (Wpromote-internal) provide deterministic, tested operations.
+Shell scripts in `~/code/scripts/` provide deterministic, tested operations.
 Prefer calling these over reimplementing their logic in prompts.
+
+When working under `~/code/wpromote/`, additional Wpromote-internal scripts
+under `~/code/wpromote/scripts/` are documented in `wpromote-context.md`,
+which is loaded conditionally by the OpenCode launcher wrapper.
 
 ## Layout
 
@@ -9,7 +13,6 @@ Prefer calling these over reimplementing their logic in prompts.
 - **`~/code/scripts/lib/`** — sourced helpers shared by agent/ and shell/ scripts.
 - **`~/code/scripts/shell/`** — interactive-shell setup, sourced via the three-barrel init: `init_env.zsh` from `.zshenv`, `init_profile.zsh` from `.zprofile`, `init_rc.zsh` from `.zshrc`. Not directly invoked.
 - **`~/code/scripts/personal/`** — personal utilities not used by opencode.
-- **`~/code/wpromote/scripts/`** — Wpromote-internal (cluster names, project IDs, etc.).
 
 ## Utilities (`agent/`)
 
@@ -27,16 +30,6 @@ Prefer calling these over reimplementing their logic in prompts.
 | `~/code/scripts/agent/sonar-pr-issues.sh` | Fetch SonarCloud issues as JSON | `sonar-pr-issues.sh [--severity LEVEL] [PR_NUMBER]` |
 | `~/code/scripts/agent/jira-fetch-ticket.sh` | Fetch Jira ticket data as JSON | `jira-fetch-ticket.sh [--all] TICKET-ID` |
 | `~/code/scripts/agent/opencode-deps-check.sh` | Check OpenCode config deps (`package.json` + `opencode.json`) for outdated/unpinned versions | `opencode-deps-check.sh [--human\|--json]` |
-
-## Wpromote-internal (`~/code/wpromote/scripts/`)
-
-| Script | Purpose | Usage |
-|--------|---------|-------|
-| `~/code/wpromote/scripts/agent/gke-logs.sh` | Read GKE container logs for a Wpromote service (dev/test) | `gke-logs.sh <repo> <env> [--freshness 1h] [--container NAME] [--filter EXPR]` |
-| `~/code/wpromote/scripts/agent/jira-qa-render.sh` | Render a Jira QA-subtask description (ADF + plain text) from AC/source/steps/notes inputs, using the vendored team template | `jira-qa-render.sh --ac-file PATH --source URL --steps-file PATH [--notes-file PATH] [--no-scope] [--no-input] [--keep-helpers] [--format adf\|text\|both]` |
-| `~/code/wpromote/scripts/agent/jira-create-subtask.sh` | Create a Jira subtask via `acli` from a render envelope (or bare ADF doc). Pure mutation — pair with `jira-qa-render.sh` | `jira-create-subtask.sh --parent KEY --summary TEXT --description-file PATH [--type NAME] [--project KEY] [--dry-run]` |
-| `~/code/wpromote/scripts/agent/jira-find-qa-subtask.sh` | List QA child subtasks of a parent story; flags each with `is_template:bool` (auto-template default state vs. human-filled) | `jira-find-qa-subtask.sh --parent KEY [--type NAME] [--skip-template-check]` |
-| `~/code/wpromote/scripts/agent/jira-update-subtask.sh` | Update an existing QA subtask's description (and optionally summary) via `acli edit --from-json`. Refuses non-template descriptions without `--force` (exit 6). Pair with `jira-qa-render.sh` | `jira-update-subtask.sh --ticket KEY --description-file PATH [--summary TEXT] [--type NAME] [--force] [--dry-run]` |
 
 ## Library (`~/code/scripts/lib/`)
 

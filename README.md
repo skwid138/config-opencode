@@ -30,8 +30,12 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orch
 │   ├── github-review-analyzer/, jira-enhance/, jira-ticket/, pr-review/
 │   ├── sonarcloud/, tdd/, ticket-plan/
 ├── instruction/                 # Auto-loaded into every agent's context
-│   ├── repo-context.md, codebase-map.md, script-usage.md
+│   ├── repo-context.md, script-usage.md
 │   ├── agent-defaults.md
+│   ├── wpromote-context.md      # Loaded CONDITIONALLY by bin/opencode wrapper (only when $PWD is under ~/code/wpromote/)
+├── bin/                         # Launcher infrastructure
+│   ├── opencode -> ~/code/scripts/personal/opencode-wrapper.sh  # symlink, intercepts `opencode` via PATH
+│   └── install-wrapper.sh       # idempotent bootstrap for the symlink
 ├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
 │   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.json
 ├── plugins/                     # Local TypeScript plugins
@@ -165,12 +169,47 @@ Tuned for GitHub Copilot's ~128K effective context (defaults assume 200K+):
 
 ## Instructions (auto-loaded into every agent)
 
-| File | What it injects |
-|------|-----------------|
-| `repo-context.md` | "Read the project's `AGENTS.md` and `.agents/skills/` if present" — silently no-ops when absent |
-| `codebase-map.md` | Wpromote repo topology incl. local dev URLs (`polaris.local`, `polarisiq.local`, `api.polaris.local`): `polaris-web`, `client-portal`, `polaris-api`, `cube`, `kraken`, `polaris-apps`, `wp-sdk`. Frontend → API → Cube/Kraken/BigQuery dependency map and Jira component → repo mapping |
-| `script-usage.md` | Reference for `~/code/scripts/` utilities — `agent/` (`branch-to-ticket.sh`, `gh-current-pr.sh`, `gh-pr-comments.sh`, `sonar-pr-issues.sh`, `jira-fetch-ticket.sh`) and `lib/` helpers |
-| `agent-defaults.md` | Standing engineering defaults — TDD posture, planning conversation routing, bug investigation routing, architecture review routing, long-running command discipline (Stryker, full test suites, broad scans) |
+`opencode.json` lists the global, always-on instruction files. `wpromote-context.md` is **not** in that list — it's injected by the launcher wrapper at `bin/opencode` only when `$PWD` is under `~/code/wpromote/` (see "Conditional Wpromote Context" below).
+
+| File | Loaded | What it injects |
+|------|--------|-----------------|
+| `repo-context.md` | always | "Read the project's `AGENTS.md` and `.agents/skills/` if present" — silently no-ops when absent |
+| `script-usage.md` | always | Reference for `~/code/scripts/` utilities — `agent/` (`branch-to-ticket.sh`, `gh-current-pr.sh`, `gh-pr-comments.sh`, `sonar-pr-issues.sh`, `jira-fetch-ticket.sh`) and `lib/` helpers. Mentions that wpromote-internal scripts are documented separately |
+| `agent-defaults.md` | always | Standing engineering defaults — TDD posture, planning conversation routing, bug investigation routing, architecture review routing, long-running command discipline (Stryker, full test suites, broad scans) |
+| `wpromote-context.md` | conditional (under `~/code/wpromote/`) | Wpromote repo topology incl. local dev URLs (`polaris.local`, `polarisiq.local`, `api.polaris.local`): `polaris-web`, `client-portal`, `polaris-api`, `cube`, `kraken`, `polaris-apps`, `wp-sdk`. Frontend → API → Cube/Kraken/BigQuery dependency map, Jira component → repo mapping, GCP/GKE gotchas, and the `~/code/wpromote/scripts/agent/` script catalog |
+
+## Conditional Wpromote Context (launcher)
+
+OpenCode has no native `if cwd contains X then load Y` mechanism for instruction files — the agent's directive file list is fixed at session start. To load wpromote-specific context **only inside wpromote work**, this config uses a launcher wrapper that intercepts the `opencode` binary via `PATH` and conditionally injects the file via the documented `OPENCODE_CONFIG_CONTENT` env var.
+
+**Components:**
+
+- **`bin/opencode`** — symlink to `~/code/scripts/personal/opencode-wrapper.sh`. The shell scripts repo prepends `$HOME/.config/opencode/bin` to `PATH` (in `shell/env/paths.zsh`), so a bare `opencode` invocation hits the wrapper before the real binary at `/opt/homebrew/bin/opencode`. The wrapper itself is the source of truth (lives in `~/code/scripts/personal/`) so it's audited by `scripts-doctor`, has bats coverage (`tests/opencode-wrapper.bats`), and follows the standard script conventions (`-h`/`--help`, `set -uo pipefail`, sources `lib/common.sh`).
+- **`bin/install-wrapper.sh`** — idempotent bootstrap. Creates the `bin/opencode` symlink (or repairs it on drift). Run once per machine; rerun if `scripts-doctor` reports the symlink is missing or drifted.
+  - `--check` exits 0 (healthy) / 1 (drift or missing) for CI / health-check use.
+  - `--force` overwrites a regular file at the symlink path; refuses to overwrite a directory.
+- **`scripts-doctor` integration** — audits that `bin/opencode` is a symlink resolving to `personal/opencode-wrapper.sh` in the scripts repo. Surfaces `missing — run install-wrapper.sh` if the bootstrap hasn't been run.
+
+**Behavior:**
+
+The wrapper inspects `$PWD` and, when it's under `~/code/wpromote/`, sets `OPENCODE_CONFIG_CONTENT` to a JSON document that adds `instruction/wpromote-context.md` to the instruction list, then `exec`s the real `opencode` with the same argv. Outside the wpromote tree, it `exec`s through unmodified — zero overhead, no injection.
+
+Carve-outs:
+- **`opencode web` and `opencode attach`** pass through unmodified. `web` freezes config at boot (already-running daemon), and `attach` is a TUI client that doesn't need the conditional context.
+- **`--help`** is handled by the wrapper itself (not passed through), to satisfy `scripts-doctor`'s `--help` audit and prevent wrapper-vs-binary recursion edge cases.
+- **`--no-conditional`** is a manual escape hatch that bypasses injection regardless of `$PWD`.
+
+Verbose mode: `OPENCODE_WRAPPER_VERBOSE=1` prints a one-line stderr notice when injection happens. Off by default to keep `opencode` invocations quiet.
+
+**Bootstrap on a fresh box:**
+
+```bash
+~/.config/opencode/bin/install-wrapper.sh
+which opencode    # should resolve to ~/.config/opencode/bin/opencode
+~/code/scripts/agent/scripts-doctor.sh | grep wrapper  # should be ✓
+```
+
+If `which opencode` resolves to `/opt/homebrew/bin/opencode` instead, `~/.config/opencode/bin` isn't on `PATH` ahead of Homebrew. The shell scripts repo's `shell/env/paths.zsh` handles this via `_path_prepend "$HOME/.config/opencode/bin"`; ensure the env-tier init (`init_env.zsh` from `.zshenv`) is wired up.
 
 ## Configuration Choices
 

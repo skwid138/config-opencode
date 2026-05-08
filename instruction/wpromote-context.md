@@ -1,3 +1,11 @@
+# Wpromote-Specific Context
+
+> This file is loaded **conditionally** by the OpenCode launcher wrapper
+> (`~/code/scripts/personal/opencode-wrapper.sh`) only when `$PWD` is under
+> `~/code/wpromote/`. Outside the wpromote tree, only the global instructions
+> (`agent-defaults.md`, `repo-context.md`, `script-usage.md`) load. The
+> mechanism is documented in `~/.config/opencode/README.md`.
+
 ## Wpromote Codebase Topology
 
 All Wpromote repositories live under `~/code/wpromote/`. When working on a task that spans multiple repos, use this map to understand dependencies and coordinate changes.
@@ -153,3 +161,15 @@ Same names across all kraken BQ projects:
 | `kraken_metadata` | `polaris_dimensions`, `polaris_attributes`, `polaris_clients`, `polaris_platforms`, `taxonomy_dimension_list` |
 | `all_clients` | `polaris_<platform>__ad_level`, `polaris_<platform>__ad_level_datahub` (views), `datahub_with_preagg*` (views) |
 | `cube_pre_aggregations_<env>` | Cube preaggregation cache tables (per-env in the same project) |
+
+## Wpromote-internal Scripts (`~/code/wpromote/scripts/`)
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `~/code/wpromote/scripts/agent/gke-logs.sh` | Read GKE container logs for a Wpromote service (dev/test) | `gke-logs.sh <repo> <env> [--freshness 1h] [--container NAME] [--filter EXPR]` |
+| `~/code/wpromote/scripts/agent/jira-qa-render.sh` | Render a Jira QA-subtask description (ADF + plain text) from AC/source/steps/notes inputs, using the vendored team template | `jira-qa-render.sh --ac-file PATH --source URL --steps-file PATH [--notes-file PATH] [--no-scope] [--no-input] [--keep-helpers] [--format adf\|text\|both]` |
+| `~/code/wpromote/scripts/agent/jira-create-subtask.sh` | Create a Jira subtask via `acli` from a render envelope (or bare ADF doc). Pure mutation — pair with `jira-qa-render.sh` | `jira-create-subtask.sh --parent KEY --summary TEXT --description-file PATH [--type NAME] [--project KEY] [--dry-run]` |
+| `~/code/wpromote/scripts/agent/jira-find-qa-subtask.sh` | List QA child subtasks of a parent story; flags each with `is_template:bool` (auto-template default state vs. human-filled) | `jira-find-qa-subtask.sh --parent KEY [--type NAME] [--skip-template-check]` |
+| `~/code/wpromote/scripts/agent/jira-update-subtask.sh` | Update an existing QA subtask's description (and optionally summary) via `acli edit --from-json`. Refuses non-template descriptions without `--force` (exit 6). Pair with `jira-qa-render.sh` | `jira-update-subtask.sh --ticket KEY --description-file PATH [--summary TEXT] [--type NAME] [--force] [--dry-run]` |
+
+Wpromote-internal scripts follow the same conventions as the public scripts (see `script-usage.md`): `-h`/`--help`, exit codes, JSON-on-stdout for data scripts, no remote mutation, dependency self-checks. New scripts that encode Wpromote infrastructure inventory (cluster names, project IDs, internal endpoints) belong in the private repo; otherwise they go in public `~/code/scripts/agent/`.
