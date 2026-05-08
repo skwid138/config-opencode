@@ -17,7 +17,8 @@
         "instruction/repo-context.md",
         "instruction/codebase-map.md",
         "instruction/orchestration-runtime.md",
-        "instruction/script-usage.md"
+        "instruction/script-usage.md",
+        "instruction/agent-defaults.md"
     ],
     "permission": {
         "external_directory": {
