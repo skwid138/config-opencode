@@ -190,6 +190,8 @@ OpenCode has no native `if cwd contains X then load Y` mechanism for instruction
   - `--force` overwrites a regular file at the symlink path; refuses to overwrite a directory.
 - **`scripts-doctor` integration** — audits that `bin/opencode` is a symlink resolving to `personal/opencode-wrapper.sh` in the scripts repo. Surfaces `missing — run install-wrapper.sh` if the bootstrap hasn't been run.
 
+> Note: `bin/opencode` will appear as **untracked** in `git status` after running `install-wrapper.sh`. This is expected — it's a per-machine symlink (the target is an absolute path on this machine), not a tracked artifact. If it ever shows up as a regular file rather than a symlink, re-run `install-wrapper.sh` to repair.
+
 **Behavior:**
 
 The wrapper inspects `$PWD` and, when it's under `~/code/wpromote/`, sets `OPENCODE_CONFIG_CONTENT` to a JSON document that adds `instruction/wpromote-context.md` to the instruction list, then `exec`s the real `opencode` with the same argv. Outside the wpromote tree, it `exec`s through unmodified — zero overhead, no injection.
