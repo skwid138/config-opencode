@@ -22,6 +22,11 @@
         "external_directory": {
             "/Users/hunter/code/wpromote/*": "allow",
             "/Users/hunter/code/scripts/*": "allow"
+        },
+        "edit": "ask",
+        "write": "ask",
+        "bash": {
+            "*": "ask"
         }
     },
     "plugin": [

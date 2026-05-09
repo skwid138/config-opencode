@@ -18,8 +18,8 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orch
 │   ├── legolas.md               # Codebase exploration subagent
 │   ├── radagast.md              # External docs/OSS research subagent (GPT-5.5)
 │   ├── treebeard.md             # Read-only planner/reviewer subagent
-│   ├── celebrimbor.md           # Implementation subagent
-│   └── elrond.md                # Architecture/tradeoff advisor subagent
+│   ├── aragorn.md               # Implementation subagent (sole writer)
+│   └── saruman.md               # Adversarial plan reviewer subagent
 ├── command/                     # Slash commands that drive skills
 │   ├── ticket.md, plan.md, ac-quality.md, impl-plan.md
 │   ├── review.md, check-ac.md, review-plan.md, sonar.md
@@ -53,12 +53,12 @@ All agents are defined locally under `agent/`. The default OpenCode `build` and 
 | **legolas** | subagent | claude-opus-4.7 | Codebase exploration & call-path discovery |
 | **radagast** | subagent | **gpt-5.5 (xhigh reasoning)** | External docs / OSS research |
 | **treebeard** | subagent | claude-opus-4.7 | Pre-planning, plan review, read-only analysis |
-| **celebrimbor** | subagent | claude-opus-4.7 | Autonomous end-to-end implementation |
-| **elrond** | subagent | claude-opus-4.7 | Architecture & tradeoff consultation |
+| **aragorn** | subagent | claude-opus-4.7 | Autonomous end-to-end implementation; the only writer in the roster |
+| **saruman** | subagent | claude-opus-4.7 | Adversarial plan review; mandatory before any aragorn dispatch |
 
 **Why Radagast uses a different model:** GPT-5.5 with xhigh reasoning effort has been stronger in practice for web research and synthesizing external docs across many fetched pages. Every other agent stays on Claude Opus 4.7 for code-centric reasoning consistency. This is the only intentional model split — revisit if/when a Claude release closes the research-quality gap.
 
-**Treebeard is locked down:** `permission` denies `write` and `edit`, and bash is `ask` by default with only `git diff`, `git log`, and `grep` whitelisted. He's the safety-rails agent — never runs anything destructive.
+**All read-only agents are locked down:** every agent except Aragorn has an explicit `permission` block denying `write` and `edit`, with bash restricted to a read-only allowlist. Aragorn is the sole writer. The global posture (in `opencode.json`) is `ask`-by-default with a small denylist for catastrophic operations (`rm -rf /*`, `sudo *`, `git push --force*`).
 
 ## Commands
 
@@ -217,7 +217,7 @@ If `which opencode` resolves to `/opt/homebrew/bin/opencode` instead, `~/.config
 
 **Default model:** `github-copilot/claude-opus-4.7`. No auto-update — run `opencode models` and edit `opencode.json` when a newer Opus ships.
 
-**Hidden built-in agents:** `build` and `plan` are hidden via `opencode.json`. The LOTR roster covers their roles (celebrimbor for build, treebeard for plan).
+**Hidden built-in agents:** `build` and `plan` are hidden via `opencode.json`. The LOTR roster covers their roles (aragorn for build, treebeard for plan).
 
 **External directory permissions:** `opencode.json` allowlists `~/code/wpromote/*` and `~/code/scripts/*` so agents can operate across all team repos and the shared scripts dir without per-call prompts.
 

@@ -33,7 +33,7 @@ Tell the user you intend to spawn 3+ parallel exploration tasks via the Task too
 
 - The number of sub-agents (typically 3, optionally 4).
 - The per-agent design constraint (see suggested matrix below).
-- The choice of subagent — `elrond` for tradeoff-heavy interface design, `legolas` if the brief is heavily exploration-of-existing-shape rather than design.
+- The choice of subagent — `legolas` if the brief is heavily exploration-of-existing-shape; otherwise present the design brief directly.
 
 Wait for the user to confirm before dispatching.
 

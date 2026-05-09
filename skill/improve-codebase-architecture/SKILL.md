@@ -8,14 +8,14 @@ description: >-
   modules, identify deepening candidates, or decide where to invest
   architectural effort. NOT for local refactors (one function, one file).
   This skill investigates and proposes; it does not execute refactors —
-  it hands off to celebrimbor or the user for implementation.
+  it hands off to aragorn or the user for implementation.
 ---
 
 # Improve Codebase Architecture
 
 Surface architectural friction and propose **deepening opportunities** — refactors that turn shallow modules into deep ones. The aim is testability and locality.
 
-**This skill is read-only investigation.** You explore, propose deepening candidates, optionally drop into a grilling loop on a chosen candidate, and optionally explore alternative interface designs. You **do not** execute the refactor. The output is a proposal package handed off to the user or to celebrimbor (via the Task tool with `celebrimbor` as the subagent) for implementation.
+**This skill is read-only investigation.** You explore, propose deepening candidates, optionally drop into a grilling loop on a chosen candidate, and optionally explore alternative interface designs. You **do not** execute the refactor. The output is a proposal package handed off to the user or to aragorn (via the Task tool with `aragorn` as the subagent) for implementation.
 
 When exploring the codebase, use the project's domain glossary (`CONTEXT.md` if present) to get a clear mental model of relevant modules, and read ADRs in any area you're touching.
 
@@ -95,7 +95,7 @@ Present a numbered list of deepening opportunities. For each candidate:
 
 **ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly (e.g. _"contradicts ADR-0007 — but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
 
-For tradeoff-heavy candidates where the right deepening is non-obvious, consider consulting the **`elrond`** agent via the Task tool with the candidate brief. Elrond is the architecture/tradeoff advisor — useful for second-opinion sanity checks before presenting to the user.
+For tradeoff-heavy candidates where the right deepening is non-obvious, surface the tradeoffs explicitly in the candidate brief and let the user decide.
 
 Do NOT propose interfaces yet. Ask the user: *"Which of these would you like to explore?"*
 
@@ -123,7 +123,7 @@ When the user is ready to implement, produce a deepening package:
 - **Risks.** What could break; what to verify after.
 - **ADRs.** Any new ADRs the user agreed to during the grilling loop.
 
-Hand the package to the user, or to celebrimbor via the Task tool with the package as the prompt. **Do not execute the refactor in this skill.**
+Hand the package to the user, or to aragorn via the Task tool with the package as the prompt. **Do not execute the refactor in this skill.**
 
 ## Behavioral rules
 

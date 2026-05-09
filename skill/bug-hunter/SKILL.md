@@ -335,11 +335,11 @@ explicitly requests.
 ### PR creation (`--emit pr-plan`)
 - Generate a commit plan with files to modify and changes to make
 - Does NOT create the PR — outputs the plan for review
-- User can then ask celebrimbor to implement
+- User can then ask aragorn to implement
 
 ### Fix mode (`/bug-hunt-fix`)
 - Separate command that takes bug-hunt findings and applies fixes
-- Delegates to celebrimbor for implementation
+- Delegates to aragorn for implementation
 - Runs tests after each fix to verify no regressions
 
 ---

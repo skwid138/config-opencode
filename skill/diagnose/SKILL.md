@@ -14,7 +14,7 @@ description: >-
 
 A discipline for hard bugs. Skip phases only when explicitly justified.
 
-**This skill is read-only investigation.** You build a feedback loop, reproduce the bug, generate hypotheses, instrument, and arrive at a diagnosis with a recommended fix and a regression-test design. You **do not** apply the fix, restart services, mutate config, or modify production code beyond the bounded carve-out in Phase 5. When the diagnosis is complete, hand off — to the user, to celebrimbor (via the Task tool), or to whichever agent owns implementation.
+**This skill is read-only investigation.** You build a feedback loop, reproduce the bug, generate hypotheses, instrument, and arrive at a diagnosis with a recommended fix and a regression-test design. You **do not** apply the fix, restart services, mutate config, or modify production code beyond the bounded carve-out in Phase 5. When the diagnosis is complete, hand off — to the user, to aragorn (via the Task tool), or to whichever agent owns implementation.
 
 When exploring the codebase, use the project's domain glossary (CONTEXT.md if present) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
@@ -117,7 +117,7 @@ Produce a diagnosis package containing:
 - **Risks of the fix.** What it might break, what to verify after.
 - **Follow-ups.** Architectural concerns surfaced (Phase 6 candidates), missing test coverage, related code smells.
 
-Hand the package to the user, to celebrimbor (via the Task tool, with the package as the prompt), or to whichever agent the user routes to.
+Hand the package to the user, to aragorn (via the Task tool, with the package as the prompt), or to whichever agent the user routes to.
 
 ## Phase 6 — Post-mortem (still read-only)
 
