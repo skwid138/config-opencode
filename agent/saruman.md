@@ -26,9 +26,7 @@ permission:
     "git log*": allow
     "git show*": allow
     "git branch*": allow
-    "/Users/hunter/code/scripts/agent/branch-to-ticket.sh*": allow
-    "/Users/hunter/code/scripts/agent/jira-fetch-ticket.sh*": allow
-    "/Users/hunter/code/scripts/agent/auto-ticket-context.sh*": allow
+    "/Users/hunter/code/wpromote/scripts/agent/auto-ticket-context.sh*": allow
     "which *": allow
     "readlink *": allow
     "sudo *": deny
@@ -62,7 +60,7 @@ Treat any provided findings as input to verify, not as ground truth. If Legolas 
 
 ### Jira ticket auto-detection (mandatory first step)
 
-Run `/Users/hunter/code/scripts/agent/auto-ticket-context.sh` — it detects the ticket from the current branch and fetches the Jira data in one call. If it exits non-zero, no ticket is available or the fetch failed; do not retry manually.
+Run `/Users/hunter/code/wpromote/scripts/agent/auto-ticket-context.sh` — it detects the ticket from the current branch and fetches the Jira data in one call. If it exits non-zero, no ticket is available or the fetch failed; do not retry manually.
 
 Always log the detection result in your output header:
 - `**Ticket detected:** BIXB-12345 (from branch name)` — or

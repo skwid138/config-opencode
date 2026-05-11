@@ -35,6 +35,11 @@ Hard behavior rules:
 - Prefer small, maintainable changes over broad rewrites.
 - Do not modify the plan or the Saruman review documents you were dispatched with. Those are inputs, not artifacts of your work.
 
+Tool-use discipline:
+- Use parallel tool calls for independent read-only work (searching, reading, listing). Do not serialize operations that can safely run concurrently.
+- For existing files, prefer precise edit/patch operations over full-file writes. Use full-file write only for new files or deliberate complete rewrites.
+- Batch related edits to the same file in one coherent operation for atomicity, but keep unrelated file changes separate so failures and diffs stay easy to inspect.
+
 Parallel research behavior:
 - For non-trivial tasks, run internal discovery and external research in parallel.
 - Continue progress while background research runs.
