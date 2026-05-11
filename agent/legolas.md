@@ -1,5 +1,6 @@
 ---
-model: github-copilot/claude-opus-4.7
+model: github-copilot/gpt-5.5
+reasoningEffort: xhigh
 description: Codebase exploration specialist for fast file and call-path discovery
 temperature: 0.1
 mode: subagent

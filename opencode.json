@@ -1,6 +1,6 @@
 {
     "$schema": "https://opencode.ai/config.json",
-    "model": "github-copilot/claude-opus-4.7",
+    "model": "github-copilot/claude-opus-4.6",
     "agent": {
         "build": {
             "mode": "subagent",
@@ -20,8 +20,10 @@
     ],
     "permission": {
         "external_directory": {
-            "/Users/hunter/code/wpromote/*": "allow",
-            "/Users/hunter/code/scripts/*": "allow"
+            "/Users/hunter/.config/opencode/*": "allow",
+            "/Users/hunter/code/dotfiles/*": "allow",
+            "/Users/hunter/code/scripts/*": "allow",
+            "/Users/hunter/code/wpromote/*": "allow"
         },
         "edit": "ask",
         "write": "ask",
@@ -30,12 +32,18 @@
         }
     },
     "plugin": [
-      "@tarquinen/opencode-dcp@3.1.11"
+        "@tarquinen/opencode-dcp@3.1.11"
     ],
     "mcp": {
         "chrome-devtools": {
             "type": "local",
-            "command": ["npx", "-y", "chrome-devtools-mcp@0.25.0", "--browserUrl", "http://127.0.0.1:9222"],
+            "command": [
+                "npx",
+                "-y",
+                "chrome-devtools-mcp@0.25.0",
+                "--browserUrl",
+                "http://127.0.0.1:9222"
+            ],
             "enabled": true
         },
         "context7": {

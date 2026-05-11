@@ -49,12 +49,12 @@ All agents are defined locally under `agent/`. The default OpenCode `build` and 
 
 | Name | Mode | Model | Role |
 |------|------|-------|------|
-| **gandalf** | primary | claude-opus-4.7 | Orchestrator — intent classification, planning, delegation |
-| **legolas** | subagent | claude-opus-4.7 | Codebase exploration & call-path discovery |
+| **gandalf** | primary | claude-opus-4.6 | Orchestrator — intent classification, planning, delegation |
+| **legolas** | subagent | **gpt-5.5 (xhigh reasoning)** | Codebase exploration & call-path discovery |
 | **radagast** | subagent | **gpt-5.5 (xhigh reasoning)** | External docs / OSS research |
-| **treebeard** | subagent | claude-opus-4.7 | Pre-planning, plan review, read-only analysis |
-| **aragorn** | subagent | claude-opus-4.7 | Autonomous end-to-end implementation; the only writer in the roster |
-| **saruman** | subagent | claude-opus-4.7 | Adversarial plan review; mandatory before any aragorn dispatch |
+| **treebeard** | subagent | **gpt-5.5 (xhigh reasoning)** | Pre-planning, plan review, read-only analysis |
+| **aragorn** | subagent | claude-opus-4.6 | Autonomous end-to-end implementation; the only writer in the roster |
+| **saruman** | subagent | claude-opus-4.6 | Adversarial plan review; mandatory before any aragorn dispatch |
 
 **Why Radagast uses a different model:** GPT-5.5 with xhigh reasoning effort has been stronger in practice for web research and synthesizing external docs across many fetched pages. Every other agent stays on Claude Opus 4.7 for code-centric reasoning consistency. This is the only intentional model split — revisit if/when a Claude release closes the research-quality gap.
 
