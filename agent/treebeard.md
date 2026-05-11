@@ -7,6 +7,9 @@ mode: subagent
 permission:
   write: deny
   edit: deny
+  chrome-devtools_*: deny
+  figma_*: deny
+  exa_*: deny
   bash:
     "*": ask
     "git diff*": allow

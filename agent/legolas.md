@@ -7,6 +7,8 @@ mode: subagent
 permission:
   write: deny
   edit: deny
+  chrome-devtools_*: deny
+  figma_*: deny
   bash:
     "*": ask
     "rg *": allow

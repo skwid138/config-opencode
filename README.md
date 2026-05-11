@@ -1,6 +1,6 @@
 # OpenCode Config
 
-Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orchestration runtime, dynamic context pruning, and a tuned set of skills/commands for Wpromote engineering work.
+Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic context pruning, and a tuned set of skills/commands for Wpromote engineering work.
 
 > **Recent shift:** This config used to layer on top of the `@wpro-eng/opencode-config` team plugin. That dependency has been removed — everything below is now defined locally in `~/.config/opencode/`.
 
@@ -25,10 +25,11 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, custom orch
 │   ├── review.md, check-ac.md, review-plan.md, sonar.md
 │   ├── bug-hunt.md
 │   └── update-opencode-deps.md  # check & update opencode config deps
-├── skill/                       # Local skill library (11 skills)
-│   ├── bug-hunter/, chrome-devtools/, figma/, gh-fetch-pr-comments/
-│   ├── github-review-analyzer/, jira-enhance/, jira-ticket/, pr-review/
-│   ├── sonarcloud/, tdd/, ticket-plan/
+├── skill/                       # Local skill library (16 skills)
+│   ├── bug-hunter/, chrome-devtools/, diagnose/, figma/
+│   ├── gh-fetch-pr-comments/, github-review-analyzer/, grill-me/, grill-with-docs/
+│   ├── improve-codebase-architecture/, jira-enhance/, jira-ticket/, pr-review/
+│   ├── qa-subtask/, sonarcloud/, tdd/, ticket-plan/
 ├── instruction/                 # Auto-loaded into every agent's context
 │   ├── repo-context.md, script-usage.md
 │   ├── agent-defaults.md
@@ -49,14 +50,14 @@ All agents are defined locally under `agent/`. The default OpenCode `build` and 
 
 | Name | Mode | Model | Role |
 |------|------|-------|------|
-| **gandalf** | primary | claude-opus-4.6 | Orchestrator — intent classification, planning, delegation |
+| **gandalf** | primary | claude-opus-6 | Orchestrator — intent classification, planning, delegation |
 | **legolas** | subagent | **gpt-5.5 (xhigh reasoning)** | Codebase exploration & call-path discovery |
 | **radagast** | subagent | **gpt-5.5 (xhigh reasoning)** | External docs / OSS research |
 | **treebeard** | subagent | **gpt-5.5 (xhigh reasoning)** | Pre-planning, plan review, read-only analysis |
 | **aragorn** | subagent | claude-opus-4.6 | Autonomous end-to-end implementation; the only writer in the roster |
 | **saruman** | subagent | claude-opus-4.6 | Adversarial plan review; mandatory before any aragorn dispatch |
 
-**Why Radagast uses a different model:** GPT-5.5 with xhigh reasoning effort has been stronger in practice for web research and synthesizing external docs across many fetched pages. Every other agent stays on Claude Opus 4.7 for code-centric reasoning consistency. This is the only intentional model split — revisit if/when a Claude release closes the research-quality gap.
+**Why the model split:** GPT-5.5 with xhigh reasoning effort (Legolas, Radagast, Treebeard) has been stronger in practice for web research, codebase exploration, and plan review. Gandalf uses Claude Opus 6 for orchestration. Aragorn and Saruman use Claude Opus 4.6 for code-centric implementation and adversarial review. Revisit if/when model capabilities shift.
 
 **All read-only agents are locked down:** every agent except Aragorn has an explicit `permission` block denying `write` and `edit`, with bash restricted to a read-only allowlist. Aragorn is the sole writer. The global posture (in `opencode.json`) is `ask`-by-default with a small denylist for catastrophic operations (`rm -rf /*`, `sudo *`, `git push --force*`).
 
@@ -113,6 +114,11 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 | `sonarcloud` | "what did sonar find", static-analysis triage |
 | `tdd` | "write tests first", "TDD this", red-green-refactor flow |
 | `ticket-plan` | "plan this ticket", multi-codebase implementation planning |
+| `diagnose` | "diagnose this", "debug this", disciplined bug/regression investigation loop |
+| `grill-me` | "grill me", "stress-test this plan", one-question-at-a-time interrogation |
+| `grill-with-docs` | "stress-test against the glossary", grilling + CONTEXT.md/ADR persistence |
+| `improve-codebase-architecture` | "review the architecture", system-level deepening-opportunity scan |
+| `qa-subtask` | "write QA steps", "create a QA subtask", generate QA instructions from AC + PR |
 
 ## MCPs
 
@@ -236,7 +242,7 @@ Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
 
 ## Configuration Choices
 
-**Default model:** `github-copilot/claude-opus-4.7`. No auto-update — run `opencode models` and edit `opencode.json` when a newer Opus ships.
+**Default model:** `github-copilot/claude-opus-4.6`. No auto-update — run `opencode models` and edit `opencode.json` when a newer Opus ships.
 
 **Hidden built-in agents:** `build` and `plan` are hidden via `opencode.json`. The LOTR roster covers their roles (aragorn for build, treebeard for plan).
 
@@ -255,7 +261,7 @@ Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
 | Add a provider | `opencode auth login` |
 | Tail DCP logs | `tail -f ~/.config/opencode/logs/dcp/*.log` |
 | Inspect tasks | `/tasks`, then `/task <id>` |
-| Health check | `/diagnostics` |
+| Health check | `opencode mcp list` (verify MCPs), `opencode models` (verify model) |
 
 ## Setup (fresh machine)
 
