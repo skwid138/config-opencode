@@ -11,7 +11,7 @@
 | **aragorn** | Autonomous end-to-end implementation; sole writer | gpt-5.5 (xhigh) | **yes** |
 | **saruman** | Adversarial plan review; mandatory before aragorn dispatch | gpt-5.5 (xhigh) | no |
 
-## Skills (16)
+## Skills (17)
 
 | Skill | Description |
 |-------|-------------|
@@ -26,6 +26,7 @@
 | `improve-codebase-architecture` | System-level architecture review and deepening-opportunity scan |
 | `jira-enhance` | Audit and improve Jira acceptance criteria quality |
 | `jira-ticket` | Fetch and summarize Jira tickets for estimation/implementation |
+| `plan-author` | Structure gathered context into a .project-plans/ plan document |
 | `pr-review` | Code quality + AC compliance review of branch diff |
 | `qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
 | `sonarcloud` | Fetch and analyze SonarCloud issues for a PR |

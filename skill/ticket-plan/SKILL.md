@@ -505,6 +505,10 @@ change — no coordination needed.">
 - **Dependencies:** <blocked by other tickets, waiting on design, etc.>
 ```
 
+> **Note:** For non-ticket plans (ad-hoc plans from gathered context), use the
+> `plan-author` skill. Its template aligns with this output structure for
+> consistency across all `.project-plans/` documents.
+
 ---
 
 ## Phase 4: Output

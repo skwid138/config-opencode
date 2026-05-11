@@ -25,7 +25,7 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 │   ├── review.md, check-ac.md, review-plan.md, sonar.md
 │   ├── bug-hunt.md
 │   └── update-opencode-deps.md  # check & update opencode config deps
-├── skill/                       # Local skill library (16 skills)
+├── skill/                       # Local skill library (17 skills)
 │   ├── bug-hunter/, chrome-devtools/, diagnose/, figma/
 │   ├── gh-fetch-pr-comments/, github-review-analyzer/, grill-me/, grill-with-docs/
 │   ├── improve-codebase-architecture/, jira-enhance/, jira-ticket/, pr-review/
@@ -71,6 +71,7 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 |---------|-------|-------------|
 | `/ticket <ID>` | jira-ticket | Fetch and summarize a ticket (auto-detects from branch if no ID) |
 | `/plan [--quick] [--post-jira]` | ticket-plan | Full implementation plan: fetch ticket → explore codebases → synthesize plan |
+| `/plan-author [slug]` | plan-author | Structure gathered context into a .project-plans/ plan document |
 | `/ac-quality` | jira-enhance | Audit AC quality, post improvements as Jira comment |
 | `/impl-plan` | jira-enhance | Generate implementation details from codebase, post to Jira |
 
@@ -115,6 +116,7 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 | `sonarcloud` | "what did sonar find", static-analysis triage |
 | `tdd` | "write tests first", "TDD this", red-green-refactor flow |
 | `ticket-plan` | "plan this ticket", multi-codebase implementation planning |
+| `plan-author` | "write a plan", "structure this into a plan", plan document from gathered context |
 | `diagnose` | "diagnose this", "debug this", disciplined bug/regression investigation loop |
 | `grill-me` | "grill me", "stress-test this plan", one-question-at-a-time interrogation |
 | `grill-with-docs` | "stress-test against the glossary", grilling + CONTEXT.md/ADR persistence |
