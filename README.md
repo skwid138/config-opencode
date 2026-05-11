@@ -24,11 +24,11 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 │   ├── review.md, check-ac.md, review-plan.md, sonar.md
 │   ├── bug-hunt.md
 │   └── update-opencode-deps.md  # check & update opencode config deps
-├── skill/                       # Local skill library (17 skills)
+├── skill/                       # Local skill library (18 skills)
 │   ├── bug-hunter/, chrome-devtools/, diagnose/, figma/
 │   ├── gh-fetch-pr-comments/, github-review-analyzer/, grill-me/, grill-with-docs/
 │   ├── improve-codebase-architecture/, jira-enhance/, jira-ticket/, pr-review/
-│   ├── qa-subtask/, sonarcloud/, tdd/, ticket-plan/
+│   ├── prototype/, qa-subtask/, sonarcloud/, tdd/, ticket-plan/
 ├── instruction/                 # Auto-loaded into every agent's context
 │   ├── repo-context.md, script-usage.md
 │   ├── agent-defaults.md
@@ -111,6 +111,7 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 | `jira-enhance` | "improve AC", "flesh out ticket", AC-quality audits |
 | `jira-ticket` | Any Jira ticket ID or URL — adapts to summary/estimate/implement/test intents |
 | `pr-review` | "review my PR", "does my code satisfy the AC" |
+| `prototype` | "prototype this", "let me play with it", "try a few designs", sanity-check data models or UI options |
 | `sonarcloud` | "what did sonar find", static-analysis triage |
 | `tdd` | "write tests first", "TDD this", red-green-refactor flow |
 | `ticket-plan` | "plan this ticket", multi-codebase implementation planning |
