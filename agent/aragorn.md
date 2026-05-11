@@ -1,5 +1,6 @@
 ---
-model: github-copilot/claude-opus-4.6
+model: openai/gpt-5.5
+reasoningEffort: xhigh
 description: Autonomous deep implementation worker for end-to-end execution
 temperature: 0.1
 mode: subagent

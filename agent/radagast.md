@@ -1,5 +1,5 @@
 ---
-model: github-copilot/gpt-5.5
+model: openai/gpt-5.5
 reasoningEffort: xhigh
 description: External docs and OSS research specialist
 temperature: 0.1

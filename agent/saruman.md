@@ -1,5 +1,6 @@
 ---
-model: github-copilot/claude-opus-4.6
+model: openai/gpt-5.5
+reasoningEffort: xhigh
 description: Adversarial plan reviewer; finds what is wrong with plans before they cost real time
 temperature: 0.1
 mode: subagent

@@ -1,5 +1,5 @@
 ---
-model: github-copilot/gpt-5.5
+model: openai/gpt-5.5
 reasoningEffort: xhigh
 description: Planning and plan-review specialist for ambiguity, risk, and execution readiness
 temperature: 0.1
