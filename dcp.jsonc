@@ -4,26 +4,23 @@
   // Master switch
   "enabled": true,
 
-  // Verbose logging during trial period; turn off after 1-2 weeks of validation.
+  // Disabled — trial complete. Re-enable for debugging.
   // Logs go to ~/.config/opencode/logs/dcp/
-  "debug": true,
+  "debug": false,
 
-  // In-chat detailed notifications so we can observe pruning behavior during trial
-  "pruneNotification": "detailed",
+  // Summary notifications for ongoing visibility
+  "pruneNotification": "summary",
   "pruneNotificationType": "chat",
 
   // Slash commands enabled (/dcp context, /dcp stats, /dcp compress, etc.)
   "commands": {
     "enabled": true,
-    "protectedTools": []
+    "protectedTools": ["task", "skill", "todowrite", "todoread"]
   },
 
-  // Trial in manual mode: DCP won't autonomously compress, but automatic
-  // strategies (deduplication, purgeErrors) still run as a safe net.
-  // Use /dcp compress and /dcp sweep manually to evaluate behavior.
-  // Flip "enabled": false after trial period to let DCP run autonomously.
+  // Autonomous mode active — automatic strategies still run as safety net.
   "manualMode": {
-    "enabled": true,
+    "enabled": false,
     "automaticStrategies": true
   },
 
@@ -46,7 +43,7 @@
     "mode": "range",
     "permission": "allow",
 
-    // Show compressed content inline during trial so we can audit summaries
+    // Show compressed content inline for ongoing audit visibility
     "showCompression": true,
 
     "summaryBuffer": true,
@@ -64,7 +61,7 @@
     "nudgeForce": "soft",
 
     // Default protected tools (task, skill, todowrite, todoread) cover orchestration outputs
-    "protectedTools": [],
+    "protectedTools": ["task", "skill", "todowrite", "todoread"],
 
     // Don't preserve user messages verbatim — allows compression of large pasted content
     "protectUserMessages": false
@@ -73,12 +70,12 @@
   "strategies": {
     "deduplication": {
       "enabled": true,
-      "protectedTools": []
+      "protectedTools": ["task", "skill", "todowrite", "todoread"]
     },
     "purgeErrors": {
       "enabled": true,
       "turns": 4,
-      "protectedTools": []
+      "protectedTools": ["task", "skill", "todowrite", "todoread"]
     }
   }
 }
