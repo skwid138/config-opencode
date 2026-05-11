@@ -103,7 +103,7 @@ plan quality high:
    it, and dispatches exploration tasks
 2. **Legolas (explorer)** agents run in parallel across relevant codebases,
    returning structured summaries — not raw file contents
-3. **Treebeard (planner)** receives the condensed exploration results plus
+3. **The executing agent** receives the condensed exploration results plus
    parsed ticket data and synthesizes the final plan
 
 This separation is critical. Explorer agents handle the "dirty" work of reading
@@ -310,7 +310,7 @@ project key prefix from component paths for readability.
 
 ### Step 4: Format for planner
 
-Structure the results as a section to pass to treebeard:
+Structure the results as a section for plan synthesis:
 
 ```
 ### SonarCloud Findings
@@ -350,10 +350,10 @@ The planner should incorporate SonarCloud findings into:
 
 ---
 
-## Phase 3: Synthesize the Plan (Delegate to Treebeard)
+## Phase 3: Synthesize the Plan
 
-Once all exploration summaries are collected, delegate to treebeard (planner)
-with the following structured input:
+Once all exploration summaries are collected, synthesize the plan directly using
+the plan-author skill's template structure. Use the following structured input:
 
 > Create a comprehensive implementation plan for Jira ticket `<TICKET-ID>`.
 >

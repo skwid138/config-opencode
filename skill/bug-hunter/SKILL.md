@@ -197,7 +197,7 @@ For **Quick Scan** and **Boundary Audit**: delegate trace work to a single
 **legolas** agent with the boundary map as input.
 
 For **Deep Trace**: delegate to **legolas** for evidence gathering, then
-**treebeard** for synthesis and deduplication.
+synthesize and deduplicate findings directly.
 
 ---
 

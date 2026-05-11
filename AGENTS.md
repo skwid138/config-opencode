@@ -7,7 +7,6 @@
 | **gandalf** | Primary orchestrator — intent classification, planning, delegation | claude-opus-4.6 (copilot) | no |
 | **legolas** | Codebase exploration & call-path discovery | gpt-5.5 (xhigh) | no |
 | **radagast** | External docs / OSS research | gpt-5.5 (xhigh) | no |
-| **treebeard** | Pre-planning, plan review, read-only analysis | gpt-5.5 (xhigh) | no |
 | **aragorn** | Autonomous end-to-end implementation; sole writer | gpt-5.5 (xhigh) | **yes** |
 | **saruman** | Adversarial plan review; mandatory before aragorn dispatch | gpt-5.5 (xhigh) | no |
 
