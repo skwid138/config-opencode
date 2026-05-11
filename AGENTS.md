@@ -55,6 +55,7 @@ Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
 - `opencode.json` — only modify when explicitly asked (model bumps, MCP changes).
 - Agent frontmatter `permission` blocks — only modify when explicitly asked.
 - `.project-plans/` — do not create or modify.
+- `docs/` — reference documentation; do not modify without explicit ask.
 
 ## Testing
 
@@ -75,5 +76,6 @@ Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
 ├── plugins/               # Local TypeScript plugins
 ├── bin/                   # Launcher wrapper infrastructure
 ├── mcp/                   # Reference-only MCP snippets
+├── docs/                  # Reference documentation (skill authoring, etc.)
 └── dcp.jsonc              # Dynamic Context Pruning config
 ```

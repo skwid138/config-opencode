@@ -37,6 +37,7 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 ├── bin/                         # Launcher infrastructure
 │   ├── opencode -> ~/code/scripts/personal/opencode-wrapper.sh  # symlink, intercepts `opencode` via PATH
 │   └── install-wrapper.sh       # idempotent bootstrap for the symlink
+├── docs/                        # Reference documentation (skill authoring, etc.)
 ├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
 │   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.json
 ├── plugins/                     # Local TypeScript plugins
@@ -310,7 +311,7 @@ Things that are intentionally pending or under iteration:
 
 | Asset | Path | Notes |
 |-------|------|-------|
-| Skill | `skill/<name>/SKILL.md` | Frontmatter description must be sharp — that's what triggers auto-invocation |
+| Skill | `skill/<name>/SKILL.md` | Frontmatter description must be sharp — that's what triggers auto-invocation. See [`docs/skill-authoring.md`](docs/skill-authoring.md) for the authoring rubric |
 | Command | `command/<name>.md` | Frontmatter `description` is shown in the slash menu; body is the prompt |
 | Agent | `agent/<name>.md` | Frontmatter: `model`, `description`, `temperature`, `mode` (`primary`/`subagent`), optional `permission` |
 | Instruction | `instruction/<name>.md` + entry in `opencode.json` `instructions[]` | Loaded into every agent's context — keep them short and high-signal |
