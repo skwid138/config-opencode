@@ -213,6 +213,27 @@ which opencode    # should resolve to ~/.config/opencode/bin/opencode
 
 If `which opencode` resolves to `/opt/homebrew/bin/opencode` instead, `~/.config/opencode/bin` isn't on `PATH` ahead of Homebrew. The shell scripts repo's `shell/env/paths.zsh` handles this via `_path_prepend "$HOME/.config/opencode/bin"`; ensure the env-tier init (`init_env.zsh` from `.zshenv`) is wired up.
 
+## OpenCode daemon and the wrapper quartet
+
+`opencode web` starts a long-lived HTTP daemon that **freezes the entire config tree at boot** — `opencode.json`, all instructions, all agent files, all skill `SKILL.md` files. Edits made after the daemon starts have no effect on attached sessions until the daemon is restarted. This caused a recurring class of bug ("I edited the agent prompt, why is the old behavior still happening?") because nothing surfaced the staleness.
+
+Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
+
+| Wrapper | Alias | Purpose |
+|---------|-------|---------|
+| `opensession.sh` | `opensession` | **Daily driver.** Ensures a daemon is running on the port, then attaches. No daemon → background-spawns `openweb`, waits for the listener with identity verification, exec's `openattach`. Fresh daemon → attaches silently. Stale daemon → delegates the prompt to `openattach`. `--restart` calls `openweb --restart`; `--force` passes through to `openattach --force`. |
+| `opencode-web.sh` | `openweb` | Starts the daemon. If a daemon is already running on the port, exits with guidance to re-invoke with `--restart` (kill + respawn) or `--force` (kill any holder, including foreign listeners). On start, writes a sidecar file recording the SHA-256 hash of the config tree at boot. |
+| `opencode-attach.sh` | `openattach` | TUI client. Before exec'ing into the daemon, compares the current config-tree hash against the sidecar. If they differ ("stale daemon"), warns and prompts on a real TTY; aborts non-interactively with exit 5 and bypass instructions. |
+| `opencode-wrapper.sh` | (PATH shim) | The conditional-context wrapper above. Web/attach pass through unmodified. |
+
+**Sidecar file:** `~/.local/share/opencode/daemon-config-hash-<port>-<pid>` — written atomically when `openweb` starts. Records the port, pid, ISO 8601 start time, and SHA-256 over the sorted file list of `~/.config/opencode/` (with symlink targets included via `readlink`). Cleaned up on graceful exit; orphan sidecars are filtered out by a `ps` identity check on the recorded pid (`comm == opencode`, no `pgrep -f` matches against arbitrary command lines).
+
+**Bypass:** `openattach --force` (or `OPENCODE_ATTACH_FORCE=1 openattach`) skips the staleness check. Use when you know the config drift is intentional and irrelevant to the current session (e.g. you edited an unrelated skill).
+
+**Shared helper:** `~/code/scripts/lib/opencode-daemon.sh` is sourced by both `openweb` and `openattach`. It owns the hash function, sidecar I/O, and identity verification — the wrappers stay declarative.
+
+**Coverage:** `tests/opencode-daemon.bats` (43 tests on the helper), `tests/opencode-web.bats` (28 tests, 3-phase lsof stub model for pre-flight detection), `tests/opencode-attach.bats` (29 tests including a real-pty test via BSD `script(1)` for the TTY prompt branch), `tests/opensession.bats` (19 tests covering spawn / fresh / stale / foreign-listener / race / timeout / `--restart` / `--force` / bash-3.2 regression).
+
 ## Configuration Choices
 
 **Default model:** `github-copilot/claude-opus-4.7`. No auto-update — run `opencode models` and edit `opencode.json` when a newer Opus ships.
