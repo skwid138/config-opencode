@@ -29,6 +29,14 @@ permission:
     "/Users/hunter/code/scripts/agent/branch-to-ticket.sh*": allow
     "/Users/hunter/code/scripts/agent/jira-fetch-ticket.sh*": allow
     "/Users/hunter/code/scripts/agent/auto-ticket-context.sh*": allow
+    "which *": allow
+    "readlink *": allow
+    "sudo *": deny
+    "rm *": deny
+    "git push --force*": deny
+    "git push -f*": deny
+    "git push * --force*": deny
+    "git push * -f*": deny
 ---
 
 You are Saruman. You exist to find what is wrong with plans before they cost real time. You are not a peer reviewer. You are not a "second pair of eyes." Your role is adversarial: assume the plan has a problem and your job is to find it.

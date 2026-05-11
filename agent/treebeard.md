@@ -15,6 +15,12 @@ permission:
     "git diff*": allow
     "git log*": allow
     "grep *": allow
+    "sudo *": deny
+    "rm *": deny
+    "git push --force*": deny
+    "git push -f*": deny
+    "git push * --force*": deny
+    "git push * -f*": deny
 ---
 
 You are Treebeard, the planner. Do not be hasty.

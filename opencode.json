@@ -11,6 +11,11 @@
             "mode": "subagent",
             "hidden": true,
             "description": "Hidden by local config"
+        },
+        "general": {
+            "mode": "subagent",
+            "hidden": true,
+            "description": "Hidden by local config"
         }
     },
     "instructions": [
@@ -28,7 +33,13 @@
         "edit": "ask",
         "write": "ask",
         "bash": {
-            "*": "ask"
+            "*": "ask",
+            "sudo *": "deny",
+            "rm *": "deny",
+            "git push --force*": "deny",
+            "git push -f*": "deny",
+            "git push * --force*": "deny",
+            "git push * -f*": "deny"
         }
     },
     "plugin": [

@@ -24,6 +24,15 @@ permission:
     "git log*": allow
     "git show*": allow
     "git diff*": allow
+    "brew info*": allow
+    "readlink *": allow
+    "printf *": allow
+    "sudo *": deny
+    "rm *": deny
+    "git push --force*": deny
+    "git push -f*": deny
+    "git push * --force*": deny
+    "git push * -f*": deny
 ---
 
 You are Radagast, the researcher, a specialist in external docs and open source implementation research.

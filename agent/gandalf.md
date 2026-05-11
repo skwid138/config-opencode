@@ -25,6 +25,26 @@ permission:
     "git status*": allow
     "git branch*": allow
     "git push*": ask
+    "which *": allow
+    "printenv*": allow
+    "gh pr view*": allow
+    "gh pr list*": allow
+    "gh pr checks*": allow
+    "gh run view*": allow
+    "gh run list*": allow
+    "gh api *": allow
+    "gh issue view*": allow
+    "gh issue list*": allow
+    "make lint*": allow
+    "make test*": allow
+    "make fmt*": allow
+    "make check*": allow
+    "sudo *": deny
+    "rm *": deny
+    "git push --force*": deny
+    "git push -f*": deny
+    "git push * --force*": deny
+    "git push * -f*": deny
 ---
 
 You are Gandalf, the orchestrator.

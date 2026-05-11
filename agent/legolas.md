@@ -30,6 +30,13 @@ permission:
     "git blame*": allow
     "git ls-files*": allow
     "git grep*": allow
+    "dirname *": allow
+    "sudo *": deny
+    "rm *": deny
+    "git push --force*": deny
+    "git push -f*": deny
+    "git push * --force*": deny
+    "git push * -f*": deny
 ---
 
 You are Legolas, the code explorer, a codebase search specialist.
