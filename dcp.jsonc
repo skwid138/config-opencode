@@ -1,81 +1,84 @@
 {
   "$schema": "https://raw.githubusercontent.com/Opencode-DCP/opencode-dynamic-context-pruning/master/dcp.schema.json",
-
   // Master switch
   "enabled": true,
-
   // Disabled — trial complete. Re-enable for debugging.
   // Logs go to ~/.config/opencode/logs/dcp/
   "debug": false,
-
   // Detailed notifications for ongoing visibility
-  "pruneNotification": "detailed",
+  "pruneNotification": "minimal",
   "pruneNotificationType": "chat",
-
   // Slash commands enabled (/dcp context, /dcp stats, /dcp compress, etc.)
   "commands": {
     "enabled": true,
-    "protectedTools": ["task", "skill", "todowrite", "todoread"]
+    "protectedTools": [
+      "task",
+      "skill",
+      "todowrite",
+      "todoread"
+    ]
   },
-
   // Autonomous mode active — automatic strategies still run as safety net.
   "manualMode": {
     "enabled": false,
     "automaticStrategies": true
   },
-
   // No turn protection — protected tools list (task, skill, etc.) is sufficient
   "turnProtection": {
     "enabled": false,
     "turns": 4
   },
-
   // Conservative defaults — keep subagents and custom prompts off until trial proves stable
   "experimental": {
     "allowSubAgents": false,
     "customPrompts": false
   },
-
   // No extra file pattern protections beyond default tool protection
   "protectedFilePatterns": [],
-
   "compress": {
     "mode": "range",
     "permission": "allow",
-
     // Show compressed content inline for ongoing audit visibility
     "showCompression": true,
-
     "summaryBuffer": true,
-
     // Tuned for GitHub Copilot models (~128K effective context).
     // Defaults assume 200K+ windows which would over-allow context for Copilot.
     // Above 80K → strong compression nudges. Below 40K → no reminder nudges.
     "maxContextLimit": 80000,
     "minContextLimit": 40000,
-
     "nudgeFrequency": 5,
     "iterationNudgeThreshold": 15,
-
     // Soft nudges — sessions are long but bounded; avoid aggressive interruption
     "nudgeForce": "soft",
-
     // Default protected tools (task, skill, todowrite, todoread) cover orchestration outputs
-    "protectedTools": ["task", "skill", "todowrite", "todoread"],
-
+    "protectedTools": [
+      "task",
+      "skill",
+      "todowrite",
+      "todoread"
+    ],
     // Don't preserve user messages verbatim — allows compression of large pasted content
     "protectUserMessages": false
   },
-
   "strategies": {
     "deduplication": {
       "enabled": true,
-      "protectedTools": ["task", "skill", "todowrite", "todoread"]
+      "protectedTools": [
+        "task",
+        "skill",
+        "todowrite",
+        "todoread"
+      ]
     },
     "purgeErrors": {
       "enabled": true,
       "turns": 4,
-      "protectedTools": ["task", "skill", "todowrite", "todoread"]
+      "protectedTools": [
+        "task",
+        "skill",
+        "todowrite",
+        "todoread"
+      ]
     }
   }
 }
