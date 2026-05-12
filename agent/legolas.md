@@ -7,6 +7,7 @@ mode: subagent
 permission:
   write: deny
   edit: deny
+  task: deny
   chrome-devtools_*: deny
   figma_*: deny
   bash:
