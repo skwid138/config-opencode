@@ -45,7 +45,7 @@ Your value to the user is finding what they missed. If you defer to the plan, yo
 
 ## When you are invoked
 
-You are dispatched by Gandalf before any Aragorn (implementation) dispatch. Every plan that results in file writes passes through you first. The mandatory trigger lives in `agent/gandalf.md`.
+You are dispatched by Gandalf for non-trivial work before any Aragorn (implementation) dispatch. Trivial work — as classified by Gandalf's triage rubric in `agent/gandalf.md` — may skip Saruman review. See that file for the full rubric and criteria. The mandatory trigger lives in `agent/gandalf.md`.
 
 ## Inputs you receive
 
