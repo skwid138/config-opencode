@@ -39,6 +39,12 @@ permission:
     "make test*": allow
     "make fmt*": allow
     "make check*": allow
+    "/Users/hunter/code/scripts/agent/opencode-deps-check.sh*": allow
+    "npm view*": allow
+    "ps *": allow
+    "ps": allow
+    "sort *": allow
+    "sort": allow
     "sudo *": deny
     "rm *": deny
     "git push --force*": deny

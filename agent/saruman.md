@@ -26,6 +26,7 @@ permission:
     "git log*": allow
     "git show*": allow
     "git branch*": allow
+    "git -C *": allow
     "/Users/hunter/code/wpromote/scripts/agent/auto-ticket-context.sh*": allow
     "which *": allow
     "readlink *": allow
