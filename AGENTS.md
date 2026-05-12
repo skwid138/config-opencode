@@ -72,7 +72,7 @@ Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
 ├── opencode.json          # Model, MCPs, plugins, permissions
 ├── agent/                 # Agent definitions (frontmatter + system prompt)
 ├── command/               # Slash commands (thin wrappers around skills)
-├── skill/                 # Skill library (16 skills)
+├── skill/                 # Skill library (18 skills)
 ├── instruction/           # Auto-loaded context for all agents
 ├── plugins/               # Local TypeScript plugins
 ├── bin/                   # Launcher wrapper infrastructure
