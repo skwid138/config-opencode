@@ -8,8 +8,8 @@
   // Logs go to ~/.config/opencode/logs/dcp/
   "debug": false,
 
-  // Summary notifications for ongoing visibility
-  "pruneNotification": "summary",
+  // Detailed notifications for ongoing visibility
+  "pruneNotification": "detailed",
   "pruneNotificationType": "chat",
 
   // Slash commands enabled (/dcp context, /dcp stats, /dcp compress, etc.)
