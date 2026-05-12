@@ -18,17 +18,18 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 │   ├── legolas.md               # Codebase exploration subagent
 │   ├── radagast.md              # External docs/OSS research subagent
 │   ├── aragorn.md               # Implementation subagent (sole writer)
-│   └── saruman.md               # Adversarial plan reviewer subagent
+│   └── saruman.md               # Adversarial reviewer subagent
 ├── command/                     # Slash commands that drive skills
 │   ├── ticket.md, plan.md, plan-author.md, ac-quality.md, impl-plan.md
 │   ├── review.md, check-ac.md, review-plan.md, sonar.md
 │   ├── qa-subtask.md, bug-hunt.md
 │   └── scripts-doctor.md, update-opencode-deps.md
-├── skill/                       # Local skill library (18 skills)
+├── skill/                       # Local skill library (19 skills)
 │   ├── bug-hunter/, chrome-devtools/, diagnose/, figma/
 │   ├── gh-fetch-pr-comments/, github-review-analyzer/, grill-me/, grill-with-docs/
 │   ├── improve-codebase-architecture/, jira-enhance/, jira-ticket/, plan-author/
-│   ├── pr-review/, prototype/, qa-subtask/, sonarcloud/, tdd/, ticket-plan/
+│   ├── post-impl-audit/, pr-review/, prototype/, qa-subtask/, sonarcloud/, tdd/
+│   └── ticket-plan/
 ├── instruction/                 # Auto-loaded into every agent's context
 │   ├── repo-context.md, script-usage.md
 │   ├── agent-defaults.md
@@ -54,7 +55,7 @@ All agents are defined locally under `agent/`. The default OpenCode `build`, `pl
 | **legolas** | subagent | gpt-5.5 (xhigh reasoning) | Codebase exploration & call-path discovery |
 | **radagast** | subagent | gpt-5.5 (xhigh reasoning) | External docs / OSS research |
 | **aragorn** | subagent | gpt-5.5 (xhigh reasoning) | Autonomous end-to-end implementation; the only writer in the roster |
-| **saruman** | subagent | gpt-5.5 (xhigh reasoning) | Adversarial plan review; mandatory before any aragorn dispatch |
+| **saruman** | subagent | gpt-5.5 (xhigh reasoning) | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time |
 
 **Why the model split:** Gandalf uses a different provider/model path than the subagents — see the table above and `opencode.json` for exact model IDs. The split exists because the subagent provider has been stronger for research, exploration, implementation, and adversarial review in practice. Revisit if/when model capabilities shift.
 
@@ -122,6 +123,7 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 | `tdd` | "write tests first", "TDD this", red-green-refactor flow |
 | `ticket-plan` | "plan this ticket", multi-codebase implementation planning |
 | `plan-author` | "write a plan", "structure this into a plan", plan document from gathered context |
+| `post-impl-audit` | "audit the implementation", "check Aragorn's work", post-Aragorn implementation audit against a plan |
 | `diagnose` | "diagnose this", "debug this", disciplined bug/regression investigation loop |
 | `grill-me` | "grill me", "stress-test this plan", one-question-at-a-time interrogation |
 | `grill-with-docs` | "stress-test against the glossary", grilling + CONTEXT.md/ADR persistence |
@@ -182,7 +184,7 @@ Tuned for GitHub Copilot's ~128K effective context (defaults assume 200K+):
 |------|--------|-----------------|
 | `repo-context.md` | always | "Read the project's `AGENTS.md` and `.agents/skills/` if present" — silently no-ops when absent |
 | `script-usage.md` | always | Reference for `~/code/scripts/` utilities — `agent/` (`branch-to-ticket.sh`, `gh-current-pr.sh`, `gh-pr-comments.sh`, `sonar-pr-issues.sh`, `jira-fetch-ticket.sh`) and `lib/` helpers. Mentions that wpromote-internal scripts are documented separately |
-| `agent-defaults.md` | always | Standing engineering defaults — TDD posture, planning conversation routing, bug investigation routing, architecture review routing, long-running command discipline (Stryker, full test suites, broad scans), honest-disagreement posture |
+| `agent-defaults.md` | always | Standing engineering defaults — TDD posture, planning conversation routing, bug investigation routing, post-implementation audit routing, architecture review routing, long-running command discipline (Stryker, full test suites, broad scans), honest-disagreement posture |
 | `wpromote-context.md` | conditional (under `~/code/wpromote/`) | Wpromote repo topology incl. local dev URLs (`polaris.local`, `polarisiq.local`, `api.polaris.local`): `polaris-web`, `client-portal`, `polaris-api`, `cube`, `kraken`, `polaris-apps`, `wp-sdk`. Frontend → API → Cube/Kraken/BigQuery dependency map, Jira component → repo mapping, GCP/GKE gotchas, and the `~/code/wpromote/scripts/agent/` script catalog |
 
 ## Conditional Wpromote Context (launcher)

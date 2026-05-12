@@ -59,6 +59,15 @@ Detection precedence:
 3. If the user wants proactive defensive scanning, prefer `bug-hunter`.
 4. If the request is ambiguous between the two, ask which posture they want.
 
+## Post-implementation audit
+
+After Aragorn completes non-trivial work, Gandalf should load the `post-impl-audit` skill and dispatch Saruman before final verification. This audit compares Aragorn's actual output against the plan that authorized it; it is distinct from user-triggered PR review.
+
+Detection precedence:
+1. Explicit user request always wins (phrasing like "audit the implementation", "check Aragorn's work", or "post-impl review").
+2. Gandalf auto-dispatches for non-trivial work after Aragorn completes and before Verify.
+3. Skip for trivial work as defined by Gandalf's triage rubric (single file/intent, no design decisions, no ambiguity, no external system changes, reversible).
+
 ## Architecture review
 
 When the user asks for an architecture review, deepening-opportunity scan, or codebase-level refactoring proposal — phrasing like "review the architecture", "find deepening opportunities", "where's the architectural debt", "this codebase is a ball of mud", "make this more testable at the system level", "consolidate these tightly-coupled modules" — prefer the `improve-codebase-architecture` skill. It enforces a disciplined process (explore → present candidates → grilling loop on user-chosen candidate → optional parallel interface design) and uses a precise architecture vocabulary (module, interface, depth, seam, adapter, leverage, locality).

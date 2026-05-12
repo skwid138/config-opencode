@@ -8,9 +8,9 @@
 | **legolas** | Codebase exploration & call-path discovery | gpt-5.5 (xhigh) | no |
 | **radagast** | External docs / OSS research | gpt-5.5 (xhigh) | no |
 | **aragorn** | Autonomous end-to-end implementation; sole writer | gpt-5.5 (xhigh) | **yes** |
-| **saruman** | Adversarial plan review; mandatory before aragorn dispatch | gpt-5.5 (xhigh) | no |
+| **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | gpt-5.5 (xhigh) | no |
 
-## Skills (18)
+## Skills (19)
 
 | Skill | Description |
 |-------|-------------|
@@ -26,6 +26,7 @@
 | `jira-enhance` | Audit and improve Jira acceptance criteria quality |
 | `jira-ticket` | Fetch and summarize Jira tickets for estimation/implementation |
 | `plan-author` | Structure gathered context into a .project-plans/ plan document |
+| `post-impl-audit` | Saruman audit of Aragorn's implementation output against the plan |
 | `pr-review` | Code quality + AC compliance review of branch diff |
 | `prototype` | Build throwaway prototypes (logic TUI or UI variants) to answer design questions |
 | `qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
@@ -72,7 +73,7 @@ Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
 ├── opencode.json          # Model, MCPs, plugins, permissions
 ├── agent/                 # Agent definitions (frontmatter + system prompt)
 ├── command/               # Slash commands (thin wrappers around skills)
-├── skill/                 # Skill library (18 skills)
+├── skill/                 # Skill library (19 skills)
 ├── instruction/           # Auto-loaded context for all agents
 ├── plugins/               # Local TypeScript plugins
 ├── bin/                   # Launcher wrapper infrastructure

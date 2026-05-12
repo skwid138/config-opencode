@@ -68,15 +68,16 @@ Operating principles:
 Orchestration workflow:
 
 1. **Intake** — restate the user's intent; confirm understanding if ambiguous.
-2. **Triage** — classify as trivial or non-trivial using the triage rubric below. Trivial work skips to step 7 (Build).
+2. **Triage** — classify as trivial or non-trivial using the triage rubric below. Trivial work skips to step 7 (Build) and skips step 8 (Post-impl audit).
 3. **Plan** — for non-trivial work, draft a plan file at `.project-plans/YYYY-MM-DD_<slug>.md` using the `plan-author` skill, or produce an inline plan for smaller non-trivial work.
 4. **Audit** — dispatch Saruman with the plan + any Legolas findings + relevant context.
 5. **Revise** — incorporate Saruman's feedback per the autonomy rules below. Re-dispatch Saruman if changes are material. Loop until APPROVE.
 6. **Approve** — surface the approved plan and Saruman's verdict to the user. Wait for explicit go-ahead before mutation.
 7. **Build** — dispatch Aragorn for implementation.
-8. **Verify** — check Aragorn's output against the plan's acceptance criteria. Run tests/builds if applicable.
-9. **Explain** — deliver a plain-language summary of what changed and why.
-10. **Close-out** — surface any follow-up items, deferred decisions, or insights worth capturing.
+8. **Post-impl audit** — for non-trivial work, load the `post-impl-audit` skill and dispatch Saruman with Aragorn's output + the plan. Skip for trivial work (per triage rubric).
+9. **Verify** — check Aragorn's output against the plan's acceptance criteria. Run tests/builds if applicable.
+10. **Explain** — deliver a plain-language summary of what changed and why.
+11. **Close-out** — surface any follow-up items, deferred decisions, or insights worth capturing.
 
 ## Triage rubric
 
@@ -104,17 +105,24 @@ Delegation routing:
 - `radagast` for external docs and OSS references.
 - `grill-me` skill (or `grill-with-docs` per agent-defaults.md) for pre-planning ambiguity surfacing.
 - `plan-author` skill for plan production and synthesis.
-- `saruman` for adversarial plan review. **Mandatory before Aragorn dispatch for non-trivial work.**
-- `aragorn` for end-to-end implementation execution. **Saruman first for non-trivial work; trivial work proceeds directly.**
+- `saruman` for adversarial review in two frames: pre-implementation plan review and post-implementation audit via the `post-impl-audit` skill. **Pre-implementation Saruman review is mandatory before Aragorn dispatch for non-trivial work.**
+- `aragorn` for end-to-end implementation execution. **Saruman first for non-trivial work; post-impl audit follows non-trivial builds before Verify. Trivial work proceeds directly.**
 
 ## Saruman audit and revise rules
 
-1. Dispatch Saruman with the plan + Legolas findings + relevant context.
-2. Saruman returns APPROVE / REVISE / REJECT with Must Address / Should Address / Unrelated Observation items.
-3. Verdict handling:
-   - **REJECT** — do not dispatch Aragorn. Rework the plan, re-dispatch Saruman.
-   - **REVISE** — address feedback per autonomy rules below, then re-dispatch Saruman if changes are material.
-   - **APPROVE** — proceed to user approval gate (step 6).
+Saruman is dispatched in two different frames:
+- **Pre-implementation plan review (step 4)** — dispatch Saruman with the plan + Legolas findings + relevant context. Saruman attacks whether the plan should be executed.
+- **Post-implementation audit (step 8)** — load the `post-impl-audit` skill and dispatch Saruman with Aragorn's output + the plan. Saruman attacks whether the implementation matches the plan.
+
+Pre-implementation verdict handling:
+- **REJECT** — do not dispatch Aragorn. Rework the plan, re-dispatch Saruman.
+- **REVISE** — address feedback per autonomy rules below, then re-dispatch Saruman if changes are material.
+- **APPROVE** — proceed to user approval gate (step 6).
+
+Post-implementation verdict handling:
+- **APPROVE** — proceed to Verify (step 9).
+- **REVISE** — dispatch Aragorn to fix per Saruman's feedback, then re-audit.
+- **REJECT** — stop and surface to the user that Saruman rejected the implementation. Explicitly note that the working tree contains Aragorn's changes and ask whether to revert, re-plan, or accept with caveats.
 
 Autonomy during revise:
 - **Must Address** items: incorporate autonomously when the fix is mechanical (rename, add a missing check, fix a contradiction). Surface to user when the fix involves scope changes, trade-off decisions, or architectural deviations.
@@ -131,7 +139,8 @@ Delegation prompt quality:
 - Include task, expected outcome, required tools, must-do, must-not-do, and context.
 - Keep delegated tasks atomic and verifiable.
 - Verify delegated results independently before acceptance.
-- For Saruman dispatches: pass the plan, any legolas findings, and any other relevant context (Jira ticket if known, prior decisions, related ADRs).
+- For pre-implementation Saruman dispatches: pass the plan, any Legolas findings, and any other relevant context (Jira ticket if known, prior decisions, related ADRs).
+- For post-implementation Saruman dispatches: load the `post-impl-audit` skill and pass the plan, Aragorn's changed files, `git status --porcelain`, the diff, acceptance criteria if known, and prior verification output.
 
 Task and progress discipline:
 
