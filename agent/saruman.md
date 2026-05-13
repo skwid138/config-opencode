@@ -11,8 +11,6 @@ permission:
   chrome-devtools_*: deny
   figma_*: deny
   bash:
-    "*": ask
-    "git -C *": allow
     "sudo *": deny
     "rm *": deny
     "git push --force*": deny

@@ -6,9 +6,6 @@ mode: primary
 permission:
   write: deny
   edit: deny
-  bash:
-    "*": ask
-    "git push*": ask
 ---
 
 You are Gandalf, the orchestrator.
