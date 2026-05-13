@@ -5,8 +5,8 @@ description: >-
   implementation details for a ticket by analyzing the codebase. Use this skill
   when a user asks to review AC quality, improve acceptance criteria, check if AC
   are complete, "are the AC good enough", "what's missing from the AC", "flesh
-  out implementation details", "add technical details to the ticket", "plan the
-  implementation for BIXB-18835", or any request to evaluate or enhance Jira
+  out implementation details", "add technical details to the ticket", or any
+  request to evaluate or enhance Jira
   ticket content — even if they don't explicitly say "Jira" or "acceptance
   criteria." Also use when the user wants to prepare a ticket for development by
   adding technical implementation context.
@@ -16,7 +16,17 @@ description: >-
 
 Evaluate Jira ticket acceptance criteria for quality and completeness, and
 generate implementation details by analyzing the actual codebases involved.
-Posts results as Jira comments for team visibility.
+Previews results by default; posting to Jira is opt-in and gated.
+
+## Executor ownership
+
+The invoking agent may perform the read-only audit and codebase analysis.
+Codebase exploration should be delegated to **Legolas** when it is non-trivial.
+Jira comment mutations are not performed by read-only agents: `--post` requests
+posting, then Gandalf routes the comment body through Saruman review, user
+approval, and **Aragorn** execution. For non-trivial work, implementation routes
+through Gandalf's workflow: plan → Saruman pre-impl review → user approval →
+Aragorn execution → post-impl audit.
 
 ## When to use this skill
 
@@ -25,7 +35,6 @@ Posts results as Jira comments for team visibility.
 - "What's missing from this ticket?"
 - "Flesh out the implementation details"
 - "Add technical context to BIXB-18835"
-- "Plan the implementation for this ticket"
 - "What would it take to implement BIXB-18835?"
 - "Prepare BIXB-18835 for development"
 - "Is this ticket ready for dev?"
@@ -47,8 +56,14 @@ If the user's intent is ambiguous, ask which mode they want.
 | Input | Example | Handling |
 |-------|---------|---------|
 | Ticket ID | `BIXB-18835` | Use directly |
-| No argument | `/ac-quality` | Detect from branch name |
+| No argument | `/jira-ac-quality` or `/jira-add-imp-plan` | Detect from branch name |
 | URL | `https://wpromote.atlassian.net/browse/BIXB-18835` | Extract ID from path |
+
+Optional flags:
+
+| Flag | Purpose |
+|------|---------|
+| `--post` | Request posting the generated comment to Jira after Saruman review and user approval. Without this flag, preview only. |
 
 **Branch → Ticket conversion:**
 
@@ -69,12 +84,12 @@ and no ticket ID was provided, ask the user.
 
 ## Preflight
 
-1. **Verify acli:**
+1. **Verify wrapper script:**
    ```bash
-   which acli && acli auth status
+   ~/code/scripts/agent/jira-fetch-ticket.sh --help
    ```
-   If unavailable or unauthenticated, stop and instruct: "Install acli and run
-   `acli auth login`."
+   The wrapper handles its own `acli`/`jq` dependency and auth checks. Surface
+   its errors verbatim.
 
 2. **For impl-plan mode — verify git:**
    ```bash
@@ -86,11 +101,7 @@ and no ticket ID was provided, ask the user.
 Fetch the ticket data for both modes:
 
 ```bash
-# Plain text view for human-readable content
-acli jira workitem view <TICKET-ID>
-
-# Full JSON for structured fields
-acli jira workitem view <TICKET-ID> --fields '*all' --json
+~/code/scripts/agent/jira-fetch-ticket.sh --all <TICKET-ID>
 ```
 
 Parse the description to extract:
@@ -145,9 +156,16 @@ Check for common missing AC patterns:
 For each gap found, write a concrete, specific AC suggestion. Follow the same
 style as the existing AC in the ticket.
 
-### Step 5: Post as Jira comment
+### Step 5: Preview, then optional gated Jira comment
 
-Format the output and post as a comment on the ticket:
+Format the output as a plain-text Jira comment body and display it in chat.
+Without `--post`, stop here. With `--post`, do **not** post immediately:
+
+1. Surface the exact comment body for Saruman review.
+2. Gandalf dispatches Saruman to attack the comment for accuracy, scope creep,
+   unsafe advice, and unsupported claims.
+3. After Saruman approval, ask the user for explicit approval to post.
+4. Dispatch Aragorn to execute the Jira mutation:
 
 ```bash
 acli jira workitem comment create --key <TICKET-ID> --body "<content>"
@@ -195,7 +213,9 @@ From the fetched ticket, extract:
 
 ### Step 2: Map to repositories
 
-Use the Jira Component → Repository mapping:
+Use `instruction/wpromote-context.md` for Jira Component → Repository mapping
+when it has been conditionally loaded under `~/code/wpromote/`. If unavailable,
+use this fallback mapping and state that it is inferred:
 
 | Jira Component | Repository | Path |
 |---------------|------------|------|
@@ -216,21 +236,19 @@ If multiple repos are involved, explore each.
 
 ### Step 3: Explore the codebase(s)
 
-For each relevant repository:
+For each relevant repository, dispatch **Legolas** with a focused brief to:
 
-1. **Read project conventions:**
-   ```bash
-   cat ~/code/wpromote/<repo>/AGENTS.md 2>/dev/null
-   ```
-
-2. **Search for related code** based on AC keywords. Use grep/find to locate:
+1. Read project conventions (`AGENTS.md` and `.agents/skills/` if present).
+2. Search for related code based on AC keywords:
    - Existing implementations of similar features
    - Related API endpoints, components, or services
    - Data models and schemas involved
    - Test patterns used in the project
+3. Summarize the patterns: how the codebase handles similar features, what
+   conventions it follows, and what testing framework/patterns are used.
 
-3. **Understand the patterns** — how does the codebase handle similar features?
-   What conventions does it follow? What testing framework and patterns are used?
+Legolas must return structured findings with file paths and line numbers where
+useful, not raw file dumps.
 
 Spend time here — the implementation plan is only as good as the codebase
 understanding behind it. Read actual source files to understand patterns, don't
@@ -280,9 +298,12 @@ Risks and Open Questions:
   - [Items that need clarification before or during implementation]
 ```
 
-### Step 5: Post as Jira comment
+### Step 5: Preview, then optional gated Jira comment
 
-Post the implementation plan as a Jira comment:
+Display the implementation details in chat and render a plain-text Jira comment
+body. Without `--post`, stop here. With `--post`, do **not** post immediately:
+Saruman reviews the comment body, the user approves, then Aragorn executes the
+Jira mutation.
 
 ```bash
 acli jira workitem comment create --key <TICKET-ID> --body "<content>"

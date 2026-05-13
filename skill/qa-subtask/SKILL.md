@@ -8,9 +8,9 @@ description: >-
   BIXB-XXXX", "what should QA test", "pare down my QA notes", or any request to
   produce QA test instructions for a ticket — even if they don't explicitly say
   "QA subtask." Output is a ready-to-paste subtask description matching the
-  team's existing format. Defaults to read-only preview; pass `--push` to
-  update the existing QA subtask (or `--create` to create a new one) via the
-  vendored render + find + update + create scripts.
+  team's existing format. Defaults to preview with a local render-envelope file;
+  Jira mutations via `--push`, `--create`, or `--update` require Saruman review,
+  user approval, and Aragorn execution.
 ---
 
 # QA Subtask Generator
@@ -18,6 +18,15 @@ description: >-
 Produce concise, scannable QA subtask descriptions that match the team's
 established pattern. The skill reads peer QA subtasks to learn the house style,
 then applies that style to the target story.
+
+## Executor ownership
+
+The invoking agent may perform read-only Jira/PR/code analysis and render the
+preview envelope locally. Preview mode has a local write side-effect: it saves a
+render envelope file (for example `/tmp/qa-render-BIXB-XXXXX.json`) containing
+ADF + plain text. Jira mutations are remote writes and must route through
+Gandalf: Saruman reviews the exact update/create body, the user approves, and
+**Aragorn** executes the `--push`, `--create`, or `--update` mutation.
 
 Peer QA tickets are the spec — the shape of a good QA subtask is whatever the
 team's recently-shipped subtasks look like, not a generic template. Always
@@ -40,7 +49,7 @@ additional one).
 
 Do **not** use this skill to:
 - Audit AC quality (use `jira-enhance` ac-audit mode)
-- Generate implementation plans (use `jira-enhance` impl-plan or `ticket-plan`)
+- Generate implementation plans (use `jira-enhance` impl-plan or `jira-plan`)
 - Review PR code (use `pr-review`)
 - Run QA itself (no automation; this is a human handoff document)
 
@@ -64,9 +73,9 @@ Optional flags:
 | `--no-scope` | Drop the `SCOPE:` row from the output (passes through to renderer) |
 | `--no-input` | Drop the `INPUT DATA/EXPECTED OUTPUT` row from the output |
 | `--keep-helpers` | Keep the right-column italic helper text in each row (default is to drop it, matching peer corpus) |
-| `--push` | After generating, mutate Jira: update the existing QA subtask if one is found, otherwise refuse and require `--create`. Without this flag, the skill **previews and stops**. |
-| `--create` | Force the create path even when an existing QA subtask is found (e.g. team needs a second QA subtask for a story). Implies `--push`. |
-| `--update <KEY>` | Skip auto-discovery and update the named QA subtask explicitly. Implies `--push`. |
+| `--push` | Request a gated Jira update after preview: update the existing QA subtask if one is found, otherwise refuse and require `--create`. Without this flag, the skill **previews and stops**. |
+| `--create` | Request the gated create path even when an existing QA subtask is found (e.g. team needs a second QA subtask for a story). Implies `--push`. |
+| `--update <KEY>` | Request a gated update of the named QA subtask explicitly. Implies `--push`. |
 | `--force` | Pass through to `jira-update-subtask.sh --force` so the update overwrites a non-template (already-filled) description. Use sparingly. |
 
 ### Resolving the SOURCE base URL
@@ -292,16 +301,25 @@ Show the user:
    table mapping verbose → pared-down so the user can sanity-check the
    compression
 4. **Path to the saved render envelope** (e.g. `/tmp/qa-render-BIXB-XXXXX.json`)
-   so subsequent calls can re-use it
+   so subsequent calls can re-use it. This file is a local write side-effect
+   even when no Jira mutation occurs.
 
-### Phase 7: Push (gated)
+### Phase 7: Push / create / update (gated)
 
 If `--push` was **not** passed, stop after Phase 6. Do not call any mutation
 script. The user can paste the preview into Jira manually, or re-invoke with
 `--push` to confirm.
 
-If `--push` is passed, route based on Phase 1.5's discovery + the user's
-explicit overrides:
+If `--push`, `--create`, or `--update` is passed, do **not** mutate Jira
+immediately. First:
+
+1. Surface the exact summary and render-envelope path that would be sent.
+2. Dispatch Saruman to review the Jira body for accuracy, scope, and safety.
+3. Wait for explicit user approval after Saruman's verdict.
+4. Dispatch Aragorn to run the mutation script.
+
+After the gate, route based on Phase 1.5's discovery + the user's explicit
+overrides:
 
 **Update path (default when an existing template-state subtask is found):**
 
@@ -392,18 +410,19 @@ ADDITIONAL NOTES/ATTACHMENTS:
 
 ### Next step
 
-Without `--push`: paste the preview into a new QA subtask in Jira manually,
-or re-invoke with `--push` to create it via `jira-create-subtask.sh`.
+Without `--push`: paste the preview into Jira manually, or re-invoke with
+`--push`/`--create`/`--update` to request a gated Jira mutation.
 
-With `--push`: subtask created at <url>.
+With `--push`: after Saruman review, user approval, and Aragorn execution,
+subtask updated/created at <url>.
 ````
 
 ## Guardrails
 
-- **Mutation is opt-in.** Without `--push`, the skill is read-only: it
-  produces a preview + render envelope and stops. The push step requires
-  explicit confirmation, either via the `--push` flag or a follow-up "yes,
-  push it" from the user.
+- **Mutation is opt-in and gated.** Without `--push`, `--create`, or `--update`,
+  the skill performs no Jira mutation; it produces a preview plus a local render
+  envelope file and stops. Push/create/update requires the flag, Saruman review,
+  explicit user approval, and Aragorn execution.
 - **Never invent AC.** If the parent ticket's AC are missing or boilerplate,
   warn the user and stop. AC quality is a `jira-enhance` problem, not a QA
   generation problem.
