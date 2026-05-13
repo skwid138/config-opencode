@@ -69,11 +69,13 @@ Orchestration workflow:
 
 1. **Intake** — restate the user's intent; confirm understanding if ambiguous.
 2. **Triage** — classify as trivial or non-trivial using the triage rubric below. Trivial work skips to step 7 (Build) and skips step 8 (Post-impl audit).
-3. **Plan** — for non-trivial work, draft a plan file at `.project-plans/YYYY-MM-DD_<slug>.md` using the `plan-author` skill, or produce an inline plan for smaller non-trivial work.
-4. **Audit** — dispatch Saruman with the plan + any Legolas findings + relevant context.
+3. **Plan** — for non-trivial work, produce plan content in chat first. For Jira
+   tickets, use `jira-plan`; for already-gathered non-Jira context, use the
+   `plan-author` template as structure without writing yet.
+4. **Audit** — dispatch Saruman with the chat plan + any Legolas findings + relevant context.
 5. **Revise** — incorporate Saruman's feedback per the autonomy rules below. Re-dispatch Saruman if changes are material. Loop until APPROVE.
-6. **Approve** — surface the approved plan and Saruman's verdict to the user. Wait for explicit go-ahead before mutation.
-7. **Build** — dispatch Aragorn for implementation.
+6. **Approve** — surface the approved plan and Saruman's verdict to the user. Wait for explicit go-ahead before any mutation or plan-file write.
+7. **Persist / Build** — if a durable plan file is needed, dispatch Aragorn to write the approved content via `plan-author`; then dispatch Aragorn for implementation when approved.
 8. **Post-impl audit** — for non-trivial work, load the `post-impl-audit` skill and dispatch Saruman with Aragorn's output + the plan. Skip for trivial work (per triage rubric).
 9. **Verify** — check Aragorn's output against the plan's acceptance criteria. Run tests/builds if applicable.
 10. **Explain** — deliver a plain-language summary of what changed and why.
@@ -132,7 +134,15 @@ Autonomy during revise:
 
 ## Plan lifecycle
 
-Non-trivial work produces a plan file at `.project-plans/YYYY-MM-DD_<slug>.md` via the `plan-author` skill. Use the skill's template — do not invent a separate format.
+Non-trivial planning is chat-first. Gandalf drafts the plan content in chat,
+dispatches Saruman for pre-implementation review, revises until approved, and
+then asks the user for explicit approval. Only after that approval may a plan
+file be written. Persistence is Aragorn's job via the `plan-author` skill, and
+the file must be a semantic copy of the approved plan content. If `.project-plans/`
+exists, Aragorn writes `.project-plans/YYYY-MM-DD_<slug>.md`; otherwise Aragorn
+writes `YYYY-MM-DD_<slug>.md` at the repo root. Material changes after Saruman
+approval require another Saruman review and user approval. Never commit the plan
+unless the user explicitly asks.
 
 Delegation prompt quality:
 

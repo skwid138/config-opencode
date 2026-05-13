@@ -36,7 +36,7 @@ If it is unclear whether a change is "executable code" (e.g. a config file with 
 
 When the user wants to stress-test a plan, pressure-test an idea, or "make sure we're on the same page," prefer the `grill-me` skill (relentless one-question-at-a-time grilling, terminology disambiguation, search-before-ask).
 
-If the project being discussed has a `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/` directory — or if the user explicitly invokes documentation (e.g. "stress-test against the glossary," "update CONTEXT.md") — prefer the `grill-with-docs` skill instead. It applies the same grilling discipline plus persists resolved terminology to `CONTEXT.md` and architecture decisions to `docs/adr/`.
+If the project being discussed has a `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/` directory — or if the user explicitly invokes documentation (e.g. "stress-test against the glossary," "update CONTEXT.md") — prefer the `grill-with-docs` skill instead. It applies the same grilling discipline and routes approved documentation writes to Aragorn for `CONTEXT.md` / `docs/adr/` persistence.
 
 Detection precedence:
 1. Explicit user invocation always wins.
@@ -49,7 +49,7 @@ The skills' descriptions trigger on overlapping vocabulary; this instruction is 
 
 When the user reports a bug, regression, or unexpected behavior — "X is broken," "this throws," "Y started failing," "performance got worse," "diagnose this," "debug this" — prefer the `diagnose` skill. It enforces a disciplined loop (build feedback signal → reproduce → hypothesise → instrument → propose fix + regression test → hand off) instead of letting the agent dive straight into code-poking.
 
-The skill is read-only investigation: it produces a diagnosis package and a recommended fix, but does not apply the fix. Implementation hands off to the user or to a write-capable agent.
+The skill is read-only investigation: it produces a diagnosis package and a recommended fix, but does not apply the fix. Implementation hands off to the user or to Aragorn through Gandalf's workflow.
 
 For *proactive* bug-finding ("audit this for bugs," "find runtime errors," "check for null safety") prefer the `bug-hunter` skill instead — it's a defensive scan, not a reactive debugging loop.
 
@@ -72,7 +72,7 @@ Detection precedence:
 
 When the user asks for an architecture review, deepening-opportunity scan, or codebase-level refactoring proposal — phrasing like "review the architecture", "find deepening opportunities", "where's the architectural debt", "this codebase is a ball of mud", "make this more testable at the system level", "consolidate these tightly-coupled modules" — prefer the `improve-codebase-architecture` skill. It enforces a disciplined process (explore → present candidates → grilling loop on user-chosen candidate → optional parallel interface design) and uses a precise architecture vocabulary (module, interface, depth, seam, adapter, leverage, locality).
 
-The skill is read-only investigation: it produces deepening proposals and recommended interface designs, but does not execute refactors. Implementation hands off to the user or to a write-capable agent.
+The skill is read-only investigation: it produces deepening proposals and recommended interface designs, but does not execute refactors. Implementation hands off to the user or to Aragorn through Gandalf's workflow; any documentation writes also route through Aragorn.
 
 **Do NOT auto-fire on local refactor requests** — "rename this function", "extract this helper", "clean up this file", "refactor this loop" are local edits, not architecture review. The skill is for system-level deepening (clusters of shallow modules, missing seams, tightly-coupled components across files). When in doubt, ask whether the user wants a system-level review or a local refactor.
 

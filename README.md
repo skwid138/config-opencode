@@ -20,16 +20,16 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 │   ├── aragorn.md               # Implementation subagent (sole writer)
 │   └── saruman.md               # Adversarial reviewer subagent
 ├── command/                     # Slash commands that drive skills
-│   ├── ticket.md, plan.md, plan-author.md, ac-quality.md, impl-plan.md
-│   ├── review.md, check-ac.md, review-plan.md, sonar.md
-│   ├── qa-subtask.md, bug-hunt.md
+│   ├── jira-ticket.md, jira-plan.md, plan-author.md
+│   ├── jira-ac-quality.md, jira-add-imp-plan.md, jira-qa-subtask.md
+│   ├── review.md, review-plan.md, sonar.md, bug-hunt.md
 │   └── scripts-doctor.md, update-opencode-deps.md
 ├── skill/                       # Local skill library (19 skills)
 │   ├── bug-hunter/, chrome-devtools/, diagnose/, figma/
 │   ├── gh-fetch-pr-comments/, github-review-analyzer/, grill-me/, grill-with-docs/
 │   ├── improve-codebase-architecture/, jira-enhance/, jira-ticket/, plan-author/
 │   ├── post-impl-audit/, pr-review/, prototype/, qa-subtask/, sonarcloud/, tdd/
-│   └── ticket-plan/
+│   └── jira-plan/
 ├── instruction/                 # Auto-loaded into every agent's context
 │   ├── repo-context.md, script-usage.md
 │   ├── agent-defaults.md
@@ -66,26 +66,28 @@ All agents are defined locally under `agent/`. The default OpenCode `build`, `pl
 Commands live in `command/*.md` and are thin wrappers around skills.
 
 ### Jira / ticket workflow
+Jira-facing commands intentionally use a `jira-` prefix so ticket reads,
+planning, Jira comments, and QA subtask generation are visibly separated.
+
 | Command | Skill | What it does |
 |---------|-------|-------------|
-| `/ticket <ID>` | jira-ticket | Fetch and summarize a ticket (auto-detects from branch if no ID) |
-| `/plan [--quick] [--post-jira]` | ticket-plan | Full implementation plan: fetch ticket → explore codebases → synthesize plan |
-| `/plan-author [slug]` | plan-author | Structure gathered context into a .project-plans/ plan document |
-| `/ac-quality` | jira-enhance | Audit AC quality, post improvements as Jira comment |
-| `/impl-plan` | jira-enhance | Generate implementation details from codebase, post to Jira |
+| `/jira-ticket <ID>` | jira-ticket | Fetch and summarize a ticket (auto-detects from branch if no ID); supports estimation |
+| `/jira-plan [--post]` | jira-plan | Chat-first plan: fetch ticket → Legolas explores → Gandalf synthesizes → Saruman reviews → user approves → Aragorn persists/implements |
+| `/plan-author [slug]` | plan-author | Persist reviewed and approved gathered context into a plan document |
+| `/jira-ac-quality [--post]` | jira-enhance | Preview AC quality audit; `--post` requests gated Jira comment |
+| `/jira-add-imp-plan [--post]` | jira-enhance | Preview implementation details from codebase; `--post` requests gated Jira comment |
 
 ### PR / code review
 | Command | Skill | What it does |
 |---------|-------|-------------|
 | `/review` | pr-review | Code quality + AC compliance review of current branch diff |
-| `/check-ac` | pr-review | AC-compliance only |
-| `/review-plan [--quick] [--jira ID]` | gh-fetch-pr-comments + github-review-analyzer | Tiered change plan from PR review comments |
+| `/review-plan [--ticket ID]` | gh-fetch-pr-comments + github-review-analyzer | Analyze PR comments, synthesize Critical + Recommended into a Gandalf-reviewed execution plan |
 | `/sonar [--severity LEVEL]` | sonarcloud | Fetch SonarCloud issues for the current PR |
 
 ### QA
 | Command | Skill | What it does |
 |---------|-------|-------------|
-| `/qa-subtask [ticket] [--push]` | qa-subtask | Generate a Jira QA subtask description from ticket AC + PR/code context; previews by default and only mutates Jira with push flags |
+| `/jira-qa-subtask [ticket] [--push]` | qa-subtask | Generate a Jira QA subtask description from ticket AC + PR/code context; previews by default with a local render envelope and gates Jira mutations |
 
 ### Defensive analysis
 | Command | Skill | What it does |
@@ -114,19 +116,19 @@ Commands live in `command/*.md` and are thin wrappers around skills.
 | `chrome-devtools` | "open the page", UI debugging, browser-driven inspection, Lighthouse, Figma-in-browser fallback |
 | `figma` | Figma URLs, design implementation, design-token extraction |
 | `gh-fetch-pr-comments` | Raw PR review comment retrieval (data layer for analyzer) |
-| `github-review-analyzer` | "triage PR comments", deep PR review analysis with codebase context |
+| `github-review-analyzer` | "triage PR comments", deep PR review analysis with codebase context and Gandalf action-plan handoff |
 | `jira-enhance` | "improve AC", "flesh out ticket", AC-quality audits |
-| `jira-ticket` | Any Jira ticket ID or URL — adapts to summary/estimate/implement/test intents |
+| `jira-ticket` | Any Jira ticket ID or URL for summary/scope/estimate; implementation routes to jira-plan/Aragorn |
 | `pr-review` | "review my PR", "does my code satisfy the AC" |
 | `prototype` | "prototype this", "let me play with it", "try a few designs", sanity-check data models or UI options |
 | `sonarcloud` | "what did sonar find", static-analysis triage |
 | `tdd` | "write tests first", "TDD this", red-green-refactor flow |
-| `ticket-plan` | "plan this ticket", multi-codebase implementation planning |
+| `jira-plan` | "plan this ticket", chat-first multi-codebase implementation planning |
 | `plan-author` | "write a plan", "structure this into a plan", plan document from gathered context |
 | `post-impl-audit` | "audit the implementation", "check Aragorn's work", post-Aragorn implementation audit against a plan |
 | `diagnose` | "diagnose this", "debug this", disciplined bug/regression investigation loop |
 | `grill-me` | "grill me", "stress-test this plan", one-question-at-a-time interrogation |
-| `grill-with-docs` | "stress-test against the glossary", grilling + CONTEXT.md/ADR persistence |
+| `grill-with-docs` | "stress-test against the glossary", grilling + routes CONTEXT.md/ADR writes through Aragorn |
 | `improve-codebase-architecture` | "review the architecture", system-level deepening-opportunity scan |
 | `qa-subtask` | "write QA steps", "create a QA subtask", generate QA instructions from AC + PR |
 

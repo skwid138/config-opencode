@@ -21,18 +21,18 @@
 | `gh-fetch-pr-comments` | Raw PR review comment retrieval (data layer) |
 | `github-review-analyzer` | Deep PR review analysis with codebase context, tiered change plan |
 | `grill-me` | One-question-at-a-time interrogation to stress-test plans |
-| `grill-with-docs` | Grilling + persistence to CONTEXT.md and ADR docs |
+| `grill-with-docs` | Grilling + routes CONTEXT.md and ADR doc writes through Aragorn |
 | `improve-codebase-architecture` | System-level architecture review and deepening-opportunity scan |
 | `jira-enhance` | Audit and improve Jira acceptance criteria quality |
-| `jira-ticket` | Fetch and summarize Jira tickets for estimation/implementation |
-| `plan-author` | Structure gathered context into a .project-plans/ plan document |
+| `jira-ticket` | Fetch and summarize Jira tickets for summary/estimation |
+| `plan-author` | Persist reviewed gathered context into a plan document |
 | `post-impl-audit` | Saruman audit of Aragorn's implementation output against the plan |
 | `pr-review` | Code quality + AC compliance review of branch diff |
 | `prototype` | Build throwaway prototypes (logic TUI or UI variants) to answer design questions |
 | `qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
 | `sonarcloud` | Fetch and analyze SonarCloud issues for a PR |
 | `tdd` | Test-driven development: red-green-refactor cycle |
-| `ticket-plan` | Multi-codebase implementation planning from Jira tickets |
+| `jira-plan` | Chat-first multi-codebase implementation planning from Jira tickets |
 
 Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
 
@@ -43,6 +43,9 @@ Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
 - **Long-running command discipline** — explain, show command, estimate cost, ask before running expensive operations.
 - Refer to `instruction/agent-defaults.md` for full standing defaults.
 - Refer to `instruction/script-usage.md` for available shell scripts and conventions.
+- Jira-facing commands use a `jira-` prefix (`/jira-ticket`, `/jira-plan`,
+  `/jira-ac-quality`, `/jira-add-imp-plan`, `/jira-qa-subtask`) so ticket reads,
+  planning, Jira comments, and QA subtask generation are visibly separated.
 
 ## Git Workflow
 
@@ -56,7 +59,8 @@ Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
 - `~/code/scripts/` — managed separately; read-only from this config's perspective.
 - `opencode.json` — only modify when explicitly asked (model bumps, MCP changes).
 - Agent frontmatter `permission` blocks — only modify when explicitly asked.
-- `.project-plans/` — do not create or modify.
+- `.project-plans/` — do not create or modify except through the approved
+  Gandalf → Saruman → user approval → Aragorn `plan-author` persistence flow.
 - `docs/` — reference documentation; do not modify without explicit ask.
 
 ## Testing
