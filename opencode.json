@@ -39,6 +39,7 @@
         "bash": {
             "*": "ask",
             "bats": "allow",
+            "brew info*": "allow",
             "cat *": "allow",
             "diff *": "allow",
             "dirname *": "allow",
@@ -57,6 +58,7 @@
             "gh repo view*": "allow",
             "gh run list*": "allow",
             "gh run view*": "allow",
+            "git -C *": "allow",
             "git blame*": "allow",
             "git branch*": "allow",
             "git diff*": "allow",
