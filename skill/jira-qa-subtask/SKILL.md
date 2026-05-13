@@ -1,5 +1,5 @@
 ---
-name: qa-subtask
+name: jira-qa-subtask
 description: >-
   Generate a concise QA subtask description for a Jira story by analyzing the
   story's acceptance criteria, the implementing PR/code, and the team's

@@ -29,7 +29,7 @@
 | `post-impl-audit` | Saruman audit of Aragorn's implementation output against the plan |
 | `pr-review` | Code quality + AC compliance review of branch diff |
 | `prototype` | Build throwaway prototypes (logic TUI or UI variants) to answer design questions |
-| `qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
+| `jira-qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
 | `sonarcloud` | Fetch and analyze SonarCloud issues for a PR |
 | `tdd` | Test-driven development: red-green-refactor cycle |
 | `jira-plan` | Chat-first multi-codebase implementation planning from Jira tickets |

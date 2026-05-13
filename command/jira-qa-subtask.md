@@ -5,7 +5,7 @@ description: >-
   envelope, and gates any Jira mutation through Saruman review, user approval,
   and Aragorn execution.
 ---
-Use the `qa-subtask` skill to produce a QA subtask description for a Jira
+Use the `jira-qa-subtask` skill to produce a QA subtask description for a Jira
 story.
 
 **Default behavior:** preview. The skill renders the description via

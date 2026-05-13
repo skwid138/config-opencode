@@ -28,7 +28,7 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 │   ├── bug-hunter/, chrome-devtools/, diagnose/, figma/
 │   ├── gh-fetch-pr-comments/, github-review-analyzer/, grill-me/, grill-with-docs/
 │   ├── improve-codebase-architecture/, jira-enhance/, jira-ticket/, plan-author/
-│   ├── post-impl-audit/, pr-review/, prototype/, qa-subtask/, sonarcloud/, tdd/
+│   ├── post-impl-audit/, pr-review/, prototype/, jira-qa-subtask/, sonarcloud/, tdd/
 │   └── jira-plan/
 ├── instruction/                 # Auto-loaded into every agent's context
 │   ├── repo-context.md, script-usage.md
@@ -87,7 +87,7 @@ planning, Jira comments, and QA subtask generation are visibly separated.
 ### QA
 | Command | Skill | What it does |
 |---------|-------|-------------|
-| `/jira-qa-subtask [ticket] [--push]` | qa-subtask | Generate a Jira QA subtask description from ticket AC + PR/code context; previews by default with a local render envelope and gates Jira mutations |
+| `/jira-qa-subtask [ticket] [--push]` | jira-qa-subtask | Generate a Jira QA subtask description from ticket AC + PR/code context; previews by default with a local render envelope and gates Jira mutations |
 
 ### Defensive analysis
 | Command | Skill | What it does |
@@ -130,7 +130,7 @@ planning, Jira comments, and QA subtask generation are visibly separated.
 | `grill-me` | "grill me", "stress-test this plan", one-question-at-a-time interrogation |
 | `grill-with-docs` | "stress-test against the glossary", grilling + routes CONTEXT.md/ADR writes through Aragorn |
 | `improve-codebase-architecture` | "review the architecture", system-level deepening-opportunity scan |
-| `qa-subtask` | "write QA steps", "create a QA subtask", generate QA instructions from AC + PR |
+| `jira-qa-subtask` | "write QA steps", "create a QA subtask", generate QA instructions from AC + PR |
 
 ## MCPs
 
