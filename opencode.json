@@ -38,6 +38,7 @@
         "write": "ask",
         "bash": {
             "*": "ask",
+            "bats": "allow",
             "cat *": "allow",
             "diff *": "allow",
             "dirname *": "allow",
