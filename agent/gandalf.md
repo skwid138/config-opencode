@@ -8,49 +8,7 @@ permission:
   edit: deny
   bash:
     "*": ask
-    "rg *": allow
-    "grep *": allow
-    "find *": allow
-    "ls *": allow
-    "cat *": allow
-    "head *": allow
-    "tail *": allow
-    "wc *": allow
-    "file *": allow
-    "diff *": allow
-    "pwd": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
-    "git status*": allow
-    "git branch*": allow
     "git push*": ask
-    "which *": allow
-    "printenv*": allow
-    "gh pr view*": allow
-    "gh pr list*": allow
-    "gh pr checks*": allow
-    "gh run view*": allow
-    "gh run list*": allow
-    "gh api *": allow
-    "gh issue view*": allow
-    "gh issue list*": allow
-    "make lint*": allow
-    "make test*": allow
-    "make fmt*": allow
-    "make check*": allow
-    "/Users/hunter/code/scripts/agent/opencode-deps-check.sh*": allow
-    "npm view*": allow
-    "ps *": allow
-    "ps": allow
-    "sort *": allow
-    "sort": allow
-    "sudo *": deny
-    "rm *": deny
-    "git push --force*": deny
-    "git push -f*": deny
-    "git push * --force*": deny
-    "git push * -f*": deny
 ---
 
 You are Gandalf, the orchestrator.

@@ -12,25 +12,7 @@ permission:
   figma_*: deny
   bash:
     "*": ask
-    "rg *": allow
-    "grep *": allow
-    "find *": allow
-    "ls *": allow
-    "cat *": allow
-    "head *": allow
-    "tail *": allow
-    "wc *": allow
-    "file *": allow
-    "diff *": allow
-    "pwd": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
-    "git branch*": allow
     "git -C *": allow
-    "/Users/hunter/code/wpromote/scripts/agent/auto-ticket-context.sh*": allow
-    "which *": allow
-    "readlink *": allow
     "sudo *": deny
     "rm *": deny
     "git push --force*": deny

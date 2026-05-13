@@ -12,21 +12,7 @@ permission:
   figma_*: deny
   bash:
     "*": ask
-    "rg *": allow
-    "grep *": allow
-    "find *": allow
-    "ls *": allow
-    "cat *": allow
-    "head *": allow
-    "tail *": allow
-    "wc *": allow
-    "file *": allow
-    "pwd": allow
-    "git log*": allow
-    "git show*": allow
-    "git diff*": allow
     "brew info*": allow
-    "readlink *": allow
     "printf *": allow
     "sudo *": deny
     "rm *": deny
