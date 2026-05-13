@@ -166,15 +166,24 @@ acli jira workitem search \
   --fields summary --json | jq '.[].key' | head -<n>
 ```
 
-If that JQL returns zero results, broaden the filter before falling back to
-the standard skeleton:
+At the start of a new sprint, the primary query may return zero results
+because recently completed QA subtasks belong to the previous sprint. If that
+JQL returns zero results, progressively broaden the search to ensure peer
+samples are found before falling back to the standard skeleton:
 
 ```bash
 # Fallback 1: drop the status filter (may include in-flight QA tickets).
 acli jira workitem search \
   --jql "project = ${PROJECT} AND summary ~ \"QA |\" ORDER BY updated DESC" ...
 
-# Fallback 2: drop the "QA |" prefix and search by issuetype.
+# Fallback 2: sprint boundary — look for completed QA subtasks in previous sprints.
+# Useful at the start of a new sprint when the current sprint has no shipped QA work yet.
+# Prioritize samples assigned to or reported by the same user/team members from the current ticket context.
+acli jira workitem search \
+  --jql "project = ${PROJECT} AND summary ~ \"QA |\" AND status = Done AND sprint in closedSprints() ORDER BY updated DESC" \
+  --fields summary --json | jq '.[].key' | head -<n>
+
+# Fallback 3: drop the "QA |" prefix and search by issuetype.
 acli jira workitem search \
   --jql "project = ${PROJECT} AND issuetype = QA ORDER BY updated DESC" ...
 ```
