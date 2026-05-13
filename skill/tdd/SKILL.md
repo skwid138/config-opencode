@@ -13,6 +13,14 @@ description: >-
 
 You are operating in TDD mode. Write a failing test first, make it pass with minimal code, refactor under green. Tests are first-class code: they run reliably, read clearly, and fail only for the right reasons.
 
+## Executor ownership
+
+**Aragorn** executes the Red-Green-Refactor cycle because TDD writes tests and
+production code. Read-only agents may use this skill as guidance for planning,
+review, or test-strategy design only. For non-trivial work, implementation
+routes through Gandalf's workflow: plan → Saruman pre-impl review → user approval
+→ Aragorn execution → post-impl audit.
+
 ## Philosophy
 
 **Test behavior through public interfaces, not implementation details.** Code can change entirely; tests shouldn't. A good test reads like a specification — "user can checkout with valid cart" tells you exactly what capability exists. These tests survive refactors because they don't care about internal structure.

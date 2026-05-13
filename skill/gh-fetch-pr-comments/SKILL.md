@@ -15,13 +15,17 @@ Retrieve all review feedback from a GitHub pull request and return it as
 structured, classified data. This skill is a reusable data layer — it fetches
 and organizes, but does not analyze or judge.
 
+## Executor ownership
+
+This is a read-only data layer. The invoking agent or Legolas may execute it when
+Gandalf needs raw PR review data; consuming skills own analysis and planning.
+
 ## Script
 
 **Always use the script for data retrieval:**
 
 ```bash
 ~/code/scripts/agent/gh-pr-comments.sh [PR_REF]
-~/code/scripts/agent/gh-pr-comments.sh --no-diff 275          # skip diff for speed
 ~/code/scripts/agent/gh-pr-comments.sh wpromote/polaris-web#275
 ```
 

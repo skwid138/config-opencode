@@ -11,6 +11,13 @@ description: >-
 
 Extract design information from Figma files to inform implementation.
 
+## Executor ownership
+
+The invoking agent extracts and reports design context. Figma file inspection is
+read-only unless the user explicitly asks otherwise. Implementation from Figma
+routes through Gandalf's workflow: plan → Saruman pre-impl review → user approval
+→ Aragorn execution → post-impl audit.
+
 ## Connection methods (in priority order)
 
 ### 1. Figma Desktop MCP (preferred)

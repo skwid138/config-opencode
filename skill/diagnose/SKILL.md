@@ -14,7 +14,16 @@ description: >-
 
 A discipline for hard bugs. Skip phases only when explicitly justified.
 
-**This skill is read-only investigation.** You build a feedback loop, reproduce the bug, generate hypotheses, instrument, and arrive at a diagnosis with a recommended fix and a regression-test design. You **do not** apply the fix, restart services, mutate config, or modify production code beyond the bounded carve-out in Phase 5. When the diagnosis is complete, hand off — to the user, to aragorn (via the Task tool), or to whichever agent owns implementation.
+## Executor ownership
+
+The invoking agent executes this read-only investigation workflow. Diagnosis
+does not apply fixes, restart services, mutate config, or modify production
+code. If a failing regression test or implementation change should be written,
+that work must be dispatched to the write-capable agent, **Aragorn**. For
+non-trivial work, implementation routes through Gandalf's workflow: plan →
+Saruman pre-impl review → user approval → Aragorn execution → post-impl audit.
+
+**This skill is read-only investigation.** You build a feedback loop, reproduce the bug, generate hypotheses, instrument, and arrive at a diagnosis with a recommended fix and a regression-test design. You **do not** apply the fix, restart services, mutate config, modify production code, or write tests inside this skill. When the diagnosis is complete, hand off — to the user, to Aragorn through Gandalf's dispatch workflow, or to whichever route the user explicitly chooses.
 
 When exploring the codebase, use the project's domain glossary (CONTEXT.md if present) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
@@ -89,11 +98,16 @@ See [instrumentation.md](instrumentation.md) for log tagging conventions, perf m
 
 ## Phase 5 — Propose fix + design regression test
 
-This skill does not apply fixes. It produces a fix proposal and, where possible, a failing regression test that proves both the bug and the fix correctness.
+This skill does not apply fixes. It produces a fix proposal and, where possible,
+a failing regression-test design that proves both the bug and the fix
+correctness once Aragorn writes it.
 
-### The carve-out: writing the failing regression test
+### Failing regression test design
 
-Writing a failing test is allowed here because it is bounded, reversible, and serves as evidence for the diagnosis. Showing a red test alongside the diagnosis is the strongest form of "I am right about what is wrong."
+This skill designs the failing regression test but does not write it. Writing
+even a red test is a local file mutation, so it routes to Aragorn. Showing a red
+test alongside the diagnosis is still the strongest form of "I am right about
+what is wrong," but Aragorn owns that write step.
 
 A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
 
@@ -101,9 +115,10 @@ A correct seam is one where the test exercises the **real bug pattern** as it oc
 
 If a correct seam exists:
 
-1. Turn the minimised repro into a failing test at that seam.
-2. Watch it fail. Confirm it fails for the right reason.
-3. **Stop.** Do not apply the fix. The failing test is your evidence.
+1. Specify how to turn the minimised repro into a failing test at that seam.
+2. Include the exact command Aragorn should run to watch it fail and confirm the
+   failure reason.
+3. **Stop.** Do not write the test or apply the fix in this skill.
 
 ### The handoff
 
@@ -112,12 +127,13 @@ Produce a diagnosis package containing:
 - **Symptom.** What the user reported, restated precisely.
 - **Repro.** The Phase 1 loop and how to run it.
 - **Cause.** The hypothesis that survived Phase 4, stated mechanistically (what is happening, where, why).
-- **Evidence.** The probe outputs, the failing regression test (if you wrote one), the ruled-out hypotheses.
+- **Evidence.** The probe outputs, the proposed regression test for Aragorn to implement, the ruled-out hypotheses.
 - **Recommended fix.** Specific code change at a specific seam, with rationale. Not the patch itself — the description.
 - **Risks of the fix.** What it might break, what to verify after.
 - **Follow-ups.** Architectural concerns surfaced (Phase 6 candidates), missing test coverage, related code smells.
 
-Hand the package to the user, to aragorn (via the Task tool, with the package as the prompt), or to whichever agent the user routes to.
+Hand the package to the user or to Gandalf for Aragorn dispatch with the package
+as the implementation prompt.
 
 ## Phase 6 — Post-mortem (still read-only)
 

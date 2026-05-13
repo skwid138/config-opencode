@@ -7,6 +7,13 @@ description: Build a throwaway prototype to flush out a design before committing
 
 A prototype is **throwaway code that answers a question**. The question decides the shape.
 
+## Executor ownership
+
+**Aragorn** creates prototype files. Read-only agents can use this skill to
+design or plan a prototype, but must route file creation to Aragorn. For
+non-trivial work, implementation routes through Gandalf's workflow: plan →
+Saruman pre-impl review → user approval → Aragorn execution → post-impl audit.
+
 ## Pick a branch
 
 Identify which question is being answered — from the user's prompt, the surrounding code, or by asking if the user is around:
@@ -24,12 +31,12 @@ The two branches produce very different artifacts — getting this wrong wastes 
 4. **Skip the polish.** No tests, no error handling beyond what makes the prototype *runnable*, no abstractions. The point is to learn something fast and then delete it.
 5. **Surface the state.** After every action (logic) or on every variant switch (UI), print or render the full relevant state so the user can see what changed.
 6. **Delete or absorb when done.** When the prototype has answered its question, either delete it or fold the validated decision into the real code — don't leave it rotting in the repo.
-7. **Scope confirmation.** Before creating prototype files, state the question being answered, the target location, and the files that will be created. Proceed after the user confirms — or immediately if they explicitly said "just prototype it" or similar.
+7. **Scope confirmation.** Before Aragorn creates prototype files, state the question being answered, the target location, and the files that will be created. Proceed after the user confirms — or immediately if they explicitly said "just prototype it" or similar.
 8. **Long-running-command discipline.** Dev servers, watchers, or build processes started for the prototype follow the long-running-command discipline in `instruction/agent-defaults.md`.
 9. **TDD exemption.** Prototype output is throwaway by definition and exempt from the TDD-by-default policy in `instruction/agent-defaults.md`. Do not write tests for prototype code. If the user intends to keep the code (promoting a prototype to production), the TDD policy applies to the promoted version, not the prototype.
 
 ## When done
 
-The *answer* is the only thing worth keeping from a prototype. Capture it somewhere durable (commit message, ADR, issue, or a `NOTES.md` next to the prototype) along with the question it was answering. If the user is around, that capture is a quick conversation; if not, leave the placeholder so they (or you, on the next pass) can fill in the verdict before deleting the prototype.
+The *answer* is the only thing worth keeping from a prototype. Capture it somewhere durable (commit message, ADR, issue, or a `NOTES.md` next to the prototype) along with the question it was answering. If the user is around, that capture is a brief conversation; if not, leave the placeholder so they (or you, on the next pass) can fill in the verdict before deleting the prototype.
 
 Remind the user that the prototype should be deleted or absorbed — don't leave it for the next reader to discover.

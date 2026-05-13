@@ -5,7 +5,7 @@ description: >-
   a user asks about SonarCloud issues, sonar findings, code quality issues from
   SonarCloud, "what did sonar find", "sonar issues for this PR", "check sonar",
   or any request to retrieve or analyze SonarCloud results — even if they don't
-  explicitly say "SonarCloud." Also used internally by ticket-plan and pr-review
+  explicitly say "SonarCloud." Also used internally by jira-plan and pr-review
   skills to incorporate static analysis findings.
 ---
 
@@ -13,7 +13,13 @@ description: >-
 
 Fetch SonarCloud issues for a pull request and present them as a structured
 report. Can be used standalone or as a data source for other skills
-(ticket-plan, pr-review).
+(jira-plan, pr-review).
+
+## Executor ownership
+
+The invoking agent executes this read-only retrieval/analysis workflow. The
+wrapper script is authoritative for fetching SonarCloud issues; raw CLI details
+in this skill are reference material only. This skill never mutates SonarCloud.
 
 ## Script
 
@@ -35,7 +41,7 @@ Use `jq` to filter/format. The rest of this skill describes presentation and con
 - "Sonar issues for PR 275"
 - "Any sonar blockers?"
 - `/sonar`
-- Called internally by ticket-plan and pr-review skills
+- Called internally by jira-plan and pr-review skills
 
 Do **not** use this skill for running SonarQube scans (that's `sonar-scanner`),
 managing SonarCloud project settings, or resolving/accepting issues in
@@ -242,7 +248,7 @@ No open SonarCloud issues found for this PR.
 The SonarCloud link for each issue is:
 `https://sonarcloud.io/project/issues?id=<project-key>&open=<issue-key>&pullRequest=<pr-number>`
 
-### Integration mode (called by ticket-plan or pr-review)
+### Integration mode (called by jira-plan or pr-review)
 
 When this skill is invoked by another skill, return structured data — not the
 markdown report. The calling skill will specify that it needs integration-mode

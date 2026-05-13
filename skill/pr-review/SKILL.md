@@ -6,8 +6,7 @@ description: >-
   their PR, check their code changes, review a diff, verify acceptance criteria
   are met by their code, "does my code satisfy the AC", "review my changes",
   "check my PR", "am I done with this ticket", or any request to evaluate local
-  code changes against quality standards or Jira ticket requirements — even if
-  they don't explicitly say "PR review."
+  code changes against quality standards or Jira ticket requirements.
 ---
 
 # PR Review
@@ -15,6 +14,14 @@ description: >-
 Review local code changes against quality standards and Jira acceptance criteria.
 Produces a structured review with code quality findings, AC compliance mapping,
 and actionable suggestions.
+
+## Executor ownership
+
+The invoking agent executes this read-only review. It may dispatch **Legolas** for
+focused codebase exploration if the diff requires broader context. This skill
+does not modify code, create PRs, push changes, or mutate Jira. It is distinct
+from `post-impl-audit`: `pr-review` is a PR reviewer perspective; post-impl audit
+is Saruman's plan-compliance check after Aragorn implements.
 
 ## When to use this skill
 
@@ -27,8 +34,9 @@ and actionable suggestions.
 - "Review the code for BIXB-18835"
 - Any request to evaluate uncommitted or branch-level changes
 
-Do **not** use this skill for reviewing other people's PRs on GitHub (use the
-github-review-analyzer skill for that), or for writing code.
+Do **not** use this skill for analyzing review comments on GitHub (use
+`github-review-analyzer`) or for writing code (route implementation through
+Gandalf to Aragorn).
 
 ## Modes
 
@@ -38,11 +46,9 @@ github-review-analyzer skill for that), or for writing code.
 | **code-only** | "just review the code", "code review only" | Code quality review without Jira interaction |
 | **ac-compliance** | "check the AC", "does my code meet the AC" | AC compliance check only, minimal code quality |
 
-If the user's intent is ambiguous, default to **full** mode.
+If intent is ambiguous, default to **full** mode.
 
 ## Input parsing
-
-The user may provide:
 
 | Input | Example | Handling |
 |-------|---------|---------|
@@ -53,236 +59,113 @@ The user may provide:
 
 ## Preflight
 
-Before starting the review:
-
-1. **Verify git context:**
+1. Verify git context:
    ```bash
    git rev-parse --is-inside-work-tree
    ```
-2. **Verify there are changes from main:**
+2. Verify there are changes from main:
    ```bash
    git diff main...HEAD --stat
    ```
-   If no changes, inform the user: "No changes found relative to main. Make sure
-   you're on a feature branch with commits."
-3. **For AC modes — verify acli:**
+   If no changes exist, report that there is nothing to review relative to main.
+3. For full/ac-compliance modes, detect the ticket with the wrapper:
    ```bash
-   which acli && acli auth status
+   ~/code/scripts/agent/branch-to-ticket.sh
    ```
-   If unavailable or unauthenticated, fall back to code-only mode and inform the
-   user.
+   If detection fails and no ticket was provided, ask for the ticket ID. In
+   code-only mode, skip ticket detection.
+4. Fetch Jira context with the wrapper, not raw `acli`:
+   ```bash
+   ~/code/scripts/agent/jira-fetch-ticket.sh --all <TICKET-ID>
+   ```
+   If unavailable, fall back to code-only mode and explain why.
 
-## Core workflow
+## Workflow
 
 ### Step 1: Gather the diff
 
-Get the full diff and a summary of changed files:
+Use git to collect:
 
 ```bash
-# File-level overview
 git diff main...HEAD --stat
-
-# Full diff content (for analysis)
 git diff main...HEAD
-
-# If user specified paths, scope the diff:
-git diff main...HEAD -- <path1> <path2>
-```
-
-If the diff is very large (>3000 lines), focus on the `--stat` overview first,
-then read individual changed files selectively. Prioritize files with the most
-changes.
-
-Also gather context about what was changed:
-
-```bash
-# List of commits on this branch
 git log main..HEAD --oneline
-
-# Current branch name
 git branch --show-current
 ```
 
-### Step 2: Detect the ticket ID
+If the user specified paths, scope the diff to those paths. If the diff is very
+large, start from the stat and changed-file list, then read changed files
+selectively.
 
-Parse the current branch name to extract the Jira ticket ID:
+### Step 2: Parse acceptance criteria
 
-```bash
-git branch --show-current
-```
+For full and ac-compliance modes, parse Jira description and relevant comments
+for:
 
-**Branch → Ticket conversion:**
-- Branch: `bixb_18835` → Ticket: `BIXB-18835`
-- Pattern: take the branch name, uppercase the project prefix, replace `_` with `-`
-- Regex: `^([a-z]+)_(\d+)` → `\1-\2` uppercased
+- Acceptance criteria
+- Business value
+- Implementation details or constraints
+- Explicit out-of-scope/deferred work
 
-If the branch name doesn't match this pattern and the user didn't provide a
-ticket ID, ask for it (in full and ac-compliance modes). In code-only mode, skip
-ticket detection entirely.
+If AC are unclear or missing, flag that as a review risk rather than inventing
+requirements.
 
-If the user provided a ticket ID as an argument, use that instead of branch
-detection.
+### Step 3: Code quality analysis
 
-### Step 3: Fetch the ticket (full and ac-compliance modes)
+Review the diff and surrounding code for:
 
-Use the Atlassian CLI to fetch ticket data:
+**Critical:** security vulnerabilities, data loss risks, logic errors, crashes,
+auth bypasses, unsafe migrations, or correctness failures.
 
-```bash
-acli jira workitem view <TICKET-ID>
-```
+**Important:** missing error handling, performance issues, boundary validation
+gaps, race conditions, missing tests for changed behavior, or pattern violations
+that create maintainability risk.
 
-Parse the description to extract:
-- **Acceptance Criteria** — the numbered/bulleted checklist of requirements
-- **Business Value** — context for why the changes matter
-- **Implementation Details** — any technical guidance or constraints
+**Suggestions:** low-risk clarity, consistency, naming, or cleanup improvements.
 
-Look for AC under headings like "Acceptance Criteria", "AC", or numbered lists
-describing expected behavior. If AC are not clearly labeled, look for
-bullet/numbered lists that describe expected behavior or conditions.
+For each finding, include file/location, issue, consequence, and concrete
+recommendation. Do not flag stylistic preferences without a codebase convention
+or correctness impact.
 
-### Step 4: Code quality analysis
+### Step 4: SonarCloud cross-reference
 
-Review the diff for these categories, ordered by severity:
+When static-analysis context is relevant, invoke the `sonarcloud` skill. Do not
+duplicate SonarCloud CLI logic here; the `sonarcloud` skill and
+`~/code/scripts/agent/sonar-pr-issues.sh` wrapper are authoritative. Incorporate
+results as supporting evidence or additional findings.
 
-**Critical (must fix):**
-- Security vulnerabilities (injection, XSS, auth bypass, exposed secrets)
-- Data loss risks (unguarded deletes, missing transactions)
-- Logic errors that produce incorrect results
+### Step 5: AC compliance mapping
 
-**Important (should fix):**
-- Missing error handling for likely failure modes
-- Performance issues (N+1 queries, unbounded loops, missing pagination)
-- Missing input validation at system boundaries
-- Race conditions or concurrency issues
-
-**Suggestions (nice to have):**
-- Code style inconsistencies with the surrounding codebase
-- Opportunities to simplify or reduce duplication
-- Missing tests for new behavior or changed logic
-- Variable/function naming that could be clearer
-
-For each finding, provide:
-1. The file and approximate location
-2. What the issue is
-3. Why it matters
-4. A concrete suggestion for fixing it
-
-**Do not flag:**
-- Stylistic preferences that don't affect correctness
-- Missing comments or documentation unless the code is genuinely unclear
-- Minor formatting (these should be caught by linters)
-
-### Step 5: SonarCloud cross-reference (all modes)
-
-If the current repository is one of the 4 SonarCloud-enabled repos
-(client-portal, kraken, polaris-api, polaris-web) and a PR exists for the
-current branch, fetch SonarCloud issues to cross-reference with the code
-quality findings from Step 4.
-
-#### Detection
-
-1. Get repo name from `git remote get-url origin`.
-2. Check if it maps to a SonarCloud project key:
-   - `client-portal` → `wpromote_client-portal`
-   - `kraken` → `wpromote_kraken`
-   - `polaris-api` → `wpromote_polaris-api`
-   - `polaris-web` → `wpromote_polaris-web`
-3. Check for a PR: `~/code/scripts/agent/gh-current-pr.sh`
-
-If the repo isn't SonarCloud-enabled or no PR exists, skip this step silently.
-
-#### Fetch
-
-```bash
-sonar list issues -p <project-key> --pull-request <pr-number> --format json
-```
-
-Filter to `issueStatus` of `OPEN` or `CONFIRMED` only.
-
-Check CI freshness first:
-```bash
-~/code/scripts/agent/gh-pr-checks-summary.sh --filter sonar --status
-```
-Output is one word: `passed | failed | running | not_found | unknown`.
-If it's `running` or `not_found`, note the staleness in the review.
-
-#### Cross-reference
-
-Compare SonarCloud issues against the code quality findings from Step 4:
-
-- **Confirmed by both:** Issues found by both the manual review and SonarCloud.
-  Note the SonarCloud rule as supporting evidence in the existing finding.
-- **SonarCloud-only:** Issues found by SonarCloud but not in the manual review.
-  Add these to the appropriate severity tier in the output (BLOCKER/CRITICAL →
-  Critical, MAJOR → Important, MINOR/INFO → Suggestions).
-- **Review-only:** Issues found by the manual review but not by SonarCloud.
-  Keep as-is — no change needed.
-
-Strip the project key prefix from component paths for readability.
-
-#### Output
-
-Add a "SonarCloud" subsection to the report, after the Code Quality Findings:
-
-```
-### SonarCloud Findings
-
-**PR:** #<number> | **CI Status:** <completed/running/not found>
-**Open issues:** <count>
-
-| Severity | File | Line | Message | Rule | In Review? |
-|----------|------|------|---------|------|------------|
-| <severity> | <file> | <line> | <message> | <rule> | ✅ / ➕ New |
-```
-
-Mark issues already caught in Step 4 as "✅" (confirmed) and SonarCloud-only
-issues as "➕ New". If no SonarCloud issues exist, show:
-
-```
-### SonarCloud Findings
-
-No open SonarCloud issues on PR #<number>.
-```
-
-If SonarCloud is not applicable (wrong repo or no PR), omit this section
-entirely.
-
-### Step 6: AC compliance mapping (full and ac-compliance modes)
-
-For each acceptance criterion from the ticket, assess whether the diff addresses
-it. Use this classification:
+For each acceptance criterion, classify the diff:
 
 | Status | Meaning |
 |--------|---------|
 | ✅ Met | The diff clearly implements this criterion |
 | ⚠️ Partial | Some aspects addressed, but gaps remain |
-| ❌ Not addressed | No changes related to this criterion found in the diff |
-| 🔍 Manual verification | Cannot determine from code alone (UI behavior, visual design, etc.) |
+| ❌ Not addressed | No changes related to this criterion found |
+| 🔍 Manual verification | Cannot determine from code alone |
 
-For each criterion, explain your reasoning briefly — which files/changes satisfy
-it, or what's missing.
+Explain the evidence for each criterion with file paths or state what is missing.
 
-### Step 7: Generate suggestions
+### Step 6: Prioritized next steps
 
-Based on the review, provide prioritized next steps:
+Group recommendations as:
 
-1. **Must do before merging** — critical and important findings
-2. **Should do** — incomplete AC items, missing tests
-3. **Consider** — suggestions, improvements for a follow-up
+1. **Must do before merging** — critical findings and unmet AC.
+2. **Should do** — important findings, partial AC, missing tests.
+3. **Consider** — optional suggestions or follow-up cleanup.
 
 ## Output format
 
-### Full mode output
+### Full mode
 
-```
+```markdown
 ## PR Review: <branch-name>
 
 **Ticket:** <TICKET-ID> — <summary>
 **Branch:** <branch-name> → main
 **Changed files:** <count> files, +<additions> -<deletions>
 **Commits:** <count> commits
-
----
 
 ### Code Quality Findings
 
@@ -295,18 +178,16 @@ Based on the review, provide prioritized next steps:
 #### Suggestions
 <findings or "None — looks clean">
 
----
+### SonarCloud Findings
+<Omit when not applicable; otherwise summarize sonarcloud skill output.>
 
 ### Acceptance Criteria Compliance
 
 | # | Criterion | Status | Evidence |
 |---|-----------|--------|----------|
 | 1 | <AC text> | ✅/⚠️/❌/🔍 | <brief explanation> |
-| 2 | <AC text> | ✅/⚠️/❌/🔍 | <brief explanation> |
 
 **Overall:** <X of Y criteria met>
-
----
 
 ### Summary & Next Steps
 
@@ -322,13 +203,13 @@ Based on the review, provide prioritized next steps:
 - <item>
 ```
 
-### Code-only mode output
+### Code-only mode
 
-Same as full mode but omit the "Acceptance Criteria Compliance" section entirely.
+Use the full-mode structure but omit Jira ticket and AC compliance sections.
 
-### AC-compliance mode output
+### AC-compliance mode
 
-```
+```markdown
 ## AC Compliance Check: <branch-name>
 
 **Ticket:** <TICKET-ID> — <summary>
@@ -343,19 +224,18 @@ Same as full mode but omit the "Acceptance Criteria Compliance" section entirely
 **Overall:** <X of Y criteria met>
 
 ### Gaps
-<For any ❌ or ⚠️ items, describe what's missing and suggest what to implement>
+<For any ❌ or ⚠️ items, describe what is missing and suggest what to implement>
 ```
 
-## Important guidelines
+## Guardrails
 
-- **Be specific, not vague.** "This function might have issues" is useless.
-  "Line 42 in `api/handler.ts`: the `userId` parameter is used in a SQL query
-  without parameterization" is actionable.
-- **Respect the codebase style.** If the project uses a particular pattern, don't
-  flag it as wrong just because you'd do it differently.
-- **Don't over-flag.** A review with 30 nitpicks is noise. Focus on what
-  actually matters for correctness, security, and meeting requirements.
-- **Read surrounding code.** Don't review the diff in isolation. Read the files
-  being modified to understand the existing patterns and context.
-- **Stay read-only.** This skill reviews code — it does not modify code, create
-  PRs, or push changes.
+- **Be specific.** Findings need concrete file paths and consequences.
+- **Read surrounding code.** Do not review the diff in isolation.
+- **Respect codebase style.** Only flag style when a convention exists or the
+  issue affects clarity/correctness.
+- **Do not over-flag.** Prioritize correctness, security, and requirements.
+- **Stay read-only.** This skill reviews code; it does not modify code, create
+  PRs, push changes, or mutate Jira.
+- **Route fixes correctly.** For non-trivial work, implementation routes through
+  Gandalf's workflow: plan → Saruman pre-impl review → user approval → Aragorn
+  execution → post-impl audit.

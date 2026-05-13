@@ -14,6 +14,12 @@ Use Saruman's adversarial posture to review Aragorn's completed work against the
 specific plan that authorized it. This is not a PR review: it is narrower,
 plan-scoped, and happens before Gandalf's final Verify step.
 
+## Executor ownership
+
+**Saruman** executes this read-only audit. Gandalf gathers the plan, diff,
+status, changed files, acceptance criteria, and prior verification output before
+dispatch. Aragorn addresses any REVISE findings through Gandalf's workflow.
+
 ## When to use this skill
 
 - After Aragorn completes non-trivial implementation work.

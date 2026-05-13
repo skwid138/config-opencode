@@ -29,11 +29,11 @@ Show this to the user. While they read, prepare the sub-agent briefs.
 
 ### 2. Propose the parallel dispatch
 
-Tell the user you intend to spawn 3+ parallel exploration tasks via the Task tool, each producing a **radically different** interface for the deepened module. Give them:
+Tell the user you intend to dispatch 3+ parallel exploration tasks, each producing a **radically different** interface for the deepened module. Give them:
 
 - The number of sub-agents (typically 3, optionally 4).
 - The per-agent design constraint (see suggested matrix below).
-- The choice of subagent — `legolas` if the brief is heavily exploration-of-existing-shape; otherwise present the design brief directly.
+- The choice of subagent — **Legolas** if the brief is heavily exploration-of-existing-shape; otherwise present the design brief directly.
 
 Wait for the user to confirm before dispatching.
 

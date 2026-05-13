@@ -19,6 +19,14 @@ Proactively find bugs that tests miss by tracing data flow from system
 boundaries to crash sites. Focuses on the gap between what TypeScript types
 promise and what runtime data actually delivers.
 
+## Executor ownership
+
+Gandalf loads this skill for proactive bug-finding requests and coordinates the
+scan. Codebase exploration is delegated to **Legolas**; the invoking agent
+synthesizes the report. This skill is read-only and does not modify code. For
+non-trivial work, implementation routes through Gandalf's workflow: plan →
+Saruman pre-impl review → user approval → Aragorn execution → post-impl audit.
+
 > **Core insight:** The most dangerous bugs live at system boundaries where
 > external data enters the app. TypeScript types describe the *intended* shape,
 > but APIs, storage, and user input can deliver anything. Tests use well-formed
@@ -51,11 +59,11 @@ Do **not** use this skill for:
 
 | Mode | Flag | Best for | Scan depth |
 |------|------|----------|-----------|
-| **Quick Scan** (default) | none | Feature directory, broad sweep | Broad, shallow — obvious gaps |
+| **Standard Scan** (default) | none | Feature directory, broad sweep | Broad coverage with the full report structure |
 | **Boundary Audit** | `--mode boundary` | RTK Query slice, API layer | Transform completeness, normalization |
 | **Deep Trace** | `--mode trace` | Single component or data flow | Fewer findings, strongest proof chains |
 
-If the user's intent is ambiguous, default to **Quick Scan**.
+If the user's intent is ambiguous, default to **Standard Scan**.
 
 ## Input parsing
 
@@ -75,7 +83,7 @@ Optional flags:
 
 | Flag | Default | Purpose |
 |------|---------|---------|
-| `--mode <mode>` | `quick` | Scan mode (quick, boundary, trace) |
+| `--mode <mode>` | `standard` | Scan mode (standard, boundary, trace) |
 | `--max-files <N>` | 30 | Cap on files to scan (prevents runaway) |
 | `--detectors <list>` | all | Comma-separated detector subset |
 
@@ -102,7 +110,7 @@ Optional flags:
 **Goal:** Identify all system boundaries in scope — places where external data
 enters the application.
 
-Delegate to **legolas** (explorer) with this prompt structure:
+Gandalf delegates to **Legolas** (explorer) with this prompt structure:
 
 > Explore the codebase at the specified scope to build a boundary map.
 >
@@ -193,10 +201,10 @@ If any link in the chain is uncertain, downgrade to P2 or move to Notes.
 
 ### Delegation
 
-For **Quick Scan** and **Boundary Audit**: delegate trace work to a single
-**legolas** agent with the boundary map as input.
+For **Standard Scan** and **Boundary Audit**: delegate trace work to a single
+**Legolas** exploration dispatch with the boundary map as input.
 
-For **Deep Trace**: delegate to **legolas** for evidence gathering, then
+For **Deep Trace**: delegate to **Legolas** for evidence gathering, then
 synthesize and deduplicate findings directly.
 
 ---
@@ -234,7 +242,7 @@ sites.
 ```markdown
 ## Bug Hunt Report: <scope>
 
-**Mode:** <quick|boundary|trace>
+**Mode:** <standard|boundary|trace>
 **Files scanned:** <count>
 **Boundaries found:** <count>
 **Findings:** <P0 count> crashers, <P1 count> likely bugs, <P2 count> hardening
@@ -330,16 +338,18 @@ explicitly requests.
 - Generate one Jira ticket per root cause (not per symptom)
 - Title: `[Bug] <one-line summary>`
 - Description: proof chain + fix suggestion + test suggestion
-- Requires `acli` authentication
+- If ever implemented, Jira creation must be preview-default and route through
+  Saruman review, user approval, and Aragorn execution before any mutation
 
 ### PR creation (`--emit pr-plan`)
 - Generate a commit plan with files to modify and changes to make
 - Does NOT create the PR — outputs the plan for review
-- User can then ask aragorn to implement
+- User can then ask Gandalf to route implementation through Aragorn
 
 ### Fix mode (`/bug-hunt-fix`)
 - Separate command that takes bug-hunt findings and applies fixes
-- Delegates to aragorn for implementation
+- Routes through Gandalf's implementation workflow with Aragorn executing after
+  Saruman review and user approval
 - Runs tests after each fix to verify no regressions
 
 ---

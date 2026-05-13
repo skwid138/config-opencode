@@ -8,14 +8,22 @@ description: >-
   modules, identify deepening candidates, or decide where to invest
   architectural effort. NOT for local refactors (one function, one file).
   This skill investigates and proposes; it does not execute refactors —
-  it hands off to aragorn or the user for implementation.
+  implementation routes through Gandalf and Aragorn.
 ---
 
 # Improve Codebase Architecture
 
 Surface architectural friction and propose **deepening opportunities** — refactors that turn shallow modules into deep ones. The aim is testability and locality.
 
-**This skill is read-only investigation.** You explore, propose deepening candidates, optionally drop into a grilling loop on a chosen candidate, and optionally explore alternative interface designs. You **do not** execute the refactor. The output is a proposal package handed off to the user or to aragorn (via the Task tool with `aragorn` as the subagent) for implementation.
+## Executor ownership
+
+Architecture review is read-only: the invoking agent explores, proposes
+deepening candidates, runs the grilling loop, and may design alternative
+interfaces. **Legolas** handles delegated codebase exploration. Refactors and
+documentation writes are not executed in this skill; they route through Gandalf
+to **Aragorn**. For non-trivial work, implementation routes through Gandalf's
+workflow: plan → Saruman pre-impl review → user approval → Aragorn execution →
+post-impl audit.
 
 When exploring the codebase, use the project's domain glossary (`CONTEXT.md` if present) to get a clear mental model of relevant modules, and read ADRs in any area you're touching.
 
@@ -70,7 +78,7 @@ This skill is _informed_ by the project's domain model. The domain language give
 
 Read the project's domain glossary and any ADRs in the area you're touching first.
 
-Then delegate codebase exploration to the **`legolas`** agent via the Task tool. Legolas is the codebase-exploration subagent — give it a focused brief that names the area of friction and the kinds of signal you want (shallow modules, leaked seams, untested clusters). Don't follow rigid heuristics — explore organically and note where you experience friction:
+Then dispatch codebase exploration to **Legolas**. Legolas is the codebase-exploration subagent — give it a focused brief that names the area of friction and the kinds of signal you want (shallow modules, leaked seams, untested clusters). Don't follow rigid heuristics — explore organically and note where you experience friction:
 
 - Where does understanding one concept require bouncing between many small modules?
 - Where are modules **shallow** — interface nearly as complex as the implementation?
@@ -80,7 +88,7 @@ Then delegate codebase exploration to the **`legolas`** agent via the Task tool.
 
 Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
 
-If you need to issue more than one or two parallel `legolas` exploration tasks, treat that as a long-running operation: explain the batch, estimate the cost, and ask before dispatching (per the discipline above).
+If you need to issue more than one or two parallel **Legolas** exploration tasks, treat that as a long-running operation: explain the batch, estimate the cost, and ask before dispatching (per the discipline above).
 
 ### 2. Present candidates
 
@@ -103,11 +111,21 @@ Do NOT propose interfaces yet. Ask the user: *"Which of these would you like to 
 
 Once the user picks a candidate, drop into a grilling conversation. Walk the design tree with them — constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
 
-Side effects happen inline as decisions crystallize:
+Documentation side effects are staged inline as decisions crystallize, but file
+writes route through Aragorn:
 
-- **Naming a deepened module after a concept not in `CONTEXT.md`?** Add the term to `CONTEXT.md` — same discipline as the `grill-with-docs` skill (see `skill/grill-with-docs/context-format.md`). Create the file lazily if it doesn't exist.
-- **Sharpening a fuzzy term during the conversation?** Update `CONTEXT.md` right there.
-- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing — skip ephemeral reasons ("not worth it right now") and self-evident ones. See `skill/grill-with-docs/adr-format.md`.
+- **Naming a deepened module after a concept not in `CONTEXT.md`?** Propose the
+  term for `CONTEXT.md` — same discipline as the `grill-with-docs` skill (see
+  `skill/grill-with-docs/context-format.md`). Aragorn creates or updates the
+  file after confirmation.
+- **Sharpening a fuzzy term during the conversation?** Stage the CONTEXT.md
+  update immediately, then route the approved write to Aragorn.
+- **User rejects the candidate with a load-bearing reason?** Offer an ADR,
+  framed as: _"Want me to record this as an ADR so future architecture reviews
+  don't re-suggest it?"_ Only offer when the reason would actually be needed by
+  a future explorer to avoid re-suggesting the same thing — skip ephemeral
+  reasons ("not worth it right now") and self-evident ones. See
+  `skill/grill-with-docs/adr-format.md`. Aragorn writes approved ADRs.
 - **Want to explore alternative interfaces for the deepened module?** See [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md) for the parallel-sub-agent design exploration.
 
 ### 4. Hand off
@@ -123,7 +141,8 @@ When the user is ready to implement, produce a deepening package:
 - **Risks.** What could break; what to verify after.
 - **ADRs.** Any new ADRs the user agreed to during the grilling loop.
 
-Hand the package to the user, or to aragorn via the Task tool with the package as the prompt. **Do not execute the refactor in this skill.**
+Hand the package to the user or to Gandalf for Aragorn dispatch. **Do not execute
+the refactor in this skill.**
 
 ## Behavioral rules
 
@@ -149,12 +168,12 @@ Hand the package to the user, or to aragorn via the Task tool with the package a
 
 ```
 [ ] CONTEXT.md and relevant ADRs read
-[ ] Exploration brief sent to legolas (or done in-skill if narrow)
+[ ] Exploration brief sent to Legolas (or done in-skill if narrow)
 [ ] Candidates presented with files / problem / solution / benefits
 [ ] Architecture vocabulary used consistently
 [ ] User picked a candidate before interface design started
 [ ] Grilling loop walked the design tree (constraints, dependencies, tests)
-[ ] Side effects (CONTEXT.md updates, ADRs) recorded inline
+[ ] Documentation updates (CONTEXT.md, ADRs) staged and routed to Aragorn when approved
 [ ] Deepening package complete and handed off
 ```
 

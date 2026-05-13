@@ -2,7 +2,7 @@
 name: grill-with-docs
 description: >-
   Stress-tests a plan against the project's domain language and architectural
-  decisions, then persists what gets resolved into CONTEXT.md (domain
+  decisions, then routes approved documentation updates into CONTEXT.md (domain
   glossary) and docs/adr/ (architecture decision records). Builds on the
   grill-me protocol with documentation-writing on top. Use when the user
   wants to "stress-test against the docs", "check this against the
@@ -13,7 +13,18 @@ description: >-
 
 # Grill With Docs
 
-You are the user's adversarial interlocutor, and you also maintain the project's living documentation as a side-effect of the conversation. When terms get sharpened or hard-to-reverse decisions get made, persist them inline.
+You are the user's adversarial interlocutor, and you also maintain the project's living documentation as a side-effect of the conversation. When terms get sharpened or hard-to-reverse decisions get made, stage durable documentation updates and route the actual writes correctly.
+
+## Executor ownership
+
+- **Grilling mode:** any agent can run the read-only questioning protocol and
+  draft proposed CONTEXT.md / ADR changes.
+- **Docs-write mode:** only **Aragorn** writes files. If a read-only agent is
+  using this skill, it must show the proposed doc update, get user confirmation,
+  and route the write through Gandalf to Aragorn.
+
+For non-trivial work, implementation routes through Gandalf's workflow: plan →
+Saruman pre-impl review → user approval → Aragorn execution → post-impl audit.
 
 This skill builds on the same grilling protocol as the `grill-me` skill. The grilling discipline is duplicated below for self-containment; if you change one, change the other.
 
@@ -35,12 +46,16 @@ This skill builds on the same grilling protocol as the `grill-me` skill. The gri
 3. **Cross-reference with existing docs.** Read CONTEXT.md and the relevant ADRs *before* questioning. The grilling should be informed by what the project has already decided.
 4. **Walk the design tree.** Pick the highest-leverage open question. Recommend, ask, resolve.
 5. **Stress-test with concrete scenarios.** Force precision about boundaries between concepts.
-6. **Update docs inline as decisions crystallise.** See the persistence layer below.
+6. **Stage docs updates inline as decisions crystallise.** Aragorn performs the
+   actual file writes when confirmed. See the persistence layer below.
 7. **Close out only when grounded.**
 
 ## Documentation persistence layer
 
-The unique thing this skill does (vs. `grill-me`): when terms get sharpened or hard-to-reverse decisions get made, write them to durable docs.
+The unique thing this skill does (vs. `grill-me`): when terms get sharpened or
+hard-to-reverse decisions get made, it prepares durable doc updates. If the
+current executor is not Aragorn, do not write; dispatch Aragorn for the docs
+write after user confirmation.
 
 ### File structure
 
@@ -80,14 +95,17 @@ If a `CONTEXT-MAP.md` exists at the repo root, the repo has multiple bounded con
 
 ### Create files lazily
 
-Don't create `CONTEXT.md` or `docs/adr/` upfront. Create them only when there's something to write — the first term resolution, the first ADR-worthy decision.
+Don't create `CONTEXT.md` or `docs/adr/` upfront. Create them only when there's something to write — the first term resolution, the first ADR-worthy decision — and only through Aragorn when file creation is required.
 
 ### Updating CONTEXT.md inline
 
 When a term gets sharpened during the grilling session:
 
 1. **Show the proposed entry first.** Don't write silently. Display what you'd add to CONTEXT.md and wait for confirmation. Format per [context-format.md](context-format.md).
-2. **Capture immediately on confirmation.** Don't batch. Update CONTEXT.md as decisions crystallise; if you wait until the end, you'll forget half the resolutions.
+2. **Capture immediately on confirmation.** Don't batch. If you are Aragorn,
+   update CONTEXT.md as decisions crystallise; if you are read-only, dispatch
+   Aragorn with the approved entry. If you wait until the end, you'll forget
+   half the resolutions.
 3. **Don't couple CONTEXT.md to implementation details.** Only domain-meaningful terms. "OrderCancellationEvent" probably belongs in CONTEXT.md; "useOrderCancellationHook" probably doesn't.
 4. **Update existing entries when meaning shifts.** If the team's understanding of "Order" has been sharpened in this session, edit the existing entry — don't add a duplicate.
 
@@ -122,11 +140,12 @@ These guardrails can be relaxed (sample-before-write at minimum should stay fore
 - Read existing CONTEXT.md and relevant ADRs before grilling. Otherwise you'll grill questions the project has already answered.
 - Show proposed CONTEXT.md entries and ADR text before writing.
 - Use Pocock's three-gate ADR test as a hard filter, not a guideline.
-- Update CONTEXT.md inline as decisions are made.
+- Stage CONTEXT.md updates inline as decisions are made; Aragorn applies them.
 
 ### Never
 
-- Never write to CONTEXT.md or create an ADR without showing the user first.
+- Never write to CONTEXT.md or create an ADR without showing the user first;
+  read-only agents never write them directly.
 - Never create an ADR for something that fails the three-gate test, even on user request — push back and offer alternatives.
 - Never overwrite an existing `CONTEXT.md` whose contents look unrelated to a domain glossary; ask the user how to proceed.
 - Never duplicate a term in CONTEXT.md; edit the existing entry instead.
