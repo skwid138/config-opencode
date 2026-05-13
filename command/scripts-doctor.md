@@ -28,7 +28,7 @@ The script exits 1 if any check fails; 0 otherwise.
    - List every `fail` and `warn` with its `name` and `detail` field. Skip `pass` entries unless the user asks for the full report — the goal is signal, not noise.
 
 3. **Triage**: For each failing check, classify it:
-   - **Convention violation** (e.g. `set -e` present, missing strict mode) → quick mechanical fix; reference `~/code/scripts/docs/CONVENTIONS.md`.
+   - **Convention violation** (e.g. `set -e` present, missing strict mode) → small mechanical fix; reference `~/code/scripts/docs/CONVENTIONS.md`.
    - **Missing artifact** (no bats suite, no CI workflow, missing checkout pin) → may be intentional in early scaffolding; flag and ask.
    - **Tooling gap** (required tool missing) → install via `brew` (macOS) or `apt` (Linux); never auto-install without approval.
 

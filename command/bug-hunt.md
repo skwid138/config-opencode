@@ -6,12 +6,12 @@ description: >-
 ---
 Use the `bug-hunter` skill to scan the specified scope for defensive coding gaps.
 
-**Default behavior:** Quick Scan mode — broad sweep for obvious gaps across the
-scoped files. Traces data flow from API boundaries through transforms into
+**Default behavior:** Standard Scan mode — broad sweep with the full report
+structure across the scoped files. Traces data flow from API boundaries through transforms into
 consumers, looking for unguarded access patterns.
 
 **Modes:**
-- Default (no flag): Quick Scan — broad, shallow
+- Default (no flag): Standard Scan — broad coverage with full evidence structure
 - `--mode boundary`: Boundary Audit — focused on API transform completeness
 - `--mode trace`: Deep Trace — fewer findings, strongest proof chains
 
