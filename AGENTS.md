@@ -8,7 +8,7 @@
 | **legolas** | Codebase exploration & call-path discovery | gpt-5.5 (xhigh) | no |
 | **radagast** | External docs / OSS research | gpt-5.5 (xhigh) | no |
 | **aragorn** | Autonomous end-to-end implementation; sole writer | gpt-5.5 (xhigh) | **yes** |
-| **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | gpt-5.5 (xhigh) | no |
+| **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | claude-opus-4.6 (copilot) | no |
 
 ## Skills (19)
 

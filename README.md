@@ -55,7 +55,7 @@ All agents are defined locally under `agent/`. The default OpenCode `build`, `pl
 | **legolas** | subagent | gpt-5.5 (xhigh reasoning) | Codebase exploration & call-path discovery |
 | **radagast** | subagent | gpt-5.5 (xhigh reasoning) | External docs / OSS research |
 | **aragorn** | subagent | gpt-5.5 (xhigh reasoning) | Autonomous end-to-end implementation; the only writer in the roster |
-| **saruman** | subagent | gpt-5.5 (xhigh reasoning) | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time |
+| **saruman** | subagent | claude-opus-4.6 (Copilot) | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time |
 
 **Why the model split:** Gandalf uses a different provider/model path than the subagents — see the table above and `opencode.json` for exact model IDs. The split exists because the subagent provider has been stronger for research, exploration, implementation, and adversarial review in practice. Revisit if/when model capabilities shift.
 
