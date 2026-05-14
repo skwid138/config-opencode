@@ -1,6 +1,6 @@
 ---
 model: openai/gpt-5.5
-reasoningEffort: xhigh
+reasoningEffort: medium
 description: Codebase exploration specialist for fast file and call-path discovery
 temperature: 0.1
 mode: subagent

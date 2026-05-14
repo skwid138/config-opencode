@@ -1,6 +1,6 @@
 ---
 model: openai/gpt-5.5
-reasoningEffort: xhigh
+reasoningEffort: high
 description: External docs and OSS research specialist
 temperature: 0.1
 mode: subagent
