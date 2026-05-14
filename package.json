@@ -6,6 +6,6 @@
   },
   "packageManager": "npm@11.12.1",
   "dependencies": {
-    "@opencode-ai/plugin": "1.14.48"
+    "@opencode-ai/plugin": "1.14.50"
   }
 }
