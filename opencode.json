@@ -136,7 +136,7 @@
             "command": [
                 "npx",
                 "-y",
-                "chrome-devtools-mcp@0.26.0",
+                "chrome-devtools-mcp@1.0.1",
                 "--browserUrl",
                 "http://127.0.0.1:9222"
             ],
