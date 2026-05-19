@@ -93,6 +93,7 @@ Every change follows Red-Green-Refactor. No exceptions.
 4. **Coverage is a flashlight, not a target.** Use it to discover untested paths, not as proof of quality.
 5. **Untestable code is design debt.** Propose the smallest refactor that introduces seams.
 6. **Test code is production code.** Same quality standards apply.
+7. **Use the project's domain glossary.** If a `CONTEXT.md` exists, use its vocabulary so that test names and interface terms match the team's ubiquitous language.
 
 ## Behavioral rules
 

@@ -10,7 +10,7 @@
 | **aragorn** | Autonomous end-to-end implementation; sole writer | gpt-5.5 (xhigh) | **yes** |
 | **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | claude-opus-4.6 (copilot) | no |
 
-## Skills (19)
+## Skills (21)
 
 | Skill | Description |
 |-------|-------------|
@@ -22,6 +22,7 @@
 | `github-review-analyzer` | Deep PR review analysis with codebase context, tiered change plan |
 | `grill-me` | One-question-at-a-time interrogation to stress-test plans |
 | `grill-with-docs` | Grilling + routes CONTEXT.md and ADR doc writes through Aragorn |
+| `handoff` | Compact conversation into handoff doc for cross-session continuity |
 | `improve-codebase-architecture` | System-level architecture review and deepening-opportunity scan |
 | `jira-enhance` | Audit and improve Jira acceptance criteria quality |
 | `jira-ticket` | Fetch and summarize Jira tickets for summary/estimation |
@@ -32,6 +33,7 @@
 | `jira-qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
 | `sonarcloud` | Fetch and analyze SonarCloud issues for a PR |
 | `tdd` | Test-driven development: red-green-refactor cycle |
+| `to-issues` | Convert a plan into vertical-slice GitHub issues (GitHub-only) |
 | `jira-plan` | Chat-first multi-codebase implementation planning from Jira tickets |
 
 Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
