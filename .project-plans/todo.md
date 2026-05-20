@@ -6,8 +6,8 @@
 
 ### HIGH
 
-- [ ] **Fix Saruman auto-ticket-context.sh ask/deny loop** — Make the "mandatory first step" in `agent/saruman.md` conditional: only run when in a git repo with a branch matching a ticket pattern; skip otherwise. This is a behavioral contract change, not just a doc edit. (Effort: XS)
-- [ ] **Harden `plan` agent bash permissions** — Add a permission block to the `plan` agent config in `opencode.json` restricting bash access. Currently has no permission block at all. (Effort: XS)
+- [x] ~~**Fix Saruman auto-ticket-context.sh ask/deny loop**~~ — ✅ 2026-05-20 — Fixed by council permission ruleset injection (catch-all deny replaces catch-all ask in child sessions).
+- [x] ~~**Harden `plan` agent bash permissions**~~ — Cancelled — agent is hidden/unused; not worth the maintenance.
 
 ### MEDIUM
 
@@ -29,3 +29,4 @@ _(migrated from previous todo — see `archive/2026-05-20_todo.md` for full hist
 - ✅ 2026-05-12 — Shell layer plan T1-T3 (critical fixes, reliability, new scripts)
 - ✅ 2026-05-20 — Council permission fix (explicit permission ruleset injection into councillor sessions, opencode.json bash rules)
 - ✅ 2026-05-20 — Council plugin tests + session.abort() cleanup
+- ✅ 2026-05-20 — Saruman ask/deny loop fix (via council permission ruleset injection)
