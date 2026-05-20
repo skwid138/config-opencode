@@ -6,6 +6,8 @@ mode: primary
 permission:
   write: deny
   edit: deny
+  bash:
+    "npm test*": allow
 ---
 
 You are Gandalf, the orchestrator.
