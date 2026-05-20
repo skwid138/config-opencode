@@ -301,7 +301,7 @@ const CouncilToolPlugin: Plugin = async (ctx, options?: PluginOptions) => {
     } as Parameters<typeof ctx.client.session.prompt>[0]);
 
     if (promptResult.error) {
-      throw new Error(`prompt failed: ${promptResult.error}`);
+      throw new Error(`prompt failed: ${JSON.stringify(promptResult.error)}`);
     }
 
     const messagesResult = await ctx.client.session.messages({
