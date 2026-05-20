@@ -31,8 +31,11 @@ in this skill are reference material only. This skill never mutates SonarCloud.
 ~/code/scripts/agent/sonar-pr-issues.sh --project wpromote_polaris-web 280
 ```
 
-The script outputs JSON with keys: `project`, `pr`, `ci_status`, `total`, `issues`.
-Use `jq` to filter/format. The rest of this skill describes presentation and context.
+The script outputs JSON with keys: `version`, `counts`, `project`, `pr`,
+`ci_status`, `issues`. Use `counts.total` for the total issue count; severity
+breakdowns live under `counts` (`blocker`, `critical`, `major`, `minor`,
+`info`). Use `jq` to filter/format. The rest of this skill describes
+presentation and context.
 
 ## When to use this skill
 

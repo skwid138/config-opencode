@@ -33,8 +33,9 @@ implementation routes through Gandalf's workflow: plan → Saruman pre-impl revi
 ~/code/scripts/agent/jira-fetch-ticket.sh --json-fields BIXB-18835
 ```
 
-The script outputs JSON with keys: `ticket_id`, `plain_view`, `description`,
-`fields`, `comments`, `links`, `attachments`. Use `jq` to extract what you need.
+The script outputs JSON with keys: `version`, `ticket_id`, `plain_view`,
+`description`, `fields`, `comments`, `links`, `attachments`. Use `jq` to extract
+what you need.
 
 ## When to use this skill
 

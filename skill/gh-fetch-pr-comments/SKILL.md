@@ -29,9 +29,10 @@ Gandalf needs raw PR review data; consuming skills own analysis and planning.
 ~/code/scripts/agent/gh-pr-comments.sh wpromote/polaris-web#275
 ```
 
-The script outputs JSON with keys: `metadata`, `reviews`, `threads`, `files`, `commits`, `diff`.
-Use `jq` to extract what you need. The rest of this skill describes how to
-classify and present the data.
+The script outputs JSON with keys: `version`, `counts`, `metadata`, `reviews`,
+`threads`, `files`, `commits`, `diff`. `counts` summarizes the array lengths for
+`reviews`, `threads`, `files`, and `commits`. Use `jq` to extract what you need.
+The rest of this skill describes how to classify and present the data.
 
 ## When to use this skill
 
