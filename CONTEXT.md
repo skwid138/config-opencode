@@ -73,3 +73,21 @@ A local preview artifact containing formatted output for review before any remot
 
 - "config" — in this repo refers to the OpenCode configuration itself (`~/.config/opencode/`), not application configuration in target projects. Use "project config" for the latter.
 - "wrapper" — refers to the OpenCode launcher wrapper that enables conditional context injection, not a code wrapper/decorator pattern.
+
+### Council Review
+
+**Council:**
+A parallel multi-model adversarial review where 3-4 frontier models independently review the same artifact, then an aggregator synthesizes findings.
+_Avoid_: ensemble, swarm
+
+**Councillor:**
+One reviewer session in a council — the existing reviewer agent (default: Saruman) prompted with a specific model override.
+_Avoid_: reviewer instance, agent clone
+
+**Elrond:**
+The council aggregator agent. Performs lightweight structural synthesis (dedup, agreement counting, grouping) without making judgment calls. Final verdict authority stays with Gandalf.
+_Avoid_: council master, synthesizer, arbiter
+
+**Council Fallback:**
+When fewer than 2 councillors return valid responses, the council fails and Gandalf falls back to solo Saruman review.
+_Avoid_: degraded council
