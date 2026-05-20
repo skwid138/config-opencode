@@ -20,8 +20,8 @@
 | `figma` | Extract design context from Figma files for implementation |
 | `gh-fetch-pr-comments` | Raw PR review comment retrieval (data layer) |
 | `github-review-analyzer` | Deep PR review analysis with codebase context, tiered change plan |
-| `grill-me` | One-question-at-a-time interrogation to stress-test plans |
-| `grill-with-docs` | Grilling + routes CONTEXT.md and ADR doc writes through Aragorn |
+| `grill-me` | Backup grilling for non-codebase discussions (explicit invocation only) |
+| `grill-with-docs` | Default grilling + CONTEXT.md/ADR persistence for all planning sessions |
 | `handoff` | Compact conversation into handoff doc for cross-session continuity |
 | `improve-codebase-architecture` | System-level architecture review and deepening-opportunity scan |
 | `jira-enhance` | Audit and improve Jira acceptance criteria quality |

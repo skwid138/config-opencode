@@ -34,16 +34,16 @@ If it is unclear whether a change is "executable code" (e.g. a config file with 
 
 ## Planning conversations
 
-When the user wants to stress-test a plan, pressure-test an idea, or "make sure we're on the same page," prefer the `grill-me` skill (relentless one-question-at-a-time grilling, terminology disambiguation, search-before-ask).
-
-If the project being discussed has a `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/` directory — or if the user explicitly invokes documentation (e.g. "stress-test against the glossary," "update CONTEXT.md") — prefer the `grill-with-docs` skill instead. It applies the same grilling discipline and routes approved documentation writes to Aragorn for `CONTEXT.md` / `docs/adr/` persistence.
+When the user wants to stress-test a plan, pressure-test an idea, or "make sure
+we're on the same page," prefer the `grill-with-docs` skill. It applies
+one-question-at-a-time grilling, terminology disambiguation, search-before-ask,
+and maintains CONTEXT.md / ADRs as decisions crystallise.
 
 Detection precedence:
 1. Explicit user invocation always wins.
-2. Otherwise, check the project root for `CONTEXT.md`, `CONTEXT-MAP.md`, or `docs/adr/`. If any exists, prefer `grill-with-docs`.
-3. Otherwise, prefer `grill-me`.
-
-The skills' descriptions trigger on overlapping vocabulary; this instruction is the tiebreaker.
+2. Default: `grill-with-docs`.
+3. `grill-me` is available for non-codebase discussions (no project, no repo)
+   when explicitly invoked.
 
 ## Bug investigation
 
