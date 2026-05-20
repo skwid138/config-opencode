@@ -4,11 +4,11 @@
 
 | Agent | Role | Model | Write Access |
 |-------|------|-------|-------------|
-| **gandalf** | Primary orchestrator — intent classification, planning, delegation | claude-opus-4.6 (copilot) | no |
+| **gandalf** | Primary orchestrator — intent classification, planning, delegation | openai/gpt-5.5 (high) | no |
 | **legolas** | Codebase exploration & call-path discovery | gpt-5.5 (xhigh) | no |
 | **radagast** | External docs / OSS research | gpt-5.5 (xhigh) | no |
 | **aragorn** | Autonomous end-to-end implementation; sole writer | gpt-5.5 (xhigh) | **yes** |
-| **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | claude-opus-4.6 (copilot) | no |
+| **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | openai/gpt-5.5 (high) | no |
 
 ## Skills (22)
 
