@@ -13,6 +13,13 @@ const COUNCILLOR_RETRY_TIMEOUT_MS = 90_000;
 const ELROND_TIMEOUT_MS = 60_000;
 const HARD_CAP_MS = 360_000;
 
+type TimeoutConfig = {
+  councillor_ms: number;
+  councillor_retry_ms: number;
+  elrond_ms: number;
+  hard_cap_ms: number;
+};
+
 type ModelConfig = {
   providerID: string;
   modelID: string;
@@ -23,6 +30,7 @@ type CouncilConfig = {
   aggregator: string;
   models: ModelConfig[];
   aggregator_model: ModelConfig | null;
+  timeouts: TimeoutConfig;
 };
 
 type CouncillorSuccess = {
@@ -46,6 +54,12 @@ const DEFAULT_COUNCIL_CONFIG: CouncilConfig = {
     { providerID: "github-copilot", modelID: "gpt-5.3-codex" },
   ],
   aggregator_model: null,
+  timeouts: {
+    councillor_ms: COUNCILLOR_TIMEOUT_MS,
+    councillor_retry_ms: COUNCILLOR_RETRY_TIMEOUT_MS,
+    elrond_ms: ELROND_TIMEOUT_MS,
+    hard_cap_ms: HARD_CAP_MS,
+  },
 };
 
 const ELROND_TOOLS = {
@@ -123,7 +137,17 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function normalizeCouncilConfig(
+function readTimeoutMs(
+  source: Record<string, unknown>,
+  key: keyof TimeoutConfig,
+  fallback: number,
+): number {
+  const raw = source[key];
+  if (typeof raw !== "number" || !Number.isFinite(raw)) return fallback;
+  return Math.min(HARD_CAP_MS, Math.max(1, Math.round(raw)));
+}
+
+export function normalizeCouncilConfig(
   raw: unknown,
   fallback: CouncilConfig = DEFAULT_COUNCIL_CONFIG,
 ): CouncilConfig {
@@ -144,6 +168,8 @@ function normalizeCouncilConfig(
         ? source.aggregator_model
         : fallback.aggregator_model;
 
+  const timeoutSource = isPlainObject(source.timeouts) ? source.timeouts : {};
+
   return {
     reviewer:
       typeof source.reviewer === "string" && source.reviewer.trim().length > 0
@@ -156,6 +182,28 @@ function normalizeCouncilConfig(
         : fallback.aggregator,
     models: models.length > 0 ? models : fallback.models,
     aggregator_model: aggregatorModel,
+    timeouts: {
+      councillor_ms: readTimeoutMs(
+        timeoutSource,
+        "councillor_ms",
+        fallback.timeouts.councillor_ms,
+      ),
+      councillor_retry_ms: readTimeoutMs(
+        timeoutSource,
+        "councillor_retry_ms",
+        fallback.timeouts.councillor_retry_ms,
+      ),
+      elrond_ms: readTimeoutMs(
+        timeoutSource,
+        "elrond_ms",
+        fallback.timeouts.elrond_ms,
+      ),
+      hard_cap_ms: readTimeoutMs(
+        timeoutSource,
+        "hard_cap_ms",
+        fallback.timeouts.hard_cap_ms,
+      ),
+    },
   };
 }
 
@@ -171,7 +219,7 @@ function formatSeconds(ms: number): string {
   return `${Math.round(ms / 1000)}s`;
 }
 
-async function raceWithTimeout<T>(
+export async function raceWithTimeout<T>(
   promise: Promise<T>,
   timeoutMs: number,
   label: string,
@@ -263,10 +311,12 @@ const CouncilToolPlugin: Plugin = async (ctx, options?: PluginOptions) => {
       body: {
         parentID: parentSessionID,
         title,
-        permission: [{ permission: "question", action: "deny", pattern: "*" }],
       },
       query: { directory: await parentDirectory(parentSessionID) },
-    } as Parameters<typeof ctx.client.session.create>[0]);
+    } as Parameters<typeof ctx.client.session.create>[0]) as {
+      data?: { id?: string };
+      error?: unknown;
+    };
 
     if (createResult.error) {
       throw new Error(`failed to create child session: ${createResult.error}`);
@@ -298,7 +348,7 @@ const CouncilToolPlugin: Plugin = async (ctx, options?: PluginOptions) => {
     const promptResult = await ctx.client.session.prompt({
       path: { id: input.sessionID },
       body,
-    } as Parameters<typeof ctx.client.session.prompt>[0]);
+    } as Parameters<typeof ctx.client.session.prompt>[0]) as { error?: unknown };
 
     if (promptResult.error) {
       throw new Error(`prompt failed: ${JSON.stringify(promptResult.error)}`);
@@ -306,7 +356,7 @@ const CouncilToolPlugin: Plugin = async (ctx, options?: PluginOptions) => {
 
     const messagesResult = await ctx.client.session.messages({
       path: { id: input.sessionID },
-    });
+    }) as { data?: unknown; error?: unknown };
 
     if (messagesResult.error) {
       throw new Error(`failed to get messages: ${messagesResult.error}`);
@@ -330,17 +380,27 @@ const CouncilToolPlugin: Plugin = async (ctx, options?: PluginOptions) => {
     const label = modelLabel(input.model);
     return await raceWithTimeout(
       (async () => {
-        const sessionID = await createChildSession(
-          input.parentSessionID,
-          `council: ${label} attempt ${input.attempt}`,
-        );
+        let sessionID: string | undefined;
+        try {
+          sessionID = await createChildSession(
+            input.parentSessionID,
+            `council: ${label} attempt ${input.attempt}`,
+          );
 
-        return await promptAndExtract({
-          sessionID,
-          agent: councilConfig.reviewer,
-          model: input.model,
-          prompt: input.prompt,
-        });
+          return await promptAndExtract({
+            sessionID,
+            agent: councilConfig.reviewer,
+            model: input.model,
+            prompt: input.prompt,
+          });
+        } finally {
+          // Known limitation: indefinite hangs never reach finally; server-side session TTL is the fallback.
+          if (sessionID) {
+            await ctx.client.session
+              .abort({ path: { id: sessionID } })
+              .catch(() => {});
+          }
+        }
       })(),
       input.timeoutMs,
       `${label} attempt ${input.attempt}`,
@@ -355,7 +415,7 @@ const CouncilToolPlugin: Plugin = async (ctx, options?: PluginOptions) => {
     try {
       const response = await runCouncillorAttempt({
         ...input,
-        timeoutMs: COUNCILLOR_TIMEOUT_MS,
+        timeoutMs: councilConfig.timeouts.councillor_ms,
         attempt: 1,
       });
       return { model: input.model, response, attempts: 1 };
@@ -363,7 +423,7 @@ const CouncilToolPlugin: Plugin = async (ctx, options?: PluginOptions) => {
       try {
         const response = await runCouncillorAttempt({
           ...input,
-          timeoutMs: COUNCILLOR_RETRY_TIMEOUT_MS,
+          timeoutMs: councilConfig.timeouts.councillor_retry_ms,
           attempt: 2,
         });
         return { model: input.model, response, attempts: 2 };
@@ -383,20 +443,30 @@ const CouncilToolPlugin: Plugin = async (ctx, options?: PluginOptions) => {
   }): Promise<string> {
     return await raceWithTimeout(
       (async () => {
-        const sessionID = await createChildSession(
-          input.parentSessionID,
-          "council: Elrond aggregation",
-        );
+        let sessionID: string | undefined;
+        try {
+          sessionID = await createChildSession(
+            input.parentSessionID,
+            "council: Elrond aggregation",
+          );
 
-        return await promptAndExtract({
-          sessionID,
-          agent: councilConfig.aggregator,
-          model: councilConfig.aggregator_model ?? undefined,
-          tools: ELROND_TOOLS,
-          prompt: buildElrondPrompt(input),
-        });
+          return await promptAndExtract({
+            sessionID,
+            agent: councilConfig.aggregator,
+            model: councilConfig.aggregator_model ?? undefined,
+            tools: ELROND_TOOLS,
+            prompt: buildElrondPrompt(input),
+          });
+        } finally {
+          // Known limitation: indefinite hangs never reach finally; server-side session TTL is the fallback.
+          if (sessionID) {
+            await ctx.client.session
+              .abort({ path: { id: sessionID } })
+              .catch(() => {});
+          }
+        }
       })(),
-      ELROND_TIMEOUT_MS,
+      councilConfig.timeouts.elrond_ms,
       "Elrond aggregation",
     );
   }
@@ -458,7 +528,7 @@ Use when you need adversarial review from multiple models. The tool returns Elro
           try {
             return await raceWithTimeout(
               runCouncilReview(prompt, toolContext.sessionID),
-              HARD_CAP_MS,
+              councilConfig.timeouts.hard_cap_ms,
               "council_review",
             );
           } catch (error) {
