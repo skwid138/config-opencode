@@ -42,8 +42,8 @@ const DEFAULT_COUNCIL_CONFIG: CouncilConfig = {
   models: [
     { providerID: "github-copilot", modelID: "claude-opus-4.6" },
     { providerID: "openai", modelID: "gpt-5.5" },
-    { providerID: "github-copilot", modelID: "gemini-3.1-pro" },
-    { providerID: "github-copilot", modelID: "grok-3" },
+    { providerID: "github-copilot", modelID: "gemini-3.1-pro-preview" },
+    { providerID: "github-copilot", modelID: "gpt-5.3-codex" },
   ],
   aggregator_model: null,
 };

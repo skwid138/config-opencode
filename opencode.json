@@ -135,11 +135,11 @@
                         },
                         {
                             "providerID": "github-copilot",
-                            "modelID": "gemini-3.1-pro"
+                            "modelID": "gemini-3.1-pro-preview"
                         },
                         {
                             "providerID": "github-copilot",
-                            "modelID": "grok-3"
+                            "modelID": "gpt-5.3-codex"
                         }
                     ],
                     "aggregator_model": null
