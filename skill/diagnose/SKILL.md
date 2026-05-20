@@ -92,7 +92,7 @@ Tool preference:
 
 **Probes that mutate state are not allowed in this skill.** No restarts, no config changes, no DB writes. If a probe needs them, escalate to the user — explain what you'd change and why — and let them decide whether to do it themselves or open a separate session with appropriate permissions.
 
-**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second. Profilers and heap snapshots fall under long-running-command discipline — propose, estimate, ask.
+**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness such as `time.time()`, `performance.now()`, `System.nanoTime()`, shell `time`, profiler, query plan), then bisect. Measure first, fix second. Profilers and heap snapshots fall under long-running-command discipline — propose, estimate, ask.
 
 See [instrumentation.md](instrumentation.md) for log tagging conventions, perf measurement patterns, and clean-up checklists.
 

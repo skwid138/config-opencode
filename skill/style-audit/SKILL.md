@@ -78,7 +78,8 @@ where structured Figma values are available.
 Identify and read every file that contributes styles to the target component,
 including:
 
-- Component files with `className`, `style`, Ant Design props, or theme overrides
+- Component files with styling props/classes (e.g. `className`, `style`,
+  design-system component props, theme overrides)
 - Style hooks and token utility usage
 - Shared style files, CSS modules, global CSS, and Tailwind class composition
 - Shared primitives used by the component that may own part of the rendered UI
@@ -88,7 +89,9 @@ first component file.
 
 ### 3. Prior art check (mandatory, thorough)
 
-This is **not** a lightweight step. Thoroughly check:
+This is **not** a lightweight step. Check the project's shared components and
+feature-local reference implementations. In Polaris/Growth Planner work, treat
+these as primary signals:
 
 - `src/common/components/` for existing Ant Design wrappers or shared UI
   primitives
@@ -99,7 +102,8 @@ This is **not** a lightweight step. Thoroughly check:
   controls in nearby features
 
 Document patterns that should be followed or reused. If prior art is rejected,
-state why it does not fit.
+state why it does not fit. Outside Polaris, discover the equivalent shared
+primitives, design-system wrappers, and nearby reference implementations.
 
 ### 4. Check for project-local styling skill
 
@@ -113,7 +117,8 @@ Look for `.agents/skills/styling/SKILL.md` in the current repository.
 
 ### 5. Map Figma variables to available token equivalents
 
-For each Figma variable or token used by the design:
+For each Figma variable or token used by the design, default to the Polaris
+token system:
 
 1. Find the corresponding Polaris token available in the codebase.
 2. Identify whether the token is exposed through generated Tailwind utilities,
@@ -121,8 +126,10 @@ For each Figma variable or token used by the design:
    project mechanism.
 3. Flag Figma values that have no token equivalent.
 
-Use tokens, never raw values, unless no equivalent token exists. When no token
-exists, call that out explicitly and recommend the least risky fallback.
+For non-Polaris projects, substitute the project's own token system and exposure
+mechanisms. Use tokens, never raw values, unless no equivalent token exists.
+When no token exists, call that out explicitly and recommend the least risky
+fallback.
 
 ### 6. Produce discrepancy table
 
