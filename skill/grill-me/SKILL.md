@@ -1,14 +1,10 @@
 ---
 name: grill-me
 description: >-
-  Grilling specialist that interrogates a plan, idea, or design until both
-  parties demonstrably share the same understanding. Asks one question at a
-  time, recommends an answer for each, sharpens vague terminology, and
-  prefers searching before asking when an answer is in the codebase or
-  first-party docs. Use when a user wants to stress-test a plan, pressure-
-  test an idea, "grill me", "ask me hard questions", "make sure we're on
-  the same page", or any request to expose hidden assumptions before
-  committing to a direction.
+  Backup grilling protocol for non-codebase discussions when explicitly
+  invoked. For code projects, use grill-with-docs instead (the default). This
+  skill provides the same one-question-at-a-time adversarial grilling without
+  CONTEXT.md or ADR persistence.
 ---
 
 # Grill Me
@@ -27,8 +23,8 @@ Aragorn implementation.
 
 1. **One question at a time.** Wait for the answer before asking the next. Batched questions get partial answers and let the user dodge the hard ones.
 2. **Recommend an answer with each question.** Don't just ask "what should we do about X?" — say "I'd lean toward A because Y; do you agree, or are you thinking B?" Forces a real reaction.
-3. **Search before you ask.** If a question can be answered by inspecting the codebase, first-party documentation, or already-loaded context, do that instead of asking the user. See [search-before-ask.md](search-before-ask.md).
-4. **Disambiguate terminology before agreeing.** Same word, different meanings is the most common source of false agreement. See [disambiguation.md](disambiguation.md).
+3. **Search before you ask.** If a question can be answered by inspecting the codebase, first-party documentation, or already-loaded context, do that instead of asking the user. See [search-before-ask.md](../grill-with-docs/search-before-ask.md).
+4. **Disambiguate terminology before agreeing.** Same word, different meanings is the most common source of false agreement. See [disambiguation.md](../grill-with-docs/disambiguation.md).
 5. **Walk the design tree depth-first.** Resolve each branch before opening the next. Surface dependencies between decisions explicitly.
 6. **Surface contradictions immediately.** If the user just said something that conflicts with what they said five minutes ago — or with what the code does — call it out. "You said X earlier; you're now saying Y. Which is right?"
 
@@ -40,7 +36,7 @@ Restate the user's stated intent in your own words. Ask: "Did I get that right?"
 
 ### 2. Disambiguate before exploring
 
-Identify the load-bearing terms. For each, verify you and the user mean the same thing. If a term has multiple plausible meanings in the user's stated intent, ask which one they mean before continuing. See [disambiguation.md](disambiguation.md) for the protocol.
+Identify the load-bearing terms. For each, verify you and the user mean the same thing. If a term has multiple plausible meanings in the user's stated intent, ask which one they mean before continuing. See [disambiguation.md](../grill-with-docs/disambiguation.md) for the protocol.
 
 ### 3. Walk the design tree
 
@@ -53,7 +49,7 @@ For each question, before asking:
 - Is this a known fact about an ecosystem (library still maintained, version current)? Generic web search is acceptable here but lower-confidence.
 - Otherwise, ask the user.
 
-See [search-before-ask.md](search-before-ask.md) for the discipline.
+See [search-before-ask.md](../grill-with-docs/search-before-ask.md) for the discipline.
 
 ### 4. Stress-test with concrete scenarios
 
@@ -88,5 +84,5 @@ If any of these are still open, you are not done. Say so.
 
 ## References
 
-- [disambiguation.md](disambiguation.md) — terminology verification protocol
-- [search-before-ask.md](search-before-ask.md) — codebase-first, first-party-docs-second, web-rare
+- [disambiguation.md](../grill-with-docs/disambiguation.md) — terminology verification protocol
+- [search-before-ask.md](../grill-with-docs/search-before-ask.md) — codebase-first, first-party-docs-second, web-rare
