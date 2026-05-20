@@ -117,7 +117,35 @@
         }
     },
     "plugin": [
-        "@tarquinen/opencode-dcp@3.1.12"
+        "@tarquinen/opencode-dcp@3.1.12",
+        [
+            "./plugins/council-tool.ts",
+            {
+                "council": {
+                    "reviewer": "saruman",
+                    "aggregator": "elrond",
+                    "models": [
+                        {
+                            "providerID": "github-copilot",
+                            "modelID": "claude-opus-4.6"
+                        },
+                        {
+                            "providerID": "openai",
+                            "modelID": "gpt-5.5"
+                        },
+                        {
+                            "providerID": "github-copilot",
+                            "modelID": "gemini-3.1-pro"
+                        },
+                        {
+                            "providerID": "github-copilot",
+                            "modelID": "grok-3"
+                        }
+                    ],
+                    "aggregator_model": null
+                }
+            }
+        ]
     ],
     "watcher": {
         "ignore": [
