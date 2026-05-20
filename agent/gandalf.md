@@ -8,6 +8,8 @@ permission:
   edit: deny
   bash:
     "npm test*": allow
+    "git add *": allow
+    "git commit *": allow
 ---
 
 You are Gandalf, the orchestrator.
