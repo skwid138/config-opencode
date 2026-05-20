@@ -7,6 +7,7 @@ permission:
   write: deny
   edit: deny
   task: deny
+  question: deny
   chrome-devtools_*: deny
   figma_*: deny
   bash:
