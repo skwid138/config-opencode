@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: plugins/package-lock.json
+
+      - name: Install plugin dependencies
+        working-directory: plugins
+        run: npm ci
+
+      - name: Run plugin tests
+        working-directory: plugins
+        run: npm test
+
+      - name: Typecheck plugins
+        working-directory: plugins
+        run: npx tsc --noEmit
