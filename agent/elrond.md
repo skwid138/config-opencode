@@ -1,5 +1,5 @@
 ---
-model: openai/gpt-4.1
+model: openai/gpt-5.5-fast
 description: Council aggregator; structurally synthesizes multiple Saruman review responses without issuing a verdict
 mode: subagent
 permission:
