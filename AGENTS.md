@@ -10,7 +10,7 @@
 | **aragorn** | Autonomous end-to-end implementation; sole writer | gpt-5.5 (xhigh) | **yes** |
 | **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | claude-opus-4.6 (copilot) | no |
 
-## Skills (21)
+## Skills (22)
 
 | Skill | Description |
 |-------|-------------|
@@ -32,6 +32,7 @@
 | `prototype` | Build throwaway prototypes (logic TUI or UI variants) to answer design questions |
 | `jira-qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
 | `sonarcloud` | Fetch and analyze SonarCloud issues for a PR |
+| `style-audit` | Read-only style verification against Figma design tokens |
 | `tdd` | Test-driven development: red-green-refactor cycle |
 | `to-issues` | Convert a plan into vertical-slice GitHub issues (GitHub-only) |
 | `jira-plan` | Chat-first multi-codebase implementation planning from Jira tickets |
