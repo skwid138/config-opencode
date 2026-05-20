@@ -1,3 +1,6 @@
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@opencode-ai/plugin", () => {
@@ -33,18 +36,19 @@ function createSessionMocks() {
   };
 }
 
-function createContext(session: SessionMocks) {
+function createContext(session: SessionMocks, directory = "/fallback-directory") {
   return {
     client: { session },
-    directory: "/fallback-directory",
+    directory,
   };
 }
 
 async function createExecute(
   session: SessionMocks,
   council: Record<string, unknown>,
+  directory?: string,
 ) {
-  const hooks = (await CouncilToolPlugin(createContext(session) as never, {
+  const hooks = (await CouncilToolPlugin(createContext(session, directory) as never, {
     council,
   } as never)) as unknown as {
     tool: {
@@ -270,6 +274,44 @@ describe("Elrond threshold", () => {
       "councillor-b",
       "elrond-session",
     ]);
+  });
+});
+
+describe("child session permissions", () => {
+  it("passes bash allow and deny rules from the workspace opencode config", async () => {
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), "council-tool-"));
+    fs.writeFileSync(
+      path.join(directory, "opencode.json"),
+      JSON.stringify({
+        permission: {
+          bash: {
+            "*": "ask",
+            "git status*": "allow",
+            "npm install*": "ask",
+            "rm *": "deny",
+          },
+        },
+      }),
+    );
+    const session = createSessionMocks();
+    session.create.mockResolvedValueOnce({ data: { id: "permission-session" } });
+    session.prompt.mockResolvedValueOnce({});
+    session.messages.mockResolvedValueOnce({ data: assistantMessages("success") });
+    const execute = await createExecute(session, { models: [MODEL_A] }, directory);
+
+    await execute({ prompt: "review this" }, { sessionID: "parent-session" });
+
+    expect(session.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          permission: [
+            { permission: "bash", pattern: "git status*", action: "allow" },
+            { permission: "bash", pattern: "rm *", action: "deny" },
+            { permission: "bash", pattern: "*", action: "deny" },
+          ],
+        }),
+      }),
+    );
   });
 });
 

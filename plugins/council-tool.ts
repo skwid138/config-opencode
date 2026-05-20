@@ -6,6 +6,8 @@
  * structurally aggregate the results.
  */
 
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { tool, type Plugin, type PluginOptions } from "@opencode-ai/plugin";
 
 const COUNCILLOR_TIMEOUT_MS = 180_000;
@@ -32,6 +34,12 @@ type CouncilConfig = {
   aggregator_model: ModelConfig | null;
   timeouts: TimeoutConfig;
 };
+
+type PermissionRuleset = Array<{
+  permission: string;
+  pattern: string;
+  action: "allow" | "deny";
+}>;
 
 type CouncillorSuccess = {
   model: ModelConfig;
@@ -135,6 +143,32 @@ function isModelConfig(value: unknown): value is ModelConfig {
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function catchAllDenyRuleset(): PermissionRuleset {
+  return [{ permission: "bash", pattern: "*", action: "deny" }];
+}
+
+function buildPermissionRuleset(directory: string | undefined): PermissionRuleset {
+  try {
+    const configPath = path.join(directory || process.cwd(), "opencode.json");
+    const config = JSON.parse(fs.readFileSync(configPath, "utf8")) as unknown;
+    const permission = isPlainObject(config) ? config.permission : undefined;
+    const bash = isPlainObject(permission) ? permission.bash : undefined;
+
+    if (!isPlainObject(bash)) return catchAllDenyRuleset();
+
+    const ruleset: PermissionRuleset = Object.entries(bash)
+      .filter(
+        (entry): entry is [string, "allow" | "deny"] =>
+          entry[1] === "allow" || entry[1] === "deny",
+      )
+      .map(([pattern, action]) => ({ permission: "bash", pattern, action }));
+
+    return [...ruleset, ...catchAllDenyRuleset()];
+  } catch {
+    return catchAllDenyRuleset();
+  }
 }
 
 function readTimeoutMs(
@@ -310,6 +344,7 @@ const CouncilToolPlugin: Plugin = async (ctx, options?: PluginOptions) => {
     const createResult = await ctx.client.session.create({
       body: {
         parentID: parentSessionID,
+        permission: buildPermissionRuleset(ctx.directory),
         title,
       },
       query: { directory: await parentDirectory(parentSessionID) },
