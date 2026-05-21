@@ -1,6 +1,5 @@
 ---
-model: openai/gpt-5.5
-reasoningEffort: high
+model: github-copilot/claude-opus-4.6
 description: Primary orchestration agent for planning, delegation, and delivery
 temperature: 0.1
 mode: primary
