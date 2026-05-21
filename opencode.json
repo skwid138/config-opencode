@@ -29,10 +29,12 @@
     ],
     "permission": {
         "external_directory": {
+            "*": "ask",
             "/Users/hunter/.config/opencode/*": "allow",
-            "/Users/hunter/code/dotfiles/*": "allow",
-            "/Users/hunter/code/scripts/*": "allow",
-            "/Users/hunter/code/wpromote/*": "allow"
+            "/Users/hunter/code/*": "allow",
+            "/tmp/*": "allow",
+            "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/*": "allow",
+            "/Users/hunter/code/wpromute/*": "deny"
         },
         "edit": "ask",
         "write": "ask",
@@ -116,6 +118,9 @@
             "npm root*": "allow",
             "stat *": "allow",
             "type *": "allow",
+            "test *": "allow",
+            "~/code/scripts/agent/*": "allow",
+            "~/code/wpromote/scripts/agent/*": "allow",
             "git push * --force*": "deny",
             "git push * -f*": "deny",
             "git push --force*": "deny",
@@ -150,6 +155,18 @@
                         {
                             "providerID": "github-copilot",
                             "modelID": "gpt-5.3-codex"
+                        },
+                        {
+                            "providerID": "opencode-go",
+                            "modelID": "deepseek-v4-pro"
+                        },
+                        {
+                            "providerID": "opencode-go",
+                            "modelID": "kimi-k2.6"
+                        },
+                        {
+                            "providerID": "opencode-go",
+                            "modelID": "qwen3.6-plus"
                         }
                     ],
                     "aggregator_model": null
