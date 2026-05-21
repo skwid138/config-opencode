@@ -12,7 +12,7 @@ import { existsSync } from "node:fs";
 import { tool, type Plugin } from "@opencode-ai/plugin";
 
 // MIME type mapping
-const MIME_TYPES: Record<string, string> = {
+export const MIME_TYPES: Readonly<Record<string, string>> = Object.freeze({
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".png": "image/png",
@@ -29,22 +29,24 @@ const MIME_TYPES: Record<string, string> = {
   ".wav": "audio/wav",
   ".mp3": "audio/mpeg",
   ".ogg": "audio/ogg",
-};
+});
 
-const SUPPORTED_EXTENSIONS = Object.keys(MIME_TYPES).sort().join(", ");
-const SUPPORTED_MIME_TYPES = new Set(Object.values(MIME_TYPES));
+export const SUPPORTED_EXTENSIONS = Object.keys(MIME_TYPES).sort().join(", ");
+export const SUPPORTED_MIME_TYPES: ReadonlySet<string> = Object.freeze(
+  new Set(Object.values(MIME_TYPES)),
+);
 
-function inferMimeType(filePath: string): string {
+export function inferMimeType(filePath: string): string {
   const ext = filePath.toLowerCase().match(/\.[^.]+$/)?.[0] || "";
   return MIME_TYPES[ext] || "application/octet-stream";
 }
 
-function parseMimeFromDataUrl(data: string): string | null {
+export function parseMimeFromDataUrl(data: string): string | null {
   const match = data.match(/^data:([^;]+);base64,/);
   return match ? match[1] : null;
 }
 
-function inferMimeTypeFromBase64(data: string): string {
+export function inferMimeTypeFromBase64(data: string): string {
   const dataUrlMime = parseMimeFromDataUrl(data);
   if (dataUrlMime) return dataUrlMime;
 
@@ -57,12 +59,12 @@ function inferMimeTypeFromBase64(data: string): string {
   return "image/png";
 }
 
-function extractBase64Data(data: string): string {
+export function extractBase64Data(data: string): string {
   const match = data.match(/^data:[^;]+;base64,(.+)$/);
   return match ? match[1] : data;
 }
 
-function extractLatestAssistantText(messages: unknown): string | null {
+export function extractLatestAssistantText(messages: unknown): string | null {
   if (!Array.isArray(messages) || messages.length === 0) return null;
 
   const assistantMessages = messages
@@ -94,6 +96,20 @@ function extractLatestAssistantText(messages: unknown): string | null {
     .filter((part) => part.type === "text" && typeof part.text === "string")
     .map((part) => part.text as string)
     .join("\n");
+}
+
+function getResultError(result: unknown): unknown {
+  if (result && typeof result === "object" && "error" in result) {
+    return (result as { error?: unknown }).error;
+  }
+  return undefined;
+}
+
+function getResultData<T>(result: unknown): T | undefined {
+  if (result && typeof result === "object" && "data" in result) {
+    return (result as { data?: T }).data;
+  }
+  return undefined;
 }
 
 const VisionToolPlugin: Plugin = async (ctx) => {
@@ -211,19 +227,23 @@ If the requested information is not found, clearly state what is missing.`;
                 ],
               },
               query: { directory: parentDirectory },
-            });
+            } as Parameters<typeof ctx.client.session.create>[0]);
 
-            if (createResult.error) {
-              const errorStr = String(createResult.error);
+            const createError = getResultError(createResult);
+            if (createError) {
+              const errorStr = String(createError);
               if (errorStr.toLowerCase().includes("unauthorized")) {
                 return `Error: Failed to create session (Unauthorized). This may be due to OAuth token restrictions. Try using a different provider or API key authentication.`;
               }
-              return `Error: Failed to create session: ${createResult.error}`;
+              return `Error: Failed to create session: ${createError}`;
             }
 
-            const sessionID = createResult.data.id;
+            const sessionID = getResultData<{ id: string }>(createResult)?.id;
+            if (!sessionID) {
+              return "Error: Failed to create session: missing session id";
+            }
 
-            await ctx.client.session.prompt({
+            const promptResult = await ctx.client.session.prompt({
               path: { id: sessionID },
               body: {
                 agent: "general",
@@ -245,16 +265,22 @@ If the requested information is not found, clearly state what is missing.`;
               },
             } as Parameters<typeof ctx.client.session.prompt>[0]);
 
+            const promptError = getResultError(promptResult);
+            if (promptError) {
+              return `Error: Vision prompt failed: ${promptError}`;
+            }
+
             const messagesResult = await ctx.client.session.messages({
               path: { id: sessionID },
             });
 
-            if (messagesResult.error) {
-              return `Error: Failed to get messages: ${messagesResult.error}`;
+            const messagesError = getResultError(messagesResult);
+            if (messagesError) {
+              return `Error: Failed to get messages: ${messagesError}`;
             }
 
             const responseText = extractLatestAssistantText(
-              messagesResult.data,
+              getResultData(messagesResult),
             );
             if (!responseText) {
               return `Error: No response from vision agent`;
