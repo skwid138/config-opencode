@@ -9,5 +9,5 @@
     "noEmit": true,
     "types": ["vitest", "node"]
   },
-  "include": ["council-tool.ts", "council-tool.test.ts", "vitest.config.ts"]
+  "include": ["*.ts", "__tests__/*.test.ts"]
 }

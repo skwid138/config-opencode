@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "vitest run"
+    "test": "vitest run --config vitest.config.mts"
   },
   "dependencies": {
     "@opencode-ai/plugin": "1.15.4",
