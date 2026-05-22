@@ -34,7 +34,7 @@
             "/Users/hunter/code/*": "allow",
             "/tmp/*": "allow",
             "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/*": "allow",
-            "/Users/hunter/code/wpromute/*": "deny"
+            "/Users/hunter/code/wpromote/*": "deny"
         },
         "edit": "ask",
         "write": "ask",
