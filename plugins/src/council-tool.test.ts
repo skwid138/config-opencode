@@ -19,7 +19,7 @@ vi.mock("@opencode-ai/plugin", () => {
 import CouncilToolPlugin, {
   normalizeCouncilConfig,
   raceWithTimeout,
-} from "../council-tool";
+} from "./council-tool";
 
 const MODEL_A = { providerID: "provider-a", modelID: "model-a" };
 const MODEL_B = { providerID: "provider-b", modelID: "model-b" };

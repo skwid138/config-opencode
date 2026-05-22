@@ -41,7 +41,9 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 ├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
 │   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.json
 ├── plugins/                     # Local TypeScript plugins
-│   └── vision-tool.ts           # Large-image / PDF / video vision via Gemini
+│   └── src/                     # Plugin source and colocated tests
+│       ├── council-tool.ts      # Multi-model council review tool
+│       └── vision-tool.ts       # Large-image / PDF / video vision via Gemini
 └── logs/                        # DCP debug logs (gitignored)
 ```
 
@@ -149,9 +151,12 @@ Verify registration after edits with `opencode mcp list`.
 
 ## Plugins
 
-Two plugins are loaded — one local TypeScript file and one npm package.
+Three plugins are loaded — two local TypeScript files and one npm package.
 
-### `plugins/vision-tool.ts` (local)
+### `plugins/src/council-tool.ts` (local)
+Exposes a `council_review` tool that fans a review prompt out to configured Saruman councillors and asks Elrond to structurally aggregate the responses.
+
+### `plugins/src/vision-tool.ts` (local)
 Exposes a `vision` tool that bypasses Claude's 8000px image limit by routing files to a Gemini agent. Supports JPEG/PNG/GIF/WebP/HEIC/BMP, PDFs, MP4/MOV/AVI/WebM, and WAV/MP3/OGG. Use it instead of `read` for any media file.
 
 ### `@tarquinen/opencode-dcp` (npm)

@@ -29,7 +29,7 @@ import VisionToolPlugin, {
   inferMimeType,
   inferMimeTypeFromBase64,
   parseMimeFromDataUrl,
-} from "../vision-tool";
+} from "./vision-tool";
 
 type SessionMocks = ReturnType<typeof createSessionMocks>;
 

@@ -9,5 +9,5 @@
     "noEmit": true,
     "types": ["vitest", "node"]
   },
-  "include": ["*.ts", "__tests__/*.test.ts", "vitest.config.mts"]
+  "include": ["src/**/*.ts", "vitest.config.mts"]
 }
