@@ -91,3 +91,16 @@ _Avoid_: council master, synthesizer, arbiter
 **Council Fallback:**
 When fewer than 2 councillors return valid responses, the council fails and Gandalf falls back to solo Saruman review.
 _Avoid_: degraded council
+
+### Permission Philosophy
+
+**Read-allow by default**:
+All read-only commands and safe external directories are allowed globally so every agent (including council child sessions) can access them. Council sessions treat `ask` as effectively `deny` due to the upstream permission-prompt bug (opencode#28037), so any command an agent legitimately needs must be explicitly allowed.
+
+**Deny rules serve three purposes**:
+1. Block destructive operations (rm, force-push, sudo, sed -i)
+2. Guard against hallucinated paths that would hang council sessions
+3. Prevent council/plugin-spawned agents from getting stuck on prompts (requires full terminal close to recover — can't even exit the TUI)
+
+**Last-match-wins ordering**:
+`"*": "ask"` must be first (lowest priority). Specific allow/deny rules after it override. Agent-level permissions layer on top of global rules additively.
