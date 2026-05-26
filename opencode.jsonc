@@ -20,15 +20,6 @@
         },
         "compaction": {
             "model": "openai/gpt-5.5"
-        },
-        // TODO: Remove when @skwid138/opencode-council supports external_directory in reviewer_permission
-        // See: https://github.com/skwid138/opencode-council/issues/1
-        "saruman": {
-            "permission": {
-                "external_directory": {
-                    "/Users/hunter/*": "allow"
-                }
-            }
         }
     },
     "instructions": [
@@ -159,7 +150,7 @@
         "@tarquinen/opencode-dcp@3.1.12",
         "./plugins/src/vision-tool.ts",
         [
-            "@skwid138/opencode-council@0.2.0",
+            "@skwid138/opencode-council@0.3.0",
             {
                 "council": {
                     "reviewer": "saruman",
