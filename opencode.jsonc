@@ -187,6 +187,9 @@
                     "aggregator_model": {
                         "providerID": "openai",
                         "modelID": "gpt-5.5-fast"
+                    },
+                    "timeouts": {
+                        "aggregator_ms": 120000
                     }
                 }
             }
