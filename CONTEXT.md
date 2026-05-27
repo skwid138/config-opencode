@@ -84,8 +84,8 @@ _Avoid_: ensemble, swarm
 One reviewer session in a council — the existing reviewer agent (default: Saruman) prompted with a specific model override.
 _Avoid_: reviewer instance, agent clone
 
-**Elrond:**
-The council aggregator agent. Performs lightweight structural synthesis (dedup, agreement counting, grouping) without making judgment calls. Final verdict authority stays with Gandalf.
+**Aggregator**:
+The council aggregator — either the bundled `council-plugin-aggregator` (default) or a user-specified agent. Performs lightweight structural synthesis (dedup, agreement counting, grouping) without making judgment calls. Final verdict authority stays with Gandalf.
 _Avoid_: council master, synthesizer, arbiter
 
 **Council Fallback:**
