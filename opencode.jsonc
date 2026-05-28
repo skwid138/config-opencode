@@ -163,10 +163,11 @@
         "@tarquinen/opencode-dcp@3.1.12",
         "./plugins/src/vision-tool.ts",
         [
-            "@skwid138/opencode-council@0.3.0",
+            "@skwid138/opencode-council@0.6.0",
             {
                 "council": {
                     "reviewer": "saruman",
+                    "debug": true,
                     "models": [
                         {
                             "providerID": "github-copilot",
@@ -229,7 +230,7 @@
             "command": [
                 "npx",
                 "-y",
-                "chrome-devtools-mcp@1.0.1",
+                "chrome-devtools-mcp@1.1.1",
                 "--browserUrl",
                 "http://127.0.0.1:9222"
             ],
