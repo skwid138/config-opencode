@@ -1,5 +1,5 @@
 ---
-model: github-copilot/claude-opus-4.6
+model: github-copilot/claude-opus-4.7
 description: Primary orchestration agent for planning, delegation, and delivery
 temperature: 0.1
 mode: primary
