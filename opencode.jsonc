@@ -163,7 +163,7 @@
         "@tarquinen/opencode-dcp@3.1.12",
         "./plugins/src/vision-tool.ts",
         [
-            "@skwid138/opencode-council@0.6.0",
+            "@skwid138/opencode-council@0.8.0",
             {
                 "council": {
                     "reviewer": "saruman",
@@ -177,13 +177,25 @@
                             "providerID": "openai",
                             "modelID": "gpt-5.5"
                         },
+                        // {
+                        //     "providerID": "github-copilot",
+                        //     "modelID": "gemini-3.1-pro-preview"
+                        // },
                         {
                             "providerID": "github-copilot",
-                            "modelID": "gemini-3.1-pro-preview"
+                            "modelID": "gemini-3.5-flash"
                         },
                         {
                             "providerID": "github-copilot",
                             "modelID": "gpt-5.3-codex"
+                        },
+                        {
+                            "providerID": "opencode-go",
+                            "modelID": "mimo-v2.5"
+                        },
+                        {
+                            "providerID": "opencode-go",
+                            "modelID": "deepseek-v4-flash"
                         },
                         {
                             "providerID": "opencode-go",
@@ -195,7 +207,7 @@
                         },
                         {
                             "providerID": "opencode-go",
-                            "modelID": "qwen3.6-plus"
+                            "modelID": "qwen3.7-max"
                         }
                     ],
                     "aggregator_model": {
