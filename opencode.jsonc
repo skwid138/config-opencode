@@ -189,31 +189,32 @@
                             "providerID": "github-copilot",
                             "modelID": "gpt-5.3-codex"
                         },
-                        {
-                            "providerID": "opencode-go",
-                            "modelID": "mimo-v2.5"
-                        },
-                        {
-                            "providerID": "opencode-go",
-                            "modelID": "deepseek-v4-flash"
-                        },
-                        {
-                            "providerID": "opencode-go",
-                            "modelID": "deepseek-v4-pro"
-                        },
-                        {
-                            "providerID": "opencode-go",
-                            "modelID": "kimi-k2.6"
-                        },
-                        {
-                            "providerID": "opencode-go",
-                            "modelID": "qwen3.7-max"
-                        }
+                        // {
+                        //     "providerID": "opencode-go",
+                        //     "modelID": "mimo-v2.5"
+                        // },
+                        // {
+                        //     "providerID": "opencode-go",
+                        //     "modelID": "deepseek-v4-flash"
+                        // },
+                        // {
+                        //     "providerID": "opencode-go",
+                        //     "modelID": "deepseek-v4-pro"
+                        // },
+                        // {
+                        //     "providerID": "opencode-go",
+                        //     "modelID": "kimi-k2.6"
+                        // },
+                        // {
+                        //     "providerID": "opencode-go",
+                        //     "modelID": "qwen3.7-max"
+                        // }
                     ],
                     "aggregator_model": {
                         "providerID": "openai",
                         "modelID": "gpt-5.5-fast"
                     },
+                    "quorum": 4,
                     "timeouts": {
                         "aggregator_ms": 120000
                     }
