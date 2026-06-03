@@ -10,6 +10,7 @@ which is loaded conditionally by the OpenCode launcher wrapper.
 ## Layout
 
 - **`~/code/scripts/agent/`** — opencode-coupled tools (data retrieval for skills, helpers for commands).
+- **`~/code/scripts/data/`** — declarative manifests/templates consumed by agent scripts.
 - **`~/code/scripts/lib/`** — sourced helpers shared by agent/ and shell/ scripts.
 - **`~/code/scripts/shell/`** — interactive-shell setup, sourced via the three-barrel init: `init_env.zsh` from `.zshenv`, `init_profile.zsh` from `.zprofile`, `init_rc.zsh` from `.zshrc`. Not directly invoked.
 - **`~/code/scripts/personal/`** — personal utilities not used by opencode.
@@ -27,6 +28,7 @@ which is loaded conditionally by the OpenCode launcher wrapper.
 | Script | Purpose | Usage |
 |--------|---------|-------|
 | `~/code/scripts/agent/gh-pr-comments.sh` | Fetch PR review comments as JSON | `gh-pr-comments.sh [PR_REF]` |
+| `~/code/scripts/agent/gh-label-sync.sh` | Converge GitHub labels on `skwid138`-owned repos to `~/code/scripts/data/github-labels.yml`; dry-run by default, `--apply` mutates; rejects non-`skwid138` owners; outputs `{version:1,repos:[...]}` JSON. Override manifest with `GH_LABEL_SYNC_MANIFEST`. | `gh-label-sync.sh [--apply] skwid138/repo [skwid138/repo2 ...]` |
 | `~/code/scripts/agent/sonar-pr-issues.sh` | Fetch SonarCloud issues as JSON | `sonar-pr-issues.sh [--severity LEVEL] [PR_NUMBER]` |
 | `~/code/scripts/agent/jira-fetch-ticket.sh` | Fetch Jira ticket data as JSON | `jira-fetch-ticket.sh [--all] TICKET-ID` |
 | `~/code/scripts/agent/opencode-deps-check.sh` | Check OpenCode config deps (`package.json` + `opencode.json`) for outdated/unpinned versions | `opencode-deps-check.sh [--human\|--json]` |
@@ -44,7 +46,7 @@ which is loaded conditionally by the OpenCode launcher wrapper.
 - All scripts accept `-h`/`--help` for usage.
 - All scripts exit non-zero on error with a clear message to stderr (see `~/code/scripts/docs/EXIT-CODES.md` for the categorized convention).
 - Data scripts output JSON to stdout.
-- Scripts never commit, push, deploy, delete, or mutate remote systems.
+- Scripts are read-only with respect to remote systems unless you pass an explicit, off-by-default opt-in flag (e.g. `--apply`, `--post-jira`); see `~/code/scripts/docs/CONVENTIONS.md`.
 - Scripts check their own dependencies and report missing tools clearly.
 
 ## Where does a new agent script go?
