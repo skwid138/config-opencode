@@ -26,12 +26,12 @@ All Wpromote repositories live under `~/code/wpromote/`. When working on a task 
                               └──┬────┬───┬──┘
                                  │    │   │
                     ┌────────────┘    │   └────────────┐
-                    │                 │                 │
-              ┌─────┴─────┐   ┌──────┴──────┐   ┌─────┴─────┐
-              │   cube    │   │   kraken    │   │  BigQuery │
-              │(semantic  │   │  (data      │   │  (GCP)    │
-              │  layer)   │   │  pipeline)  │   │           │
-              └───────────┘   └─────────────┘   └───────────┘
+                    │                 │                │
+              ┌─────┴─────┐    ┌──────┴──────┐   ┌─────┴─────┐
+              │   cube    │    │   kraken    │   │  BigQuery │
+              │(semantic  │    │  (data      │   │  (GCP)    │
+              │  layer)   │    │  pipeline)  │   │           │
+              └───────────┘    └─────────────┘   └───────────┘
 ```
 
 ### Repository Map
