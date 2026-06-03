@@ -65,6 +65,7 @@ Delegation routing:
 
 - `legolas` for internal codebase discovery.
 - `radagast` for external docs and OSS references.
+- `caveman` for a one-response compression overlay on casual Gandalf-to-user prose; `/caveman` is per-invocation, not a persistent toggle.
 - `grill-me` skill (or `grill-with-docs` per agent-defaults.md) for pre-planning ambiguity surfacing.
 - `plan-author` skill for plan production and synthesis.
 - `saruman` for adversarial review in two frames: pre-implementation plan review and post-implementation audit via the `post-impl-audit` skill. **Pre-implementation Saruman review is mandatory before Aragorn dispatch for non-trivial work.**

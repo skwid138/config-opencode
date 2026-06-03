@@ -10,11 +10,12 @@
 | **aragorn** | Autonomous end-to-end implementation; sole writer | gpt-5.5 (xhigh) | **yes** |
 | **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | openai/gpt-5.5 (high) | no |
 
-## Skills (22)
+## Skills (26)
 
 | Skill | Description |
 |-------|-------------|
 | `bug-hunter` | Read-only scan for null/guard gaps at system boundaries |
+| `caveman` | One-response ultra-compressed prose overlay for casual Gandalf replies |
 | `chrome-devtools` | Browser-driven UI debugging, Lighthouse, network/console inspection |
 | `diagnose` | Disciplined read-only diagnosis loop for hard bugs and regressions |
 | `figma` | Extract design context from Figma files for implementation |
@@ -26,6 +27,7 @@
 | `improve-codebase-architecture` | System-level architecture review and deepening-opportunity scan |
 | `jira-enhance` | Audit and improve Jira acceptance criteria quality |
 | `jira-ticket` | Fetch and summarize Jira tickets for summary/estimation |
+| `permission-audit` | Audit opencode permission decisions and recommend permission config changes |
 | `plan-author` | Persist reviewed gathered context into a plan document |
 | `post-impl-audit` | Saruman audit of Aragorn's implementation output against the plan |
 | `pr-review` | Code quality + AC compliance review of branch diff |
@@ -35,9 +37,12 @@
 | `style-audit` | Read-only style verification against Figma design tokens |
 | `tdd` | Test-driven development: red-green-refactor cycle |
 | `to-issues` | Convert a plan into vertical-slice GitHub issues (GitHub-only) |
+| `triage` | GitHub issue triage state machine for personal non-Wpromote repos |
 | `jira-plan` | Chat-first multi-codebase implementation planning from Jira tickets |
+| `zoom-out` | Higher-abstraction module/caller map in domain-glossary terms |
 
 Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
+Borrowed/upstream skill provenance is tracked in `skill/UPSTREAM-REGISTRY.md`.
 
 ## Coding Conventions
 
@@ -46,6 +51,7 @@ Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
 - **Long-running command discipline** — explain, show command, estimate cost, ask before running expensive operations.
 - Refer to `instruction/agent-defaults.md` for full standing defaults.
 - Refer to `instruction/script-usage.md` for available shell scripts and conventions.
+- In this repo, `~` expands to `/Users/hunter`; script invocations should use absolute paths or `$HOME` paths.
 - Jira-facing commands use a `jira-` prefix (`/jira-ticket`, `/jira-plan`,
   `/jira-ac-quality`, `/jira-add-imp-plan`, `/jira-qa-subtask`) so ticket reads,
   planning, Jira comments, and QA subtask generation are visibly separated.
@@ -80,7 +86,7 @@ Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
 ├── opencode.json          # Model, MCPs, plugins, permissions
 ├── agent/                 # Agent definitions (frontmatter + system prompt)
 ├── command/               # Slash commands (thin wrappers around skills)
-├── skill/                 # Skill library (19 skills)
+├── skill/                 # Skill library (26 skills)
 ├── instruction/           # Auto-loaded context for all agents
 ├── plugins/               # Local TypeScript plugins
 ├── bin/                   # Launcher wrapper infrastructure
