@@ -54,6 +54,12 @@ _Avoid_: post-mortem, retrospective
 **Render envelope**:
 A local preview artifact containing formatted output for review before any remote mutation occurs.
 
+### GitHub Scope
+
+**Repository Scope Gate**:
+A guard in the personal-GitHub skills (to-issues, triage) that proceeds only when the target repository's owner is the user's own account (skwid138). It refuses repositories owned by Wpromote — routing that work to Jira tooling — and fails closed when ownership cannot be determined.
+_Avoid_: owner allowlist (that is the mechanism, not the guard), Wpromote denylist
+
 ## Relationships
 
 - **Gandalf** delegates to **Legolas**, **Radagast**, **Aragorn**, and **Saruman**.
@@ -61,6 +67,7 @@ A local preview artifact containing formatted output for review before any remot
 - A **Command** invokes exactly one **Skill** or script.
 - **Gandalf** may dispatch multiple **Agents** while executing a **Skill**.
 - **Instructions** are always loaded; **Skills** are loaded on demand.
+- The **Repository Scope Gate** policy is enforced in three places: the `gh-label-sync` script via a typed-slug owner allowlist in bash, and the **to-issues** and **triage** skills via runtime `gh repo view` owner discovery. The allowlist is the mechanism; the gate is the shared policy. The two skills share identical gate policy, differing only where triage gates before reads (not just mutations) and refuses Wpromote work without a skill handoff.
 
 ## Example dialogue
 
