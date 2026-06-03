@@ -86,6 +86,8 @@ If any of these are still open, you are not done. Say so.
 
 When terms get sharpened or hard-to-reverse decisions get made, prepare durable doc updates. If the current executor is not Aragorn, do not write; show the proposed update, get user confirmation, and dispatch Aragorn for the docs write.
 
+`CONTEXT.md` is a glossary and nothing else; not a spec, scratch pad, or implementation-decisions repository.
+
 ### File structure
 
 Most repos have a single context:
