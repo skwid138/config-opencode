@@ -99,6 +99,15 @@ Present a numbered list of deepening opportunities. For each candidate:
 - **Solution** — plain English description of what would change
 - **Benefits** — explained in terms of locality and leverage, and how tests would improve
 
+Before falling back to inline markdown, attempt the optional HTML candidate report helper only through this default-safe contract:
+
+1. Resolve `~/code/scripts/agent/arch-review-report.sh` to the absolute path `/Users/hunter/code/scripts/agent/arch-review-report.sh`.
+2. Use the HTML report only if the script exists, is executable, exits 0, and stdout parses as well-formed JSON containing at least `{ "version": 1, "path": "..." }` with optional `opened`.
+3. Pass candidate data as JSON on stdin. Expect `{version:1,path,opened}` JSON on stdout.
+4. Any other outcome — missing script, denied permission, non-zero exit, malformed output, wrong version, or missing path — must not hard-fail the review. Present the candidates inline in markdown instead.
+
+The report helper is a presentation aid only. It does not change the read-only posture of this architecture review and must never execute refactors or modify the target codebase.
+
 **Use `CONTEXT.md` vocabulary for the domain, and [LANGUAGE.md](LANGUAGE.md) vocabulary for the architecture.** If `CONTEXT.md` defines "Order," talk about "the Order intake module" — not "the FooBarHandler," and not "the Order service."
 
 **ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly (e.g. _"contradicts ADR-0007 — but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
