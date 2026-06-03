@@ -1,5 +1,5 @@
 ---
-model: github-copilot/claude-opus-4.7
+model: github-copilot/claude-opus-4.8
 reasoningEffort: medium
 description: Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time
 temperature: 0.1
