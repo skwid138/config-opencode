@@ -24,9 +24,9 @@ for **Aragorn** to apply.
 Always use the wrapper script for data retrieval:
 
 ```bash
-~/code/scripts/agent/permission-audit.sh --json
-~/code/scripts/agent/permission-audit.sh --start 2026-05-20 --end 2026-05-21 --json
-~/code/scripts/agent/permission-audit.sh --action all --agent gandalf --json
+/Users/hunter/code/scripts/agent/permission-audit.sh --json
+/Users/hunter/code/scripts/agent/permission-audit.sh --start 2026-05-20 --end 2026-05-21 --json
+/Users/hunter/code/scripts/agent/permission-audit.sh --action all --agent gandalf --json
 ```
 
 Script interface:
@@ -36,7 +36,11 @@ permission-audit.sh [--start DATE] [--end DATE] [--action ask|deny|all] [--agent
 ```
 
 Defaults: today's date range, `--action ask`, JSON output. Dates use
-`YYYY-MM-DD`.
+`YYYY-MM-DD`. JSON summary reports `prompt_event_count` (one per `asking` log
+record) separately from `pattern_occurrence_count` (one per `patterns` array
+entry). opencode log retention is limited to about 10 files; pre-plugin agent
+attribution is best effort, and v1.15.13 SQLite permission/event tables do not
+recover the missing attribution.
 
 ## When to use this skill
 
@@ -57,7 +61,7 @@ Defaults: today's date range, `--action ask`, JSON output. Dates use
 
 ## Workflow
 
-1. Invoke `~/code/scripts/agent/permission-audit.sh --json` with the
+1. Invoke `/Users/hunter/code/scripts/agent/permission-audit.sh --json` with the
    user-specified date range and filters. If no range is specified, use the
    script default of today.
 2. Parse the JSON output.
@@ -71,8 +75,9 @@ Defaults: today's date range, `--action ask`, JSON output. Dates use
      access.
 4. Present a table of permission events plus recommendations and rationale.
 5. If the user approves, generate the config diff for **Aragorn** to apply.
-6. Remind the user about the tilde-path convention for bash permission rules:
-   add both absolute and tilde forms.
+6. Remind the user that bash rules should use anchored absolute script paths;
+   the local permission canonicalization plugin normalizes safe argv0 `~/` and
+   `$HOME/` forms before opencode evaluates permissions.
 
 ## Recommendation guidance
 
@@ -89,19 +94,27 @@ Classify each entry conservatively:
 Prefer narrow rules over broad wildcards. Use counts and repeated agents as
 supporting evidence, not as automatic justification for `allow`.
 
-## Tilde-path convention for bash rules
+## Bash path normalization
 
-When recommending bash permission rules for scripts under `~/code`, always
-recommend **both** raw command forms:
+opencode v1.15.13 normalizes permission **patterns** at config load time but
+matches bash **command nodes** before shell expansion. Pattern-side `~/`, bare
+`~`, `$HOME/`, and `$HOME` at position 0 are expanded to `/Users/hunter`; the
+raw command text is not. `${HOME}` is not expanded by opencode.
+
+Do **not** recommend both absolute and tilde bash rules. A tilde bash rule is
+expanded to the same absolute pattern as the absolute rule, so it does not match
+a raw `~/...` command. Prefer anchored absolute, sibling-safe script rules:
 
 ```json
-"/Users/hunter/code/scripts/agent/foo.sh*": "allow",
-"~/code/scripts/agent/foo.sh*": "allow"
+"/Users/hunter/code/scripts/agent/foo.sh": "allow",
+"/Users/hunter/code/scripts/agent/foo.sh *": "allow"
 ```
 
-Reason: the bash permission matcher evaluates the raw command string exactly as
-the agent wrote it. A command typed with `~` will not match an absolute-path-only
-rule, and an absolute command will not match a tilde-only rule.
+The local permission canonicalization plugin handles prompt reduction by
+rewriting only safe argv0 home forms (`~/`, bare `~`, `$HOME/`, `$HOME`) to the
+same absolute path before permission evaluation. That keeps allow and deny
+patterns in lockstep and avoids unsafe `<name>.sh*` suffixes that would also
+match sibling names such as `foo.sh.evil`.
 
 ## Output format
 
@@ -116,7 +129,7 @@ Produce a markdown report:
 
 | # | Permission | Pattern | Matched rule | Action | Count | Agents | Recommendation |
 |---|------------|---------|--------------|--------|-------|--------|----------------|
-| 1 | bash | `<pattern>` | `<matched_rule>` | ask | 3 | gandalf | Allow both absolute and tilde script forms — read-only wrapper |
+| 1 | bash | `<pattern>` | `<matched_rule>` | ask | 3 | gandalf | Add anchored absolute sibling-safe script allow — read-only wrapper |
 
 ### Recommended config changes
 
