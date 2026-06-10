@@ -42,7 +42,6 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 │   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.json
 ├── plugins/                     # Local TypeScript plugins
 │   └── src/                     # Plugin source and colocated tests
-│       ├── council-tool.ts      # Multi-model council review tool
 │       └── vision-tool.ts       # Large-image / PDF / video vision via Gemini
 └── logs/                        # DCP debug logs (gitignored)
 ```
@@ -151,16 +150,19 @@ Verify registration after edits with `opencode mcp list`.
 
 ## Plugins
 
-Three plugins are loaded — two local TypeScript files and one npm package.
-
-### `plugins/src/council-tool.ts` (local)
-Exposes a `council_review` tool that fans a review prompt out to configured Saruman councillors and asks Elrond to structurally aggregate the responses.
+Four plugins are loaded — one local TypeScript file and three npm packages.
 
 ### `plugins/src/vision-tool.ts` (local)
 Exposes a `vision` tool that bypasses Claude's 8000px image limit by routing files to a Gemini agent. Supports JPEG/PNG/GIF/WebP/HEIC/BMP, PDFs, MP4/MOV/AVI/WebM, and WAV/MP3/OGG. Use it instead of `read` for any media file.
 
 ### `@tarquinen/opencode-dcp` (npm)
 Dynamic Context Pruning. Configured via `dcp.jsonc` — see next section for current settings.
+
+### `@skwid138/opencode-command-normalizer` (npm)
+Normalizes safe bash argv0 home forms before permission evaluation so anchored absolute script rules match `~/` and `$HOME/` command forms without unsafe wildcard suffixes.
+
+### `@skwid138/opencode-council` (npm)
+Exposes a `council_review` tool that fans a review prompt out to configured Saruman councillors and asks a separate aggregator model to structurally aggregate the responses.
 
 ## Dynamic Context Pruning (DCP) — Autonomous Configuration
 
