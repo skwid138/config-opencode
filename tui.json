@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/tui.json",
-  "theme": "flamingo-ember",
+  "theme": "camellia-voltage",
   "plugin": [
     ["./plugins/home-prompt.tsx", {}],
     ["./plugins/justvibes-logo.tsx", {}]
