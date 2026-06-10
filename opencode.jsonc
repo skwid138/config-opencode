@@ -143,6 +143,9 @@
             "/Users/hunter/code/scripts/agent/sonar-pr-issues.sh *": "allow",
             "/Users/hunter/code/scripts/agent/permission-audit.sh": "allow",
             "/Users/hunter/code/scripts/agent/permission-audit.sh *": "allow",
+            // Deliberate exception to the mutating-tool -> ask convention: pi-ssh is Pi-scoped but permits arbitrary remote execution, including sudo. The local start-anchored "sudo *" deny rule does not catch remote sudo sent through this wrapper.
+            "/Users/hunter/code/scripts/agent/pi-ssh.sh": "allow",
+            "/Users/hunter/code/scripts/agent/pi-ssh.sh *": "allow",
             "/Users/hunter/code/wpromote/scripts/agent/auto-ticket-context.sh": "allow",
             "/Users/hunter/code/wpromote/scripts/agent/auto-ticket-context.sh *": "allow",
             "/Users/hunter/code/wpromote/scripts/agent/gcp-project-map.sh": "allow",
