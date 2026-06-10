@@ -5,8 +5,8 @@ operations. Prefer calling these over reimplementing their logic in prompts.
 Invoke agent scripts by direct absolute path, without a `bash ` prefix (for
 example, `/Users/hunter/code/scripts/agent/gh-current-pr.sh --json`). Exotic
 interpreter prefixes still prompt, which is safe. Avoid the `${HOME}` brace
-form; the local permission canonicalization plugin intentionally leaves it off
-by default to match opencode's own pattern expansion behavior.
+form; `@skwid138/opencode-command-normalizer` intentionally leaves it off by
+default to match opencode's own pattern expansion behavior.
 
 When working under `~/code/wpromote/`, additional Wpromote-internal scripts
 under `~/code/wpromote/scripts/` are documented in `wpromote-context.md`,

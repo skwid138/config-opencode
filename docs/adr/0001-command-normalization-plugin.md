@@ -4,6 +4,13 @@
 
 accepted
 
+> Update (2026-06): The implementation has been vendored as the npm package
+> `@skwid138/opencode-command-normalizer@0.1.0` and is loaded via
+> `opencode.jsonc`. The original local file
+> `./plugins/src/permission-canonicalizer.ts` no longer exists. Behavior and log
+> paths are unchanged; this ADR's behavioral spec remains the de-facto spec for
+> the vendored package.
+
 ## Context
 
 opencode normalizes permission **patterns** and **commands** asymmetrically. As

@@ -76,7 +76,7 @@ recover the missing attribution.
 4. Present a table of permission events plus recommendations and rationale.
 5. If the user approves, generate the config diff for **Aragorn** to apply.
 6. Remind the user that bash rules should use anchored absolute script paths;
-   the local permission canonicalization plugin normalizes safe argv0 `~/` and
+   `@skwid138/opencode-command-normalizer` normalizes safe argv0 `~/` and
    `$HOME/` forms before opencode evaluates permissions.
 
 ## Recommendation guidance
@@ -110,7 +110,7 @@ a raw `~/...` command. Prefer anchored absolute, sibling-safe script rules:
 "/Users/hunter/code/scripts/agent/foo.sh *": "allow"
 ```
 
-The local permission canonicalization plugin handles prompt reduction by
+`@skwid138/opencode-command-normalizer` handles prompt reduction by
 rewriting only safe argv0 home forms (`~/`, bare `~`, `$HOME/`, `$HOME`) to the
 same absolute path before permission evaluation. That keeps allow and deny
 patterns in lockstep and avoids unsafe `<name>.sh*` suffixes that would also
