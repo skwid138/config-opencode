@@ -27,6 +27,7 @@ which is loaded conditionally by the OpenCode launcher wrapper.
 | `/Users/hunter/code/scripts/agent/branch-to-ticket.sh` | Extract Jira ticket ID from branch name | `/Users/hunter/code/scripts/agent/branch-to-ticket.sh [branch]` |
 | `/Users/hunter/code/scripts/agent/gh-current-pr.sh` | Get PR number for current branch | `/Users/hunter/code/scripts/agent/gh-current-pr.sh [--json]` |
 | `/Users/hunter/code/scripts/agent/chrome_mcp.sh` | Launch Chrome for DevTools MCP | `/Users/hunter/code/scripts/agent/chrome_mcp.sh [--url URL]` |
+| `/Users/hunter/code/scripts/agent/pi-ssh.sh` | Pi-only SSH wrapper; prefer for ANY Pi SSH operation (use instead of raw `ssh`). Transparent stdout/exit passthrough; remote exit codes 1–5 collide with local script convention codes. | `/Users/hunter/code/scripts/agent/pi-ssh.sh [wrapper-options] [--] [remote-command...]` |
 
 ## Data Retrieval (`agent/`)
 
