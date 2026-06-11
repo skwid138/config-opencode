@@ -9,8 +9,9 @@ description: >-
 
 # Permission Audit
 
-Audit recent opencode permission `ask` / `deny` decisions from local log files,
-then present safe, evidence-backed recommendations for permission config changes.
+Audit recent opencode interactive permission decisions from the durable
+command-normalizer `decisions.log` by default, then present safe,
+evidence-backed recommendations for permission config changes.
 
 ## Executor ownership
 
@@ -26,21 +27,25 @@ Always use the wrapper script for data retrieval:
 ```bash
 /Users/hunter/code/scripts/agent/permission-audit.sh --json
 /Users/hunter/code/scripts/agent/permission-audit.sh --start 2026-05-20 --end 2026-05-21 --json
-/Users/hunter/code/scripts/agent/permission-audit.sh --action all --agent gandalf --json
+/Users/hunter/code/scripts/agent/permission-audit.sh --source decisions --action all --agent gandalf --json
+/Users/hunter/code/scripts/agent/permission-audit.sh --source native --action ask --json
 ```
 
 Script interface:
 
 ```text
-permission-audit.sh [--start DATE] [--end DATE] [--action ask|deny|all] [--agent AGENT] [--json|--human]
+permission-audit.sh [--start DATE] [--end DATE] [--source decisions|native] [--action allow|deny|all] [--agent AGENT] [--json|--human]
 ```
 
-Defaults: today's date range, `--action ask`, JSON output. Dates use
-`YYYY-MM-DD`. JSON summary reports `prompt_event_count` (one per `asking` log
-record) separately from `pattern_occurrence_count` (one per `patterns` array
-entry). opencode log retention is limited to about 10 files; pre-plugin agent
-attribution is best effort, and v1.15.13 SQLite permission/event tables do not
-recover the missing attribution.
+Defaults: today's date range, `--source decisions`, `--action all`, JSON output.
+Dates use `YYYY-MM-DD`. Decisions JSON is schema v2 and reports summary keys
+`total_events`, `allow_count`, `deny_count`, `unknown_count`, and
+`unique_permissions`.
+
+The decisions source is an interactive-prompt audit: static allow and deny rules
+that never prompt are not captured, so it is not a comprehensive policy audit.
+Use `--source native --action ask` only when you explicitly need the legacy
+rotating-log view; native uses `ask` in place of decisions' `allow` action.
 
 ## When to use this skill
 
@@ -54,9 +59,10 @@ recover the missing attribution.
 
 | Input | Example | Handling |
 |-------|---------|----------|
-| No arguments | `/permission-audit` | Audit today's `ask` decisions with JSON output |
+| No arguments | `/permission-audit` | Audit today's prompted decisions with JSON output |
 | Date range | `/permission-audit --start 2026-05-20 --end 2026-05-21` | Pass dates through to the script |
-| Action filter | `/permission-audit --action deny` | Pass `ask`, `deny`, or `all` through |
+| Source filter | `/permission-audit --source native` | Pass `decisions` or `native` through |
+| Action filter | `/permission-audit --action deny` | Pass `allow`, `deny`, or `all` through for decisions; use `ask`, `deny`, or `all` with native |
 | Agent filter | `/permission-audit --agent aragorn` | Pass the agent filter through |
 
 ## Workflow
@@ -123,13 +129,13 @@ Produce a markdown report:
 ```markdown
 ## Permission Audit: <start> to <end>
 
-**Filter:** action=<ask|deny|all>, agent=<agent or all>
+**Filter:** source=<decisions|native>, action=<allow|deny|all>, agent=<agent or all>
 **Total events:** <n>
-**Unique patterns:** <n>
+**Unique permissions:** <n>
 
-| # | Permission | Pattern | Matched rule | Action | Count | Agents | Recommendation |
-|---|------------|---------|--------------|--------|-------|--------|----------------|
-| 1 | bash | `<pattern>` | `<matched_rule>` | ask | 3 | gandalf | Add anchored absolute sibling-safe script allow — read-only wrapper |
+| # | Permission | Action/Reply | Patterns | Always offered | Count | Agents | Recommendation |
+|---|------------|--------------|----------|----------------|-------|--------|----------------|
+| 1 | `bash -lc pwd` | allow/once | `<pattern>` | `<always>` | 3 | gandalf | Add anchored absolute sibling-safe script allow — read-only wrapper |
 
 ### Recommended config changes
 
@@ -143,3 +149,7 @@ needed before applying, state that these are proposed diffs only.>
 
 If the script returns no entries, report that no matching permission decisions
 were found for the requested filters and date range.
+
+Always include the decisions-source caveat when applicable: interactive-prompt
+audit; static allow and deny rules that never prompt are not captured — not a
+comprehensive policy audit.
