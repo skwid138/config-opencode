@@ -34,18 +34,32 @@ Always use the wrapper script for data retrieval:
 Script interface:
 
 ```text
-permission-audit.sh [--start DATE] [--end DATE] [--source decisions|native] [--action allow|deny|all] [--agent AGENT] [--json|--human]
+permission-audit.sh [--start DATE] [--end DATE] [--source decisions|native] [--action allow|deny|all] [--agent AGENT] [--exclude-self] [--json|--human]
 ```
 
 Defaults: today's date range, `--source decisions`, `--action all`, JSON output.
-Dates use `YYYY-MM-DD`. Decisions JSON is schema v2 and reports summary keys
-`total_events`, `allow_count`, `deny_count`, `unknown_count`, and
-`unique_permissions`.
+Dates use `YYYY-MM-DD`. Decisions JSON is schema v3 and reports summary keys
+`total_events`, `allow_count`, `deny_count`, `unknown_count`, `unique_rules`,
+`unique_invocations`, and `self_logged_excluded`.
 
 The decisions source is an interactive-prompt audit: static allow and deny rules
 that never prompt are not captured, so it is not a comprehensive policy audit.
 Use `--source native --action ask` only when you explicitly need the legacy
 rotating-log view; native uses `ask` in place of decisions' `allow` action.
+
+Schema v3 separates static-rule evidence from prompted invocations:
+
+- `rules[]` is keyed by `(permission, glob)` from `always[]`. `reply_breakdown`
+  contains only observed reply strings. `actions` is retained but mostly latent
+  today because reject/unknown records usually have no `always[]` globs.
+- `invocations[]` is keyed by `(permission, patterns[], reply)`. Most live rows
+  currently have `count=1`; aggregation is future-proofing for repeated identical
+  prompts.
+- `--exclude-self` is opt-in and default-off. It excludes records whose
+  `patterns[]` or `always[]` contain `permission-audit.sh` or
+  `permission_audit_core`. This is a substring contract, not normalized by path,
+  alias, casing, or symlink, so it can false-positive when legitimately auditing
+  the auditor.
 
 ## When to use this skill
 
@@ -64,6 +78,7 @@ rotating-log view; native uses `ask` in place of decisions' `allow` action.
 | Source filter | `/permission-audit --source native` | Pass `decisions` or `native` through |
 | Action filter | `/permission-audit --action deny` | Pass `allow`, `deny`, or `all` through for decisions; use `ask`, `deny`, or `all` with native |
 | Agent filter | `/permission-audit --agent aragorn` | Pass the agent filter through |
+| Self filter | `/permission-audit --exclude-self` | Exclude permission-audit's own prompted records from the decisions source |
 
 ## Workflow
 
@@ -71,7 +86,7 @@ rotating-log view; native uses `ask` in place of decisions' `allow` action.
    user-specified date range and filters. If no range is specified, use the
    script default of today.
 2. Parse the JSON output.
-3. For each entry, assess:
+3. For each rule and invocation, assess:
    - Is the command or path read-only / safe? → recommend `allow`.
    - Is it destructive or system-affecting? → recommend keeping `ask` or `deny`.
    - Is it a hallucinated or typo path (for example, `wpromute`)? → recommend
@@ -131,11 +146,21 @@ Produce a markdown report:
 
 **Filter:** source=<decisions|native>, action=<allow|deny|all>, agent=<agent or all>
 **Total events:** <n>
-**Unique permissions:** <n>
+**Unique rules:** <n>
+**Unique invocations:** <n>
+**Self logged excluded:** <n>
 
-| # | Permission | Action/Reply | Patterns | Always offered | Count | Agents | Recommendation |
-|---|------------|--------------|----------|----------------|-------|--------|----------------|
-| 1 | `bash -lc pwd` | allow/once | `<pattern>` | `<always>` | 3 | gandalf | Add anchored absolute sibling-safe script allow — read-only wrapper |
+### Rules
+
+| # | Permission | Glob | Count | Replies | Actions | Agents | Recommendation |
+|---|------------|------|-------|---------|---------|--------|----------------|
+| 1 | `bash` | `echo *` | 26 | once:26 | allow:26, deny:0, unknown:0 | gandalf | Consider a narrow allow only if the glob is safe for the invoking agent |
+
+### Invocations
+
+| # | Permission | Patterns | Always offered | Action | Reply | Count | Agents | Recommendation |
+|---|------------|----------|----------------|--------|-------|-------|--------|----------------|
+| 1 | `bash` | `bash -lc pwd` | `bash -lc *` | allow | once | 1 | gandalf | No config change unless repeated and demonstrably safe |
 
 ### Recommended config changes
 
@@ -144,10 +169,11 @@ needed before applying, state that these are proposed diffs only.>
 
 ### Keep as ask/deny
 
-<List destructive, suspicious, or role-mismatched entries with reasons.>
+<List destructive, suspicious, or role-mismatched rules/invocations with reasons.>
 ```
 
-If the script returns no entries, report that no matching permission decisions
+If the script returns empty `rules` and/or `invocations`, report the empty state
+per section. If both sections are empty, say no matching permission decisions
 were found for the requested filters and date range.
 
 Always include the decisions-source caveat when applicable: interactive-prompt
