@@ -223,7 +223,7 @@
                     "models": [
                         {
                             "providerID": "github-copilot",
-                            "modelID": "claude-opus-4.6"
+                            "modelID": "claude-opus-4.7"
                         },
                         {
                             "providerID": "openai",
