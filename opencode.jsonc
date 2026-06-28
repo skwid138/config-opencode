@@ -211,7 +211,7 @@
         }
     },
     "plugin": [
-        "@tarquinen/opencode-dcp@3.1.13",
+        "@tarquinen/opencode-dcp@3.1.14",
         [
             "@skwid138/opencode-command-normalizer@0.2.0",
             {
