@@ -239,7 +239,7 @@ Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
 
 | Wrapper | Alias | Purpose |
 |---------|-------|---------|
-| `opensession.sh` | `opensession` | **Daily driver.** Ensures a daemon is running on the port, then attaches. No daemon → background-spawns `openweb`, waits for the listener with identity verification, exec's `openattach`. Fresh daemon → attaches silently. Stale daemon → delegates the prompt to `openattach`. `--restart` calls `openweb --restart`; `--force` passes through to `openattach --force`; `--debug` exports `OPENCODE_WEB_LOG_LEVEL=DEBUG` and implies `--restart` so the daemon starts with `--log-level DEBUG`. |
+| `opensession.sh` | `opensession` | **Daily driver.** Ensures a daemon is running on the port, then attaches. No daemon → background-spawns `openweb`, waits for the listener with identity verification, exec's `openattach`. Fresh daemon → attaches silently. Stale daemon → delegates the prompt to `openattach`. `--restart` calls `openweb --restart`; `--force` passes through to `openattach --force`; `--debug` exports `OPENCODE_WEB_LOG_LEVEL=DEBUG` and implies `--restart` so the daemon starts with `--log-level DEBUG`; `--local` runs `local-models.sh start` before opening/attaching. |
 | `opencode-web.sh` | `openweb` | Starts the daemon. If a daemon is already running on the port, exits with guidance to re-invoke with `--restart` (kill + respawn) or `--force` (kill any holder, including foreign listeners). On start, writes a sidecar file recording the SHA-256 hash of the config tree at boot. |
 | `opencode-attach.sh` | `openattach` | TUI client. Before exec'ing into the daemon, compares the current config-tree hash against the sidecar. If they differ ("stale daemon"), warns and prompts on a real TTY; aborts non-interactively with exit 5 and bypass instructions. |
 | `opencode-wrapper.sh` | (PATH shim) | The conditional-context wrapper above. Web/attach pass through unmodified. |
@@ -248,9 +248,11 @@ Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
 
 **Bypass:** `openattach --force` (or `OPENCODE_ATTACH_FORCE=1 openattach`) skips the staleness check. Use when you know the config drift is intentional and irrelevant to the current session (e.g. you edited an unrelated skill).
 
+**Local models:** `opensession --local` prepares LM Studio only. It starts/verifies the LM Studio OpenAI-compatible endpoint at `http://127.0.0.1:1234/v1`, but it does not load any model and does not restart the OpenCode daemon by itself. After editing the static `provider.lmstudio` model config, use `opensession --local --restart` (or let `openattach`'s stale-daemon prompt guide you) so the daemon reloads config.
+
 **Shared helper:** `~/code/scripts/lib/opencode-daemon.sh` is sourced by both `openweb` and `openattach`. It owns the hash function, sidecar I/O, and identity verification — the wrappers stay declarative.
 
-**Coverage:** `tests/opencode-daemon.bats` (43 tests on the helper), `tests/opencode-web.bats` (28 tests, 3-phase lsof stub model for pre-flight detection), `tests/opencode-attach.bats` (29 tests including a real-pty test via BSD `script(1)` for the TTY prompt branch), `tests/opensession.bats` (19 tests covering spawn / fresh / stale / foreign-listener / race / timeout / `--restart` / `--force` / bash-3.2 regression).
+**Coverage:** `tests/opencode-daemon.bats` (43 tests on the helper), `tests/opencode-web.bats` (28 tests, 3-phase lsof stub model for pre-flight detection), `tests/opencode-attach.bats` (29 tests including a real-pty test via BSD `script(1)` for the TTY prompt branch), and `tests/opensession.bats` (spawn / fresh / stale / foreign-listener / race / timeout / `--restart` / `--force` / bash-3.2 regression coverage).
 
 ## Configuration Choices
 
@@ -271,6 +273,7 @@ Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
 | Bump default model | `opencode models` → edit `opencode.json` |
 | Audit & update all config deps | `/update-opencode-deps` (or `~/code/scripts/agent/opencode-deps-check.sh` for read-only check) |
 | Add a provider | `opencode auth login` |
+| Verify LM Studio local models | `~/code/scripts/personal/local-models.sh verify` |
 | Tail DCP logs | `tail -f ~/.config/opencode/logs/dcp/*.log` |
 | Inspect tasks | `/tasks`, then `/task <id>` |
 | Health check | `opencode mcp list` (verify MCPs), `opencode models` (verify model) |
