@@ -133,13 +133,20 @@ Quick examples:
   see fresh data in the legacy project, double-check — it may be stale.
 - **Cube's BQ project for non-prod** is the same per-env data project as kraken,
   configured in Cube Cloud env vars (`CUBEJS_DB_BQ_PROJECT_ID`), not in the cube repo.
-- **`cube` and `kraken` are NOT GKE workloads.** They don't run as pods on any cluster
-  (npd / prd / sbx). `cnpg-kraken-*` pods on npd are the postgres database for kraken,
-  not the kraken app itself. Cube runs in Cube Cloud; kraken runs as Airflow jobs.
+- **Cube deprecation note (PRODUCT-OWNER ASSERTION, 2026-09-07; NON-EXHAUSTIVE;
+  not live-verified):** Cube is actively being removed; GrowthPlanner is a known
+  remaining consumer, likely not the only one.
+- **`cube` and `kraken` are NOT standalone GKE app workloads.** `cnpg-kraken-*`
+  pods on npd are the postgres database for kraken, not the kraken app itself.
+  Cube runs in Cube Cloud. No standalone kraken pod was verified; self-hosted
+  Airflow runs in-GKE for tst (`polaris-tst`, verified 2026-09-07; NOT Cloud
+  Composer). Kraken DAG placement in that Airflow is likely but unproven; prod
+  Airflow/Kraken placement is NOT verified.
 - **Prod GKE cluster ≠ home of all prod services.** `gke-prd-ek8s-primary` only hosts
   `client-portal` (deployment named `portal`), `storybook`, and Airbyte. `polaris-api`,
-  `polaris-web`, and `polaris-celery-*` on prd run on different infrastructure (likely
-  Cloud Run / GAE) — confirm the deploy target before assuming GKE-prd.
+  `polaris-web`, and `polaris-celery-*` on prd run on legacy `wpro-bixby2`
+  GCE/systemd (NOT Cloud Run, NOT GKE); see the canonical yaml and
+  `infra-gotchas.md` §2 for detail.
 - **Deploy flow (polaris-* repos):** CI builds image → `kustomize edit set image`
   in `gitops-polaris/apps/<app>/overlays/<env>/kustomization.yaml` → direct push as
   `wpromote-github-writer[bot]` (no PR) → Argo CD auto-syncs (selfHeal=true,
