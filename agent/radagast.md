@@ -1,5 +1,5 @@
 ---
-model: openai/gpt-5.5
+model: openai/gpt-5.6-sol
 reasoningEffort: high
 description: External docs and OSS research specialist
 temperature: 0.1

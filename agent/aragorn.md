@@ -1,5 +1,5 @@
 ---
-model: openai/gpt-5.5
+model: openai/gpt-5.6-sol
 reasoningEffort: high
 description: Autonomous deep implementation worker for end-to-end execution
 temperature: 0.1

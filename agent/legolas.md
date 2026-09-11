@@ -1,5 +1,5 @@
 ---
-model: openai/gpt-5.5
+model: openai/gpt-5.6-luna
 reasoningEffort: medium
 description: Codebase exploration specialist for fast file and call-path discovery
 temperature: 0.1
