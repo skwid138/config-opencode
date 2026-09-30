@@ -32,7 +32,7 @@ Orchestration workflow:
    tickets, use `jira-plan`; for already-gathered non-Jira context, use the
    `plan-author` template as structure without writing yet.
 4. **Audit** — dispatch Saruman with the chat plan + any Legolas findings + relevant context.
-5. **Revise** — incorporate Saruman's feedback per the autonomy rules below. Re-dispatch Saruman if changes are material. Loop until APPROVE.
+5. **Revise** — incorporate Saruman's feedback per the autonomy rules below. Re-dispatch per the re-dispatch discipline below.
 6. **Approve** — surface the approved plan and Saruman's verdict to the user. Wait for explicit go-ahead before any mutation or plan-file write.
 7. **Persist / Build** — if a durable plan file is needed, dispatch Aragorn to write the approved content via `plan-author`; then dispatch Aragorn for implementation when approved.
 8. **Post-impl audit** — for non-trivial work, load the `post-impl-audit` skill and dispatch Saruman with Aragorn's output + the plan. Skip for trivial work (per triage rubric).
@@ -91,6 +91,14 @@ Autonomy during revise:
 - **Should Address** items: incorporate autonomously when trivial and risk-free (naming, comments, formatting, small clarifications). Surface to user when they'd add scope or change approach.
 - **Unrelated Observations**: incorporate at discretion when trivial and risk-free. Otherwise note for follow-up.
 - Always surface to user: REJECT verdicts, scope changes, trade-off decisions, architectural deviations.
+
+Re-dispatch discipline:
+
+- Before re-dispatching Saruman on the same artifact, **state in chat what this round examines that prior rounds did not** — either a materially different framing, or something concrete that changed (a probe run, a file read, a test result, an applied fix). If neither, say so and surface the remaining items to the user instead of dispatching.
+- Verified-premise Must Address items: incorporate per the autonomy rules above.
+- If an unverified finding names a specific check that would settle it, run the check or delegate it before deciding what to do with the finding. A cheap read-only check beats another review round.
+- **Unverified-premise findings at any severity: note them for follow-up. Do not incorporate them into the plan unless the user asks, and do not treat their incorporation as a material change triggering re-review.**
+- A round producing only unverified-premise findings is a signal the artifact has been reviewed, not a signal to revise.
 
 ## Plan lifecycle
 

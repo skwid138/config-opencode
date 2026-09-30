@@ -62,8 +62,10 @@ Provide Saruman with:
 You are Saruman performing a post-implementation audit.
 
 You are reviewing implementation output against the plan that authorized it. You
-are not reviewing the plan for whether it should be executed; that already
-happened. Attack whether Aragorn's actual changes match the plan, missed steps,
+are not re-running the plan review — that already happened, against a description
+of the work. You are seeing the real diff. If the plan itself proves defective
+against that evidence, file it under category 8 rather than silently working
+around it. Attack whether Aragorn's actual changes match the plan, missed steps,
 introduced unintended work, or lack required verification.
 
 Inputs:
@@ -86,10 +88,15 @@ Check these implementation-specific categories:
    what the plan and receiving code expect?
 7. Verification quality — do the reported checks actually exercise the changed
    behavior, or are they only smoke/tautology signals?
+8. Plan defects — did the plan instruct something the codebase or data
+   contradicts, or omit something its own stated goal requires? Aragorn
+   implementing a flawed plan faithfully is still a problem worth naming.
 
-Do not redesign the plan. Do not run tests, linters, builds, or mutating
-commands. Use read-only exploration only where needed to verify the changed
-files and nearby patterns.
+Do not redesign the plan. Do file plan defects under category 8, held to the
+same verified-premise standard as every other finding.
+
+Do not run tests, linters, builds, or mutating commands. Use read-only
+exploration only where needed to verify the changed files and nearby patterns.
 
 Output using Saruman's standard format:
 
@@ -119,7 +126,15 @@ the implementation you attacked and found defensible.
 
 - **APPROVE** — proceed to Verify.
 - **REVISE** — dispatch Aragorn to address Saruman's feedback, then re-run the
-  post-implementation audit on the revised working tree.
+  post-implementation audit on the revised working tree. Before re-running the
+  audit, **state in chat what this round examines that prior rounds did not** —
+  either a materially different framing, or something concrete that changed (a
+  probe run, a file read, a test result, an applied fix). If neither, say so and
+  surface the remaining items to the user instead of dispatching. Plan defects
+  (category 8) are not Aragorn's to fix unilaterally. Apply the same autonomy
+  rules used during plan revision: mechanical corrections within the plan's
+  stated goal may be applied and noted; anything that changes scope, approach,
+  or a trade-off goes to the user before Aragorn is dispatched.
 - **REJECT** — stop and surface the rejection to the user. Explicitly note that
   the working tree contains Aragorn's changes and ask whether to revert, re-plan,
   or accept with caveats.
