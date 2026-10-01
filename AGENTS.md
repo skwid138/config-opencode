@@ -10,7 +10,7 @@
 | **aragorn** | Autonomous end-to-end implementation; sole writer | github-copilot/claude-opus-5.5 (high) | **yes** |
 | **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | github-copilot/gpt-6.1-sol (high) | no |
 
-## Skills (26)
+## Skills (27)
 
 | Skill | Description |
 |-------|-------------|
@@ -26,19 +26,20 @@
 | `handoff` | Compact conversation into handoff doc for cross-session continuity |
 | `improve-codebase-architecture` | System-level architecture review and deepening-opportunity scan |
 | `jira-enhance` | Audit and improve Jira acceptance criteria quality |
+| `jira-plan` | Chat-first multi-codebase implementation planning from Jira tickets |
+| `jira-qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
 | `jira-ticket` | Fetch and summarize Jira tickets for summary/estimation |
+| `manual-qa` | Evidence-based browser QA of a running web app against Jira ACs via Chrome DevTools |
 | `permission-audit` | Audit opencode permission decisions and recommend permission config changes |
 | `plan-author` | Persist reviewed gathered context into a plan document |
 | `post-impl-audit` | Saruman audit of Aragorn's implementation output against the plan |
 | `pr-review` | Code quality + AC compliance review of branch diff |
 | `prototype` | Build throwaway prototypes (logic TUI or UI variants) to answer design questions |
-| `jira-qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
 | `sonarcloud` | Fetch and analyze SonarCloud issues for a PR |
 | `style-audit` | Read-only style verification against Figma design tokens |
 | `tdd` | Test-driven development: red-green-refactor cycle |
 | `to-issues` | Convert a plan into vertical-slice GitHub issues (GitHub-only) |
 | `triage` | GitHub issue triage state machine for personal non-Wpromote repos |
-| `jira-plan` | Chat-first multi-codebase implementation planning from Jira tickets |
 | `zoom-out` | Higher-abstraction module/caller map in domain-glossary terms |
 
 Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
@@ -86,7 +87,7 @@ Borrowed/upstream skill provenance is tracked in `skill/UPSTREAM-REGISTRY.md`.
 ├── opencode.jsonc         # Model, MCPs, plugins, permissions
 ├── agent/                 # Agent definitions (frontmatter + system prompt)
 ├── command/               # Slash commands (thin wrappers around skills)
-├── skill/                 # Skill library (26 skills)
+├── skill/                 # Skill library (27 skills)
 ├── instruction/           # Auto-loaded context for all agents
 ├── plugins/               # Local TypeScript plugins
 ├── bin/                   # Launcher wrapper infrastructure
