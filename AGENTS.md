@@ -10,7 +10,7 @@
 | **aragorn** | Autonomous end-to-end implementation; sole writer | github-copilot/claude-opus-5.5 (high) | **yes** |
 | **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | github-copilot/gpt-6.1-sol (high) | no |
 
-## Skills (27)
+## Skills (28)
 
 | Skill | Description |
 |-------|-------------|
@@ -36,6 +36,7 @@
 | `pr-review` | Code quality + AC compliance review of branch diff |
 | `prototype` | Build throwaway prototypes (logic TUI or UI variants) to answer design questions |
 | `sonarcloud` | Fetch and analyze SonarCloud issues for a PR |
+| `steel-man` | Argue every viable option's strongest case, then re-rank prior recommendations |
 | `style-audit` | Read-only style verification against Figma design tokens |
 | `tdd` | Test-driven development: red-green-refactor cycle |
 | `to-issues` | Convert a plan into vertical-slice GitHub issues (GitHub-only) |
@@ -87,7 +88,7 @@ Borrowed/upstream skill provenance is tracked in `skill/UPSTREAM-REGISTRY.md`.
 ├── opencode.jsonc         # Model, MCPs, plugins, permissions
 ├── agent/                 # Agent definitions (frontmatter + system prompt)
 ├── command/               # Slash commands (thin wrappers around skills)
-├── skill/                 # Skill library (27 skills)
+├── skill/                 # Skill library (28 skills)
 ├── instruction/           # Auto-loaded context for all agents
 ├── plugins/               # Local TypeScript plugins
 ├── bin/                   # Launcher wrapper infrastructure

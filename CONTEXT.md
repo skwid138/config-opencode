@@ -54,6 +54,13 @@ _Avoid_: post-mortem, retrospective
 **Render envelope**:
 A local preview artifact containing formatted output for review before any remote mutation occurs.
 
+**Steel-man**:
+Arguing the strongest honest case for each viable option of a decision, then re-ranking — may overturn prior recommendations. Generative, not adversarial; distinct from **Saruman** review, which attacks one chosen artifact.
+_Avoid_: devil's advocate (manufactured dissent, banned by the honest-disagreement default)
+
+**Disqualifier**:
+Cited evidence permitting a **Steel-man** to dismiss an alternative in one line: a user-stated constraint, a verified fact (file:line, doc, test output), or a quoted prior user decision — and showing how it excludes the alternative. Best practice, conventions, simplicity, and prior recommendations are arguments, not disqualifiers.
+
 ### GitHub Scope
 
 **Repository Scope Gate**:
