@@ -4,11 +4,11 @@
 
 | Agent | Role | Model | Write Access |
 |-------|------|-------|-------------|
-| **gandalf** | Primary orchestrator — intent classification, planning, delegation | openai/gpt-5.5 (high) | no |
-| **legolas** | Codebase exploration & call-path discovery | gpt-5.5 (xhigh) | no |
-| **radagast** | External docs / OSS research | gpt-5.5 (xhigh) | no |
-| **aragorn** | Autonomous end-to-end implementation; sole writer | gpt-5.5 (xhigh) | **yes** |
-| **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | openai/gpt-5.5 (high) | no |
+| **gandalf** | Primary orchestrator — intent classification, planning, delegation | github-copilot/claude-opus-5.5 (medium) | no |
+| **legolas** | Codebase exploration & call-path discovery | github-copilot/gpt-6-luna (medium) | no |
+| **radagast** | External docs / OSS research | github-copilot/gpt-6.1-sol (high) | no |
+| **aragorn** | Autonomous end-to-end implementation; sole writer | github-copilot/claude-opus-5.5 (high) | **yes** |
+| **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | github-copilot/gpt-6.1-sol (high) | no |
 
 ## Skills (26)
 
@@ -66,7 +66,7 @@ Borrowed/upstream skill provenance is tracked in `skill/UPSTREAM-REGISTRY.md`.
 ## File Boundaries — Do Not Modify
 
 - `~/code/scripts/` — managed separately; read-only from this config's perspective.
-- `opencode.json` — only modify when explicitly asked (model bumps, MCP changes).
+- `opencode.jsonc` — only modify when explicitly asked (model bumps, MCP changes).
 - Agent frontmatter `permission` blocks — only modify when explicitly asked.
 - `.project-plans/` — do not create or modify except through the approved
   Gandalf → Saruman → user approval → Aragorn `plan-author` persistence flow.
@@ -83,7 +83,7 @@ Borrowed/upstream skill provenance is tracked in `skill/UPSTREAM-REGISTRY.md`.
 
 ```
 ~/.config/opencode/
-├── opencode.json          # Model, MCPs, plugins, permissions
+├── opencode.jsonc         # Model, MCPs, plugins, permissions
 ├── agent/                 # Agent definitions (frontmatter + system prompt)
 ├── command/               # Slash commands (thin wrappers around skills)
 ├── skill/                 # Skill library (26 skills)

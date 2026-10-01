@@ -8,7 +8,7 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 
 ```
 ~/.config/opencode/
-├── opencode.json                # Model, instructions, hidden agents, permissions, npm plugins
+├── opencode.jsonc                # Model, instructions, hidden agents, permissions, npm plugins
 ├── dcp.jsonc                    # Dynamic Context Pruning config (autonomous mode)
 ├── package.json                 # npm deps (@opencode-ai/plugin), engines, package manager
 ├── package-lock.json            # tracked for reproducible installs
@@ -39,7 +39,7 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 │   └── install-wrapper.sh       # idempotent bootstrap for the symlink
 ├── docs/                        # Reference documentation (skill authoring, etc.)
 ├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
-│   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.json
+│   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.jsonc
 ├── plugins/                     # Local TypeScript plugins
 │   └── src/                     # Plugin source and colocated tests
 │       └── vision-tool.ts       # Large-image / PDF / video vision via Gemini
@@ -48,19 +48,19 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 
 ## Agents
 
-All agents are defined locally under `agent/`. The default OpenCode `build`, `plan`, and `general` agents are explicitly hidden in `opencode.json` so the LOTR roster is the surface area.
+All agents are defined locally under `agent/`. The default OpenCode `build`, `plan`, and `general` agents are explicitly hidden in `opencode.jsonc` so the LOTR roster is the surface area.
 
 | Name | Mode | Model | Role |
 |------|------|-------|------|
-| **gandalf** | primary | claude-opus-4.6 (Copilot) | Orchestrator — intent classification, planning, delegation |
-| **legolas** | subagent | gpt-5.5 (xhigh reasoning) | Codebase exploration & call-path discovery |
-| **radagast** | subagent | gpt-5.5 (xhigh reasoning) | External docs / OSS research |
-| **aragorn** | subagent | gpt-5.5 (xhigh reasoning) | Autonomous end-to-end implementation; the only writer in the roster |
-| **saruman** | subagent | claude-opus-4.6 (Copilot) | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time |
+| **gandalf** | primary | github-copilot/claude-opus-5.5 (medium) | Orchestrator — intent classification, planning, delegation |
+| **legolas** | subagent | github-copilot/gpt-6-luna (medium) | Codebase exploration & call-path discovery |
+| **radagast** | subagent | github-copilot/gpt-6.1-sol (high) | External docs / OSS research |
+| **aragorn** | subagent | github-copilot/claude-opus-5.5 (high) | Autonomous end-to-end implementation; the only writer in the roster |
+| **saruman** | subagent | github-copilot/gpt-6.1-sol (high) | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time |
 
-**Why the model split:** Gandalf uses a different provider/model path than the subagents — see the table above and `opencode.json` for exact model IDs. The split exists because the subagent provider has been stronger for research, exploration, implementation, and adversarial review in practice. Revisit if/when model capabilities shift.
+**Why the model split:** All agents run on GitHub Copilot (billing consolidated; the openai provider stays configured but unused). Planner (Gandalf) and implementer (Aragorn) use Claude Opus 5.5; the adversarial gate (Saruman) uses GPT-6.1 Sol so reviews stay cross-family. Per-agent effort is set via `variant` in agent frontmatter. See `.project-plans/2026-10-01_copilot-model-consolidation.md` for rationale.
 
-**All read-only agents are locked down:** every agent except Aragorn has an explicit `permission` block denying `write` and `edit`, with bash restricted to a read-only allowlist. Aragorn is the sole writer. The global posture (in `opencode.json`) is `ask`-by-default with a small denylist for catastrophic operations (`rm -rf /*`, `sudo *`, `git push --force*`).
+**All read-only agents are locked down:** every agent except Aragorn has an explicit `permission` block denying `write` and `edit`, with bash restricted to a read-only allowlist. Aragorn is the sole writer. The global posture (in `opencode.jsonc`) is `ask`-by-default with a small denylist for catastrophic operations (`rm -rf /*`, `sudo *`, `git push --force*`).
 
 ## Commands
 
@@ -99,7 +99,7 @@ planning, Jira comments, and QA subtask generation are visibly separated.
 | Command | Backed by | What it does |
 |---------|-----------|-------------|
 | `/scripts-doctor` | `~/code/scripts/agent/scripts-doctor.sh` | Audit local shell-scripts repos against project conventions and report issues |
-| `/update-opencode-deps` | `~/code/scripts/agent/opencode-deps-check.sh` | Audit and update OpenCode config dependencies (`package.json`, `opencode.json` plugins, MCP package refs) |
+| `/update-opencode-deps` | `~/code/scripts/agent/opencode-deps-check.sh` | Audit and update OpenCode config dependencies (`package.json`, `opencode.jsonc` plugins, MCP package refs) |
 
 ### Dynamic Context Pruning (provided by `@tarquinen/opencode-dcp`)
 | Command | What it does |
@@ -135,7 +135,7 @@ planning, Jira comments, and QA subtask generation are visibly separated.
 
 ## MCPs
 
-MCP servers are defined inline in `opencode.json` under the top-level `mcp` key — that is the only location OpenCode reads. The `mcp/<name>/mcp.json` files in this repo are **reference snippets only** (kept for diffability and as paste-ready blocks); they are not auto-discovered. Any change must be made in `opencode.json` to take effect.
+MCP servers are defined inline in `opencode.jsonc` under the top-level `mcp` key — that is the only location OpenCode reads. The `mcp/<name>/mcp.json` files in this repo are **reference snippets only** (kept for diffability and as paste-ready blocks); they are not auto-discovered. Any change must be made in `opencode.jsonc` to take effect.
 
 | MCP | Type | Notes |
 |-----|------|-------|
@@ -153,7 +153,7 @@ Verify registration after edits with `opencode mcp list`.
 Four plugins are loaded — one local TypeScript file and three npm packages.
 
 ### `plugins/src/vision-tool.ts` (local)
-Exposes a `vision` tool that bypasses Claude's 8000px image limit by routing files to a Gemini agent. Supports JPEG/PNG/GIF/WebP/HEIC/BMP, PDFs, MP4/MOV/AVI/WebM, and WAV/MP3/OGG. Use it instead of `read` for any media file.
+Exposes a `vision` tool that bypasses Claude's 8000px image limit by routing files to a Gemini agent (`github-copilot/gemini-3.8-flash`). Supports JPEG/PNG/GIF/WebP/HEIC/BMP, PDFs, MP4/MOV/AVI/WebM, and WAV/MP3/OGG. Use it instead of `read` for any media file.
 
 ### `@tarquinen/opencode-dcp` (npm)
 Dynamic Context Pruning. Configured via `dcp.jsonc` — see next section for current settings.
@@ -162,7 +162,7 @@ Dynamic Context Pruning. Configured via `dcp.jsonc` — see next section for cur
 Normalizes safe bash argv0 home forms before permission evaluation so anchored absolute script rules match `~/` and `$HOME/` command forms without unsafe wildcard suffixes.
 
 ### `@skwid138/opencode-council` (npm)
-Exposes a `council_review` tool that fans a review prompt out to configured Saruman councillors and asks a separate aggregator model to structurally aggregate the responses.
+Exposes a `council_review` tool that fans a review prompt out to configured Saruman councillors (claude-opus-5.5, gemini-3.8-flash, gpt-6.1-sol; quorum 3) and asks a separate aggregator model (gpt-6.1-sol) to structurally aggregate the responses.
 
 ## Dynamic Context Pruning (DCP) — Autonomous Configuration
 
@@ -175,11 +175,14 @@ Currently running in **autonomous mode**. Current notable settings in `dcp.jsonc
 | `manualMode.automaticStrategies` | `true` | Deduplication and error-purge strategies remain available as a safety net |
 | `debug` | `false` | Re-enable only when debugging DCP behavior |
 | `pruneNotification` | `"minimal"` | Chat notifications stay low-noise |
-| `compress.showCompression` | `true` | Compression summaries remain visible for auditability |
+| `autoUpdate` | `false` | Pinned; DCP 3.2.0 upgrade deferred pending test |
+| `turnProtection` | `enabled: true, turns: 2` | Most recent turns protected from pruning |
+| `compress.showCompression` | `false` | Compression summaries hidden to reduce noise |
+| `compress.protectTags` | `true` | Tagged content protected from compression |
 | `experimental.allowSubAgents` | `false` | Subagent compression remains off |
 | `experimental.customPrompts` | `false` | Custom DCP prompts remain off |
 
-Tuned for GitHub Copilot's ~128K effective context (defaults assume 200K+):
+Limits kept deliberately low despite 1M advertised context — context rot degrades quality early, and Copilot >128K via OpenCode is unverified. Add Copilot 200k/100k exact-key overrides only after verifying:
 - `maxContextLimit: 80000` — strong compression nudges above this
 - `minContextLimit: 40000` — no nudges below this
 - `nudgeFrequency: 5`, `iterationNudgeThreshold: 15`, `nudgeForce: "soft"`
@@ -187,7 +190,7 @@ Tuned for GitHub Copilot's ~128K effective context (defaults assume 200K+):
 
 ## Instructions (auto-loaded into every agent)
 
-`opencode.json` lists the global, always-on instruction files. `wpromote-context.md` is **not** in that list — it's injected by the launcher wrapper at `bin/opencode` only when `$PWD` is under `~/code/wpromote/` (see "Conditional Wpromote Context" below).
+`opencode.jsonc` lists the global, always-on instruction files. `wpromote-context.md` is **not** in that list — it's injected by the launcher wrapper at `bin/opencode` only when `$PWD` is under `~/code/wpromote/` (see "Conditional Wpromote Context" below).
 
 | File | Loaded | What it injects |
 |------|--------|-----------------|
@@ -233,7 +236,7 @@ If `which opencode` resolves to `/opt/homebrew/bin/opencode` instead, `~/.config
 
 ## OpenCode daemon and the wrapper quartet
 
-`opencode web` starts a long-lived HTTP daemon that **freezes the entire config tree at boot** — `opencode.json`, all instructions, all agent files, all skill `SKILL.md` files. Edits made after the daemon starts have no effect on attached sessions until the daemon is restarted. This caused a recurring class of bug ("I edited the agent prompt, why is the old behavior still happening?") because nothing surfaced the staleness.
+`opencode web` starts a long-lived HTTP daemon that **freezes the entire config tree at boot** — `opencode.jsonc`, all instructions, all agent files, all skill `SKILL.md` files. Edits made after the daemon starts have no effect on attached sessions until the daemon is restarted. This caused a recurring class of bug ("I edited the agent prompt, why is the old behavior still happening?") because nothing surfaced the staleness.
 
 Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
 
@@ -256,11 +259,11 @@ Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
 
 ## Configuration Choices
 
-**Default model:** The primary default is configured in `opencode.json`. That file also sets `small_model` and `agent.compaction.model` — see `opencode.json` for current values. No auto-update — run `opencode models` and edit `opencode.json` when a better default ships.
+**Default model:** `github-copilot/claude-sonnet-5.5` (fallback for hidden build/plan/general). `small_model` and `agent.title` use `github-copilot/gpt-6-luna` (title at variant `low`); `agent.compaction` uses `github-copilot/claude-opus-5.5` to match the dominant session model. No auto-update — run `opencode models` and edit `opencode.jsonc` when a better default ships.
 
-**Hidden built-in agents:** `build`, `plan`, and `general` are hidden via `opencode.json`. The LOTR roster covers their roles (aragorn for build, plan-author skill for planning, Gandalf for general orchestration).
+**Hidden built-in agents:** `build`, `plan`, and `general` are hidden via `opencode.jsonc`. The LOTR roster covers their roles (aragorn for build, plan-author skill for planning, Gandalf for general orchestration).
 
-**External directory permissions:** `opencode.json` allowlists `~/.config/opencode/*`, `~/code/dotfiles/*`, `~/code/scripts/*`, and `~/code/wpromote/*` so agents can operate across this config, dotfiles, shared scripts, and team repos without per-call prompts.
+**External directory permissions:** `opencode.jsonc` allowlists `~/.config/opencode/*`, `~/code/dotfiles/*`, `~/code/scripts/*`, and `~/code/wpromote/*` so agents can operate across this config, dotfiles, shared scripts, and team repos without per-call prompts.
 
 **LOTR identity in prompts:** Each agent's system prompt opens with both names ("You are Gandalf, the orchestrator") so the role is unmistakable regardless of how the agent is invoked.
 
@@ -270,7 +273,7 @@ Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
 
 | Task | Command |
 |------|---------|
-| Bump default model | `opencode models` → edit `opencode.json` |
+| Bump default model | `opencode models` → edit `opencode.jsonc` |
 | Audit & update all config deps | `/update-opencode-deps` (or `~/code/scripts/agent/opencode-deps-check.sh` for read-only check) |
 | Add a provider | `opencode auth login` |
 | Verify LM Studio local models | `~/code/scripts/personal/local-models.sh verify` |
@@ -301,8 +304,8 @@ npm install
 
 All external packages are pinned to exact versions:
 - `package.json` → `@opencode-ai/plugin` (the plugin SDK)
-- `opencode.json` → `@tarquinen/opencode-dcp` (DCP plugin)
-- `opencode.json` → `chrome-devtools-mcp` (in the MCP `command` array)
+- `opencode.jsonc` → `@tarquinen/opencode-dcp` (DCP plugin)
+- `opencode.jsonc` → `chrome-devtools-mcp` (in the MCP `command` array)
 
 Floating `@latest` references were intentionally removed — historical Bun-era issues (e.g. cache-induced stale resolution of `@latest`) and current Arborist install failures are both avoided by pinning. To check for and apply updates use `/update-opencode-deps`.
 
@@ -318,7 +321,7 @@ Things that are intentionally pending or under iteration:
 - **Radagast model parity** — re-evaluate whether the external-research model split should remain; consolidate if research quality equalizes.
 - **Orchestration plugin features** — tmux integration, persistent task storage, provider fallback, and notification buffering were intentionally stripped from the local rewrite. Re-add only if a real need surfaces.
 - **Subagent context pruning** — DCP is autonomous on the primary thread, but `experimental.allowSubAgents` remains off until subagent compression behavior is trusted.
-- **MCP key rotation** — Exa is currently on the free tier; add an API key via `opencode.json` → `mcp.exa.headers["x-api-key"]` if rate limits start hurting.
+- **MCP key rotation** — Exa is currently on the free tier; add an API key via `opencode.jsonc` → `mcp.exa.headers["x-api-key"]` if rate limits start hurting.
 
 ## Adding Personal Assets
 
@@ -326,9 +329,9 @@ Things that are intentionally pending or under iteration:
 |-------|------|-------|
 | Skill | `skill/<name>/SKILL.md` | Frontmatter description must be sharp — that's what triggers auto-invocation. See [`docs/skill-authoring.md`](docs/skill-authoring.md) for the authoring rubric |
 | Command | `command/<name>.md` | Frontmatter `description` is shown in the slash menu; body is the prompt |
-| Agent | `agent/<name>.md` | Frontmatter: `model`, `description`, `temperature`, `mode` (`primary`/`subagent`), optional `permission` |
-| Instruction | `instruction/<name>.md` + entry in `opencode.json` `instructions[]` | Loaded into every agent's context — keep them short and high-signal |
-| MCP | `opencode.json` `mcp.<name>` | Add inline under the `mcp` key. `type: "local"` (with `command`) or `"remote"` (with `url`). Optionally drop a reference snippet at `mcp/<name>/mcp.json` for diffability — but the inline entry is what OpenCode actually loads. |
+| Agent | `agent/<name>.md` | Frontmatter: `model`, `description`, `variant`, `mode` (`primary`/`subagent`), optional `permission`. `variant` sets reasoning effort (`low`/`medium`/`high`/`xhigh`/`max`, depending on what the model supports). Don't set `temperature` (Claude 5.5 / GPT-6 models don't support it), and don't set both `variant` and `reasoningEffort` |
+| Instruction | `instruction/<name>.md` + entry in `opencode.jsonc` `instructions[]` | Loaded into every agent's context — keep them short and high-signal |
+| MCP | `opencode.jsonc` `mcp.<name>` | Add inline under the `mcp` key. `type: "local"` (with `command`) or `"remote"` (with `url`). Optionally drop a reference snippet at `mcp/<name>/mcp.json` for diffability — but the inline entry is what OpenCode actually loads. |
 | Plugin | `plugins/<name>.ts` | Import from `@opencode-ai/plugin`; export default a Plugin function |
 
 Per-project overrides go in `<repo>/.opencode/` and "local wins" — a local skill/command of the same name supersedes the global one.
