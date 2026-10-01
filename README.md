@@ -182,9 +182,9 @@ Currently running in **autonomous mode**. Current notable settings in `dcp.jsonc
 | `experimental.allowSubAgents` | `false` | Subagent compression remains off |
 | `experimental.customPrompts` | `false` | Custom DCP prompts remain off |
 
-Limits kept deliberately low despite 1M advertised context — context rot degrades quality early, and Copilot >128K via OpenCode is unverified. Add Copilot 200k/100k exact-key overrides only after verifying:
-- `maxContextLimit: 80000` — strong compression nudges above this
-- `minContextLimit: 40000` — no nudges below this
+Context limits (absolute token counts — never percentages, since e.g. `80%` of a 1M window would mean 800K):
+- `maxContextLimit: 80000` / `minContextLimit: 40000` — global fallback for any model not listed below; strong compression nudges above max, no reminder nudges below min
+- `modelMaxLimits` / `modelMinLimits` — exact `providerID/modelID` keys at **200000 / 100000** for `github-copilot/claude-opus-5.5`, `github-copilot/claude-sonnet-5.5`, and `github-copilot/gpt-6.1-sol`. Copilot was verified to exceed 128K through OpenCode on 2026-10-01 (a Gandalf session on claude-opus-5.5 reached 134.8K tokens = 13%). 200K/100K is a conservative operating band chosen over the full 1M window because of context rot (Anthropic context-engineering guidance) and credit cost
 - `nudgeFrequency: 5`, `iterationNudgeThreshold: 15`, `nudgeForce: "soft"`
 - `protectUserMessages: false` — allows compression of large pasted content
 

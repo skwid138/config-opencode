@@ -43,12 +43,26 @@
     "showCompression": false,
     "protectTags": true,
     "summaryBuffer": true,
-    // 80K/40K kept deliberately despite 1M advertised context: context rot degrades
-    // quality well before window limits, and Copilot >128K via OpenCode is unverified.
-    // Add Copilot 200k/100k exact-key overrides only after verifying >128K works.
-    // Above 80K → strong compression nudges. Below 40K → no reminder nudges.
+    // Global 80K/40K is the fallback for any model not listed in modelMaxLimits/modelMinLimits.
+    // Above max → strong compression nudges. Below min → no reminder nudges.
     "maxContextLimit": 80000,
     "minContextLimit": 40000,
+    // Copilot primary-session models verified >128K through OpenCode on 2026-10-01
+    // (Gandalf on claude-opus-5.5 observed at 134.8k tokens = 13%). 200K/100K is a
+    // conservative operating band chosen over the 1M window because of context rot
+    // (Anthropic context-engineering guidance) and per-token credit cost.
+    // Keys are exact providerID/modelID. Use absolute numbers, never percentages:
+    // "80%" of a 1M window would mean 800K.
+    "modelMaxLimits": {
+      "github-copilot/claude-opus-5.5": 200000,
+      "github-copilot/claude-sonnet-5.5": 200000,
+      "github-copilot/gpt-6.1-sol": 200000
+    },
+    "modelMinLimits": {
+      "github-copilot/claude-opus-5.5": 100000,
+      "github-copilot/claude-sonnet-5.5": 100000,
+      "github-copilot/gpt-6.1-sol": 100000
+    },
     "nudgeFrequency": 5,
     "iterationNudgeThreshold": 15,
     // Soft nudges — sessions are long but bounded; avoid aggressive interruption
