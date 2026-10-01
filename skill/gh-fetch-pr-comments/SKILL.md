@@ -99,6 +99,10 @@ gh pr view <number> --repo <owner/repo> --json title,body,state,baseRefName,head
 
 ### Step 2: Fetch reviews, threads, and comments via GraphQL
 
+> **Reference only.** This is what `/Users/hunter/code/scripts/agent/gh-pr-comments.sh`
+> runs; do not execute directly — use the script. (Direct `gh api ... -f` calls
+> trigger a permission prompt by design.)
+
 ```bash
 gh api graphql -f query='
 query($owner: String!, $repo: String!, $number: Int!) {
