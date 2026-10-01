@@ -249,7 +249,7 @@ If the requested information is not found, clearly state what is missing.`;
                 agent: "general",
                 model: {
                   providerID: "github-copilot",
-                  modelID: "gemini-3-flash-preview",
+                  modelID: "gemini-3.8-flash",
                 },
                 tools: {
                   read: false,

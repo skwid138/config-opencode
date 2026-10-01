@@ -353,6 +353,28 @@ describe("vision execute integration", () => {
     );
   });
 
+  it("routes the vision prompt to github-copilot/gemini-3.8-flash", async () => {
+    const session = createSessionMocks();
+    const execute = await createExecute(session);
+
+    await execute(
+      { file_path: "/tmp/image.png", goal: "describe" },
+      { sessionID: "parent" },
+    );
+
+    expect(session.prompt).toHaveBeenCalledTimes(1);
+    expect(session.prompt).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.objectContaining({
+          model: {
+            providerID: "github-copilot",
+            modelID: "gemini-3.8-flash",
+          },
+        }),
+      }),
+    );
+  });
+
   it("falls back to ctx.directory when parent session lookup fails", async () => {
     const session = createSessionMocks();
     session.get.mockRejectedValueOnce(new Error("not found"));
