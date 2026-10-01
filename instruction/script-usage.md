@@ -8,6 +8,15 @@ interpreter prefixes still prompt, which is safe. Avoid the `${HOME}` brace
 form; `@skwid138/opencode-command-normalizer` intentionally leaves it off by
 default to match opencode's own pattern expansion behavior.
 
+Invocation rules that avoid needless permission prompts:
+
+- Use an unquoted absolute argv0. Never quote it as `"$HOME/..."`; the
+  normalizer cannot rewrite a quoted argv0.
+- Never invoke agent scripts via relative paths such as `./agent/...`.
+- Avoid `timeout`, `bash -lc`, and `sh -c` wrappers around otherwise-allowed
+  commands; the wrapper hides the inner command and forces a prompt.
+- Prefer separate tool calls over long compound scripts with `while read` loops.
+
 When working under `~/code/wpromote/`, additional Wpromote-internal scripts
 under `~/code/wpromote/scripts/` are documented in `wpromote-context.md`,
 which is loaded conditionally by the OpenCode launcher wrapper.
