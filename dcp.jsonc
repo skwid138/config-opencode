@@ -1,5 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/Opencode-DCP/opencode-dynamic-context-pruning/master/dcp.schema.json",
+  "autoUpdate": false,
   // Master switch
   "enabled": true,
   // Disabled — trial complete. Re-enable for debugging.
@@ -23,10 +24,10 @@
     "enabled": false,
     "automaticStrategies": true
   },
-  // No turn protection — protected tools list (task, skill, etc.) is sufficient
+  // Protect the most recent turns from pruning
   "turnProtection": {
-    "enabled": false,
-    "turns": 4
+    "enabled": true,
+    "turns": 2
   },
   // Conservative defaults — keep subagents and custom prompts off until trial proves stable
   "experimental": {
@@ -38,11 +39,13 @@
   "compress": {
     "mode": "range",
     "permission": "allow",
-    // Show compressed content inline for ongoing audit visibility
-    "showCompression": true,
+    // Hide compressed content inline (reduces noise)
+    "showCompression": false,
+    "protectTags": true,
     "summaryBuffer": true,
-    // Tuned for GitHub Copilot models (~128K effective context).
-    // Defaults assume 200K+ windows which would over-allow context for Copilot.
+    // 80K/40K kept deliberately despite 1M advertised context: context rot degrades
+    // quality well before window limits, and Copilot >128K via OpenCode is unverified.
+    // Add Copilot 200k/100k exact-key overrides only after verifying >128K works.
     // Above 80K → strong compression nudges. Below 40K → no reminder nudges.
     "maxContextLimit": 80000,
     "minContextLimit": 40000,
