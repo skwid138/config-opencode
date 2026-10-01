@@ -215,7 +215,7 @@
         }
     },
     "plugin": [
-        "@tarquinen/opencode-dcp@3.1.15",
+        "@tarquinen/opencode-dcp@3.2.0",
         [
             "@skwid138/opencode-command-normalizer@0.2.0",
             {
@@ -331,7 +331,7 @@
             "command": [
                 "npx",
                 "-y",
-                "chrome-devtools-mcp@1.7.0",
+                "chrome-devtools-mcp@1.10.1",
                 "--browserUrl",
                 "http://127.0.0.1:9222"
             ],

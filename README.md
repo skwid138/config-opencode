@@ -175,7 +175,7 @@ Currently running in **autonomous mode**. Current notable settings in `dcp.jsonc
 | `manualMode.automaticStrategies` | `true` | Deduplication and error-purge strategies remain available as a safety net |
 | `debug` | `false` | Re-enable only when debugging DCP behavior |
 | `pruneNotification` | `"minimal"` | Chat notifications stay low-noise |
-| `autoUpdate` | `false` | Pinned; DCP 3.2.0 upgrade deferred pending test |
+| `autoUpdate` | `false` | Version pinned in `opencode.jsonc` (currently 3.2.0); upgrade via `/update-opencode-deps` |
 | `turnProtection` | `enabled: true, turns: 2` | Most recent turns protected from pruning |
 | `compress.showCompression` | `false` | Compression summaries hidden to reduce noise |
 | `compress.protectTags` | `true` | Tagged content protected from compression |
