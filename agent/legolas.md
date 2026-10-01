@@ -1,8 +1,7 @@
 ---
-model: openai/gpt-5.6-luna
-reasoningEffort: medium
+model: github-copilot/gpt-6-luna
+variant: medium
 description: Codebase exploration specialist for fast file and call-path discovery
-temperature: 0.1
 mode: subagent
 permission:
   write: deny

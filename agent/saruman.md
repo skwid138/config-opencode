@@ -1,8 +1,7 @@
 ---
-model: openai/gpt-5.6-sol
-reasoningEffort: high
+model: github-copilot/gpt-6.1-sol
+variant: high
 description: Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time
-temperature: 0.1
 mode: subagent
 permission:
   write: deny

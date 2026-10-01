@@ -1,7 +1,7 @@
 ---
-model: github-copilot/claude-opus-5
+model: github-copilot/claude-opus-5.5
+variant: medium
 description: Primary orchestration agent for planning, delegation, and delivery
-temperature: 0.1
 mode: primary
 permission:
   write: deny
