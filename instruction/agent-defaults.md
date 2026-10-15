@@ -118,7 +118,7 @@ A loaded skill's explicitly prescribed invocation takes precedence over these pr
 
 Not overridable by any skill.
 
-- Agents without write access never write files via bash (redirects, `tee`, `sed -i`, `sort -o`, heredoc-to-file). Two exceptions: saving a sanctioned script's stdout to the session temp dir (`/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode`) when a skill requires it; and Gandalf may run `git add`/`git commit` on explicit user request per `agent/gandalf.md`.
+- Agents without write access never write files via bash (redirects, `tee`, `sed -i`, `sort -o`, heredoc-to-file). Two exceptions: saving a sanctioned script's stdout to the session temp dir (the path named in the bash tool description) when a skill requires it; and Gandalf may run `git add`/`git commit` on explicit user request per `agent/gandalf.md`.
 - Reviewer/research agents (saruman, legolas, radagast) never invoke mutating scripts, including with `--dry-run`.
 - Never work around a permission prompt or deny by rephrasing the command.
 

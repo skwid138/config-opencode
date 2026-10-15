@@ -24,12 +24,19 @@ then applies that style to the target story.
 The invoking agent may perform read-only Jira/PR/code analysis and render the
 preview envelope locally. Preview mode has a local write side-effect: it saves the
 renderer's stdout as a render envelope file in the session temp dir
-(`"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-BIXB-XXXXX.json"`)
+(`"<session-temp>/qa-render-<KEY>.json"`)
 containing ADF + plain text. This is the sanctioned "script stdout to session
 temp" exception in `instruction/agent-defaults.md` → "Bash invocation hygiene";
-do not write any other files (no hand-written input files). Jira mutations are
-remote writes and must route through
-Gandalf: Saruman reviews the exact update/create body, the user approves, and
+do not write any other files (no hand-written input files).
+
+`<session-temp>` is the session temp dir named in the bash tool description.
+Throughout this skill, replace both `<session-temp>` and `<KEY>` with concrete
+values before executing anything: resolve the absolute envelope filename once,
+then reuse that exact resolved path for the preview, the Saruman review handoff,
+every `--description-file`, and dry-runs. Never pass the
+`"<session-temp>/qa-render-<KEY>.json"` template literally.
+
+Jira mutations are remote writes and must route through Gandalf: Saruman reviews the exact update/create body, the user approves, and
 **Aragorn** executes the `--push`, `--create`, or `--update` mutation.
 
 Peer QA tickets are the spec — the shape of a good QA subtask is whatever the
@@ -244,7 +251,7 @@ not plain text. Hand-rolling ADF in the model is brittle and lossy. Use the
 stdin and saving stdout straight to the session-temp render envelope:
 
 ```bash
-/Users/hunter/code/wpromote/scripts/agent/jira-qa-render.sh --input - --source <resolved-source-url> [--no-scope] [--no-input] [--keep-helpers] --format both > "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json" <<'QA_RENDER_EOF'
+/Users/hunter/code/wpromote/scripts/agent/jira-qa-render.sh --input - --source <resolved-source-url> [--no-scope] [--no-input] [--keep-helpers] --format both > "<session-temp>/qa-render-<KEY>.json" <<'QA_RENDER_EOF'
 === AC ===
 <one acceptance criterion per line>
 === STEPS ===
@@ -259,7 +266,7 @@ QA_RENDER_EOF
 Invocation rules:
 
 - Use the absolute renderer path exactly as shown (unquoted argv0) and one
-  quoted session-temp path, `"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json"`.
+  quoted session-temp path, `"<session-temp>/qa-render-<KEY>.json"`.
   Reuse that same path for the preview, the Saruman review handoff, and every
   `--description-file` below. Do not use `/tmp`, and do not write separate AC /
   steps / notes input files.
@@ -342,7 +349,7 @@ Show the user:
    table mapping verbose → pared-down so the user can sanity-check the
    compression
 4. **Path to the saved render envelope**
-   (`"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-BIXB-XXXXX.json"`)
+   (`"<session-temp>/qa-render-<KEY>.json"`)
    so subsequent calls can re-use it. This file is a local write side-effect
    even when no Jira mutation occurs.
 
@@ -356,7 +363,7 @@ If `--push`, `--create`, or `--update` is passed, do **not** mutate Jira
 immediately. First:
 
 1. Surface the exact summary and the session-temp render-envelope path
-   (`"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json"`)
+   (`"<session-temp>/qa-render-<KEY>.json"`)
    that would be sent.
 2. Dispatch Saruman to review the Jira body for accuracy, scope, and safety.
 3. Wait for explicit user approval after Saruman's verdict.
@@ -371,7 +378,7 @@ overrides:
 ~/code/wpromote/scripts/agent/jira-update-subtask.sh \
   --ticket <DISCOVERED-OR-EXPLICIT-KEY> \
   --summary "<suggested summary>" \
-  --description-file "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json" \
+  --description-file "<session-temp>/qa-render-<KEY>.json" \
   [--force]   # only when overwriting a non-template description
 ```
 
@@ -388,7 +395,7 @@ re-run with `--force` (pass through `--force`).
 ~/code/wpromote/scripts/agent/jira-create-subtask.sh \
   --parent <STORY-KEY> \
   --summary "<suggested summary>" \
-  --description-file "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json"
+  --description-file "<session-temp>/qa-render-<KEY>.json"
 ```
 
 Returns `{version:1, ticket_id, url}`. Surface to user.
@@ -406,10 +413,10 @@ Before calling any mutation script, optionally dry-run first:
 
 ```bash
 ~/code/wpromote/scripts/agent/jira-update-subtask.sh \
-  --ticket <KEY> --description-file "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json" --dry-run
+  --ticket <KEY> --description-file "<session-temp>/qa-render-<KEY>.json" --dry-run
 # or
 ~/code/wpromote/scripts/agent/jira-create-subtask.sh \
-  --parent <KEY> --summary "..." --description-file "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json" --dry-run
+  --parent <KEY> --summary "..." --description-file "<session-temp>/qa-render-<KEY>.json" --dry-run
 ```
 
 Useful when uncertain about the target, summary, or issue type.
@@ -444,7 +451,7 @@ ADDITIONAL NOTES/ATTACHMENTS:
 - ...
 ```
 
-**Render envelope:** `"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json"` (contains both ADF + text)
+**Render envelope:** `"<session-temp>/qa-render-<KEY>.json"` (contains both ADF + text)
 
 ### What changed from the draft (if applicable)
 

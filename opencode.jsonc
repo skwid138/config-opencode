@@ -37,6 +37,10 @@
             "/Users/hunter/.config/opencode/*": "allow",
             "/Users/hunter/code/*": "allow",
             "/tmp/*": "allow",
+            // Machine-specific macOS per-user temp dir (os.tmpdir()/opencode, the
+            // session temp dir). Permission patterns can't expand $TMPDIR, so this
+            // and the /private/var/folders/... entry below must both be updated on
+            // a new Mac or user account.
             "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/*": "allow",
             "/Users/hunter/.nvm/*": "allow",
             "/Users/hunter/.cache/*": "allow",
@@ -45,6 +49,8 @@
             "/Users/hunter/go/*": "allow",
             "/opt/homebrew/*": "allow",
             "/usr/local/*": "allow",
+            // Same machine-specific session temp dir via its /private realpath;
+            // keep in sync with the /var/folders/... entry above.
             "/private/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/*": "allow",
             "/usr/share/man/*": "allow",
             "*wpromute*": "deny"
