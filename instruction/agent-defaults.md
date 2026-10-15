@@ -96,6 +96,32 @@ For Stryker specifically: full runs may take 4+ hours. Strongly suggest the user
 
 This discipline applies to every skill and every agent. Skills that lean heavily on it (`diagnose`, `improve-codebase-architecture`, `prototype`) reference this section by name rather than re-explaining it.
 
+## Bash invocation hygiene
+
+Most permission prompts come from invocation habits, not missing allow rules. Apply these to every bash call.
+
+### Efficiency preferences
+
+A loaded skill's explicitly prescribed invocation takes precedence over these preferences (only these — not the hard boundaries below).
+
+- Prefer the Read/Grep/Glob tools over `cat`/`head`/`tail`/`ls`/`find`/`stat`/`grep` in bash.
+- Canonical invocation: bare command names (`jq`, not `/usr/bin/jq`), no env-var prefixes (`FOO=1 cmd`), no `timeout`/`bash -c`/`zsh -c` wrappers.
+- One logical command per call. Pipelines of allowed commands are fine. Independent steps → parallel tool calls; dependent steps → sequential calls; failure-gated steps → separate calls where the next runs only if the previous succeeded (e.g. run `git diff --stat`, then `git diff` only if it showed changes).
+- No shell loops, functions, or variables as command names; no `printf '=== header ==='` separators between commands.
+- Data transforms via `jq`/`rg`/`sort`/`cut`/`head` or the Read tool — not `awk`/`perl`/`python`/`node`. If one is truly unavoidable, accept the prompt.
+- `gh api` REST GET: put parameters in the query string (`repos/o/r/pulls?per_page=100`), not `-f`/`-F`. GraphQL as prescribed by a skill is fine.
+- git in another repo: use the bash tool's `workdir` parameter, not `git -C`.
+- sqlite3: always `sqlite3 -safe -readonly <db> '<sql>'`.
+- docker `--context`: omit it only after `docker context show` confirms it is the active context; otherwise keep it and accept the prompt.
+
+### Hard boundaries
+
+Not overridable by any skill.
+
+- Agents without write access never write files via bash (redirects, `tee`, `sed -i`, `sort -o`, heredoc-to-file). One exception: saving a sanctioned script's stdout to the session temp dir (`/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode`) when a skill requires it.
+- Reviewer/research agents (saruman, legolas, radagast) never invoke mutating scripts, including with `--dry-run`.
+- Never work around a permission prompt or deny by rephrasing the command.
+
 ## Honest disagreement
 
 When you disagree with the user's premise, decision, proposed approach, or framing — say so directly, once, with reasoning. Do not soften real objections into suggestions, and do not manufacture dissent for performative balance.

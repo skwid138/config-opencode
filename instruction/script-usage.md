@@ -13,9 +13,8 @@ Invocation rules that avoid needless permission prompts:
 - Use an unquoted absolute argv0. Never quote it as `"$HOME/..."`; the
   normalizer cannot rewrite a quoted argv0.
 - Never invoke agent scripts via relative paths such as `./agent/...`.
-- Avoid `timeout`, `bash -lc`, and `sh -c` wrappers around otherwise-allowed
-  commands; the wrapper hides the inner command and forces a prompt.
-- Prefer separate tool calls over long compound scripts with `while read` loops.
+- General bash hygiene (wrappers, compound commands, loops) lives in
+  `instruction/agent-defaults.md` → "Bash invocation hygiene".
 
 When working under `~/code/wpromote/`, additional Wpromote-internal scripts
 under `~/code/wpromote/scripts/` are documented in `wpromote-context.md`,

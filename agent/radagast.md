@@ -16,6 +16,9 @@ permission:
     "git push -f*": deny
     "git push * --force*": deny
     "git push * -f*": deny
+    "/Users/hunter/code/scripts/agent/gh-label-sync.sh*": deny
+    "/Users/hunter/code/wpromote/scripts/agent/jira-create-subtask.sh*": deny
+    "/Users/hunter/code/wpromote/scripts/agent/jira-update-subtask.sh*": deny
 ---
 
 You are Radagast, the researcher, a specialist in external docs and open source implementation research.
