@@ -22,9 +22,13 @@ then applies that style to the target story.
 ## Executor ownership
 
 The invoking agent may perform read-only Jira/PR/code analysis and render the
-preview envelope locally. Preview mode has a local write side-effect: it saves a
-render envelope file (for example `/tmp/qa-render-BIXB-XXXXX.json`) containing
-ADF + plain text. Jira mutations are remote writes and must route through
+preview envelope locally. Preview mode has a local write side-effect: it saves the
+renderer's stdout as a render envelope file in the session temp dir
+(`"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-BIXB-XXXXX.json"`)
+containing ADF + plain text. This is the sanctioned "script stdout to session
+temp" exception in `instruction/agent-defaults.md` → "Bash invocation hygiene";
+do not write any other files (no hand-written input files). Jira mutations are
+remote writes and must route through
 Gandalf: Saruman reviews the exact update/create body, the user approves, and
 **Aragorn** executes the `--push`, `--create`, or `--update` mutation.
 
@@ -236,21 +240,48 @@ share the same feature area (e.g., other GP subtasks for a GP story).
 
 The team's QA subtasks live in Jira as ADF tables (Atlassian Document Format),
 not plain text. Hand-rolling ADF in the model is brittle and lossy. Use the
-**vendored renderer**:
+**vendored renderer**, feeding all cell content as one sectioned document on
+stdin and saving stdout straight to the session-temp render envelope:
 
 ```bash
-~/code/wpromote/scripts/agent/jira-qa-render.sh \
-  --ac-file <path-to-ac.txt> \
-  --source <resolved-source-url> \
-  --steps-file <path-to-steps.txt> \
-  [--notes-file <path-to-notes.txt>] \
-  [--no-scope] [--no-input] [--keep-helpers] \
-  --format both
+/Users/hunter/code/wpromote/scripts/agent/jira-qa-render.sh --input - --source <resolved-source-url> [--no-scope] [--no-input] [--keep-helpers] --format both > "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json" <<'QA_RENDER_EOF'
+=== AC ===
+<one acceptance criterion per line>
+=== STEPS ===
+# Test 1 — <header>
+<step>
+  - <sub-step>
+=== NOTES ===
+<optional note lines>
+QA_RENDER_EOF
 ```
 
-The script returns a JSON envelope `{version:1, adf:{...}, text:"..."}`:
+Invocation rules:
+
+- Use the absolute renderer path exactly as shown (unquoted argv0) and one
+  quoted session-temp path, `"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json"`.
+  Reuse that same path for the preview, the Saruman review handoff, and every
+  `--description-file` below. Do not use `/tmp`, and do not write separate AC /
+  steps / notes input files.
+- The heredoc delimiter must be quoted (`<<'QA_RENDER_EOF'`, so nothing in the
+  payload is expanded) and must not appear as a line anywhere in the payload.
+  `QA_RENDER_EOF` is the default; if the payload could ever contain that line,
+  pick a different delimiter that it is guaranteed not to contain.
+- `=== AC ===` and `=== STEPS ===` are required; `=== NOTES ===` is optional.
+  Markers start at column 0.
+- **Reserved-marker limitation:** any content line shaped like `=== X ===`
+  (including with trailing spaces/tabs) is treated as a marker; an unknown one
+  is rejected with exit 2. If AC, steps, or notes genuinely need such a line,
+  fall back to the inline flags `--ac '<text>' --steps '<text>' [--notes '<text>']`
+  with shell-safe quoting (single-quoted, with embedded `'` written as `'\''`).
+  Never combine the inline flags with `--input` — the renderer rejects that.
+- If the renderer exits non-zero, surface its stderr verbatim. Do not fall back
+  to hand-written ADF.
+
+The envelope file contains `{version:1, adf:{...}, text:"..."}`:
 - `.adf` is the ADF document Jira expects.
-- `.text` is a plain-text rendering you can show the user as a preview.
+- `.text` is a plain-text rendering you can show the user as a preview
+  (read it from the envelope file, e.g. `jq -r .text "<envelope path>"`).
 
 Inputs you produce as the model:
 - **AC content**: extract numbered AC verbatim from the parent (one per line).
@@ -260,7 +291,7 @@ Inputs you produce as the model:
   - `  - sub-bullet` — two-space-indented sub-step (e.g. KPI variants)
   - blank line — ends the current test (renderer inserts a separator)
 
-  Steps files **must** contain at least one `# ` header; bullets before the
+  Steps content **must** contain at least one `# ` header; bullets before the
   first header are rejected with exit 2. Group related verifications under
   one test header rather than emitting one big flat list — this matches the
   test-grouping pattern in BIXB-19749 that tests-mode is designed to render.
@@ -272,7 +303,8 @@ TEST STEPS, ADDITIONAL NOTES) with the helper italic column dropped. To match
 the BIXB-19749 4-row shape (the most common shape for filled-in web-app QA
 subtasks), pass `--no-scope --no-input`.
 
-Save the renderer's output to a temp file — the next phases read it.
+The renderer's output is saved to the session-temp render envelope by the
+redirect above — the next phases read that file.
 
 **Suggested QA subtask summary:**
 
@@ -309,7 +341,8 @@ Show the user:
 3. **What changed from the user's draft** (if a draft was provided) — a short
    table mapping verbose → pared-down so the user can sanity-check the
    compression
-4. **Path to the saved render envelope** (e.g. `/tmp/qa-render-BIXB-XXXXX.json`)
+4. **Path to the saved render envelope**
+   (`"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-BIXB-XXXXX.json"`)
    so subsequent calls can re-use it. This file is a local write side-effect
    even when no Jira mutation occurs.
 
@@ -322,7 +355,9 @@ script. The user can paste the preview into Jira manually, or re-invoke with
 If `--push`, `--create`, or `--update` is passed, do **not** mutate Jira
 immediately. First:
 
-1. Surface the exact summary and render-envelope path that would be sent.
+1. Surface the exact summary and the session-temp render-envelope path
+   (`"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json"`)
+   that would be sent.
 2. Dispatch Saruman to review the Jira body for accuracy, scope, and safety.
 3. Wait for explicit user approval after Saruman's verdict.
 4. Dispatch Aragorn to run the mutation script.
@@ -336,7 +371,7 @@ overrides:
 ~/code/wpromote/scripts/agent/jira-update-subtask.sh \
   --ticket <DISCOVERED-OR-EXPLICIT-KEY> \
   --summary "<suggested summary>" \
-  --description-file <render-envelope-path> \
+  --description-file "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json" \
   [--force]   # only when overwriting a non-template description
 ```
 
@@ -353,7 +388,7 @@ re-run with `--force` (pass through `--force`).
 ~/code/wpromote/scripts/agent/jira-create-subtask.sh \
   --parent <STORY-KEY> \
   --summary "<suggested summary>" \
-  --description-file <render-envelope-path>
+  --description-file "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json"
 ```
 
 Returns `{version:1, ticket_id, url}`. Surface to user.
@@ -371,10 +406,10 @@ Before calling any mutation script, optionally dry-run first:
 
 ```bash
 ~/code/wpromote/scripts/agent/jira-update-subtask.sh \
-  --ticket <KEY> --description-file <envelope> --dry-run
+  --ticket <KEY> --description-file "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json" --dry-run
 # or
 ~/code/wpromote/scripts/agent/jira-create-subtask.sh \
-  --parent <KEY> --summary "..." --description-file <envelope> --dry-run
+  --parent <KEY> --summary "..." --description-file "/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json" --dry-run
 ```
 
 Useful when uncertain about the target, summary, or issue type.
@@ -409,7 +444,7 @@ ADDITIONAL NOTES/ATTACHMENTS:
 - ...
 ```
 
-**Render envelope:** `/tmp/qa-render-<TICKET>.json` (contains both ADF + text)
+**Render envelope:** `"/var/folders/q1/zwn7qv6n4xd9wx2hvrz6cm5m0000gn/T/opencode/qa-render-<KEY>.json"` (contains both ADF + text)
 
 ### What changed from the draft (if applicable)
 
