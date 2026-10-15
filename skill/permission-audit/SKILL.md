@@ -115,6 +115,14 @@ Classify each entry conservatively:
 Prefer narrow rules over broad wildcards. Use counts and repeated agents as
 supporting evidence, not as automatic justification for `allow`.
 
+**Compound-command caveat:** when a compound command (pipeline, `&&`/`;`
+chain, loop, subshell) prompts, its `rules[]` globs and `invocations[].patterns[]`
+list every segment — including segments already allowed by existing rules.
+Base recommendations only on segments not covered by existing rules, and look
+for agent-habit causes (wrappers, loops, `git -C`, interpreter one-liners,
+env-var prefixes) before recommending new allows; often the fix is invocation
+hygiene, not config.
+
 ## Bash path normalization
 
 opencode v1.15.13 normalizes permission **patterns** at config load time but
