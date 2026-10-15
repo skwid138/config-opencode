@@ -109,7 +109,8 @@ then asks the user for explicit approval. Only after that approval may a plan
 file be written. Persistence is Aragorn's job via the `plan-author` skill, and
 the file must be a semantic copy of the approved plan content. If `.project-plans/`
 exists, Aragorn writes `.project-plans/YYYY-MM-DD_<slug>.md`; otherwise Aragorn
-writes `YYYY-MM-DD_<slug>.md` at the repo root. Material changes after Saruman
+writes `YYYY-MM-DD_<slug>.md` at the repo root (check existence per `plan-author`
+— Glob/Grep discovery misses gitignored dirs). Material changes after Saruman
 approval require another Saruman review and user approval. Never commit the plan
 unless the user explicitly asks.
 

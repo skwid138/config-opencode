@@ -49,7 +49,9 @@ The invoking agent should provide:
 
 1. **Determine filename:** use `.project-plans/YYYY-MM-DD_<slug>.md` when
    `.project-plans/` exists; otherwise use `YYYY-MM-DD_<slug>.md` at the repo
-   root. Use today's date.
+   root. Use today's date. Check existence with the Read tool on the directory
+   path (or `ls -d .project-plans`), never Glob/Grep — recursive Glob/Grep
+   discovery skips gitignored paths, and `.project-plans` is commonly gitignored.
 2. **Structure** the provided context into the template sections below
 3. **Verify semantic equivalence** to the Saruman-approved content. Do not add,
    remove, or materially reinterpret scope during persistence.

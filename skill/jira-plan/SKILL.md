@@ -205,7 +205,8 @@ before any mutation: code changes, plan-file persistence, or Jira comments.
 
 After approval, dispatch Aragorn with the approved plan content and ask it to use
 `plan-author` to write the plan. Use `.project-plans/` if it exists; otherwise
-write the plan at the repository root. The persisted plan must be a semantic copy
+write the plan at the repository root (check existence per `plan-author` —
+Glob/Grep discovery misses gitignored dirs). The persisted plan must be a semantic copy
 of the approved chat plan. Never commit unless the user explicitly asks.
 
 ### Phase 7: Optional Jira post (`--post`)
