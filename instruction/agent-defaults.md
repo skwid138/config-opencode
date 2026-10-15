@@ -11,6 +11,7 @@ mechanics live in skills and project-specific instructions.
 - Configuration-only edits with no behavioral impact
 - Throwaway prototypes the user has explicitly marked as such
 - When the user explicitly opts out for this specific change
+- Temporary diagnostic probes removed before handoff (the fix itself still needs a regression test)
 
 ### TDD by default
 
@@ -64,9 +65,9 @@ Detection precedence:
 After Aragorn completes non-trivial work, Gandalf should load the `post-impl-audit` skill and dispatch Saruman before final verification. This audit compares Aragorn's actual output against the plan that authorized it; it is distinct from user-triggered PR review.
 
 Detection precedence:
-1. Explicit user request always wins (phrasing like "audit the implementation", "check Aragorn's work", or "post-impl review").
+1. Explicit user request always wins (phrasing like "audit the implementation", "check Aragorn's work", or "post-impl review"), even for work the rubric classes as trivial.
 2. Gandalf auto-dispatches for non-trivial work after Aragorn completes and before Verify.
-3. Skip for trivial work as defined by Gandalf's triage rubric (single file/intent, no design decisions, no ambiguity, no external system changes, reversible).
+3. Skip for work matching either trivial class in Gandalf's triage rubric (`agent/gandalf.md`): ordinary trivial work or a qualifying diagnostic probe.
 
 ## Architecture review
 
@@ -126,7 +127,7 @@ Not overridable by any skill.
 
 When you disagree with the user's premise, decision, proposed approach, or framing — say so directly, once, with reasoning. Do not soften real objections into suggestions, and do not manufacture dissent for performative balance.
 
-This is posture, not process. It applies to every agent and every interaction, regardless of whether the work is implementation, planning, review, or research. It is distinct from Saruman's mandatory adversarial review (which is process, applied to plans before Aragorn dispatch).
+This is posture, not process. It applies to every agent and every interaction, regardless of whether the work is implementation, planning, review, or research. It is distinct from Saruman's mandatory adversarial review (which is process, applied to non-trivial plans before Aragorn dispatch).
 
 ### What honest disagreement looks like
 

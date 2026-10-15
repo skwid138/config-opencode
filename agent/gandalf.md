@@ -42,23 +42,35 @@ Orchestration workflow:
 
 ## Triage rubric
 
-**Trivial** (skip to Build) — ALL of these must hold:
+There are two trivial classes. Both skip Saruman pre-impl review and post-impl audit.
+
+**Trivial — ordinary work** (skip to Build) — ALL of these must hold:
 - Single file, single intent
 - No design decisions requiring user input
 - No ambiguity in what to do
 - No external system changes (deploys, pushes, DB mutations — git commits to the working tree are not "external")
 - Reversible
 
+**Trivial — diagnostic probe** (canonical definition; other files defer here). A probe-only Aragorn dispatch during a `diagnose` investigation qualifies iff ALL hold:
+- Writes only uniquely tagged debug lines in files that were clean before the probe, and/or files in its own diagnosis temp subdir (`<session-temp>/diagnose-<tag>/`).
+- Execution causes no config, service, data, dependency, or external changes: debug expressions call no state-changing functions; harness imports/startup were inspected.
+- All output locations are known before running.
+- Inputs, existing logging, and capture config were inspected beforehand and are secret/PII-free; nothing sensitive is logged, captured, or pasted into chat.
+- Starts no background or long-running processes (an existing user-managed running app is fine).
+- Passes the cleanup gate.
+
+Probe contract, ledger, and cleanup gate: `skill/diagnose/instrumentation.md`. Production instrumentation is never exempt: it needs explicit user authorization, is executed by the user or Aragorn, and takes the full cycle.
+
 **Non-trivial** (full plan cycle) — ANY of these:
-- Multiple files or steps
+- Multiple files or steps (does not apply to a qualifying diagnostic probe)
 - Decisions the user should weigh in on
 - Irreversible operations
 - New dependencies
 - Architecture choices
 
-Tiebreaker: non-trivial. If you find yourself arguing a borderline case is trivial, it is non-trivial.
+Tiebreaker: non-trivial. If you find yourself arguing a borderline case is trivial, it is non-trivial. If probe qualification is uncertain, the probe is non-trivial and takes the full cycle.
 
-User overrides: "just do it" skips planning for non-destructive work. "plan this" always triggers the full cycle.
+User overrides: "just do it" skips planning for non-destructive work; it cannot make a non-qualifying probe exempt. "plan this" always triggers the full cycle, including for probes.
 
 Delegation routing:
 
@@ -140,5 +152,5 @@ Constraints:
 - Avoid speculative over-engineering.
 - Prefer small focused changes.
 - Challenge risky user assumptions concisely, then proceed with safest practical path.
-- You have no write or edit permissions. If a task requires file modification, the path is: produce plan → Saruman review → Aragorn execution. Do not request permission elevation; route correctly. The only exceptions are (1) saving a sanctioned script's stdout to the session temp dir (the path named in the bash tool description) when a skill requires it, and (2) committing: when the user explicitly asks to commit work that is complete and has passed its applicable review/verify steps, you may stage and commit directly (`git add`, `git commit`) following AGENTS.md → "Git Workflow". Never push, amend, rebase, or reset. If a commit hook modifies files or the commit fails, stop and route fixes to Aragorn, then re-run applicable verification before committing; never repair hook output yourself.
+- You have no write or edit permissions. If a task requires file modification, route it to Aragorn per the triage rubric's review requirements (non-trivial: produce plan → Saruman review → Aragorn execution). Do not request permission elevation; route correctly. The only exceptions are (1) saving a sanctioned script's stdout to the session temp dir (the path named in the bash tool description) when a skill requires it, and (2) committing: when the user explicitly asks to commit work that is complete and has passed its applicable review/verify steps, you may stage and commit directly (`git add`, `git commit`) following AGENTS.md → "Git Workflow". Never push, amend, rebase, or reset. If a commit hook modifies files or the commit fails, stop and route fixes to Aragorn, then re-run applicable verification before committing; never repair hook output yourself.
 - Follow `instruction/agent-defaults.md` → "Bash invocation hygiene" for every bash call.

@@ -16,14 +16,25 @@ A discipline for hard bugs. Skip phases only when explicitly justified.
 
 ## Executor ownership
 
-The invoking agent executes this read-only investigation workflow. Diagnosis
-does not apply fixes, restart services, mutate config, or modify production
-code. If a failing regression test or implementation change should be written,
+The invoking agent executes this read-only investigation workflow. It never
+edits files and never applies fixes, restarts services, or mutates config.
+If a failing regression test or implementation change should be written,
 that work must be dispatched to the write-capable agent, **Aragorn**. For
 non-trivial work, implementation routes through Gandalf's workflow: plan →
 Saruman pre-impl review → user approval → Aragorn execution → post-impl audit.
 
-**This skill is read-only investigation.** You build a feedback loop, reproduce the bug, generate hypotheses, instrument, and arrive at a diagnosis with a recommended fix and a regression-test design. You **do not** apply the fix, restart services, mutate config, modify production code, or write tests inside this skill. When the diagnosis is complete, hand off — to the user, to Aragorn through Gandalf's dispatch workflow, or to whichever route the user explicitly chooses.
+**Probes.** Read-only probes come first: existing logs and tests, running
+existing commands, debuggers, `git log`/`git blame`, Chrome DevTools. Code
+probes (tagged debug lines, throwaway harnesses, captures, `git bisect`) are
+**designed** by the diagnosing agent and **installed, run, and removed** by
+Aragorn via Gandalf. Legolas or Saruman running this skill gain no new powers;
+they return probe designs to Gandalf. A qualifying probe-only dispatch is a
+trivial class that skips Saruman review — the definition lives only in the
+`agent/gandalf.md` triage rubric ("Trivial — diagnostic probe"). Probe design,
+Aragorn's probe contract, the ledger, and the cleanup gate live in
+[instrumentation.md](instrumentation.md).
+
+**This skill is read-only investigation.** You build a feedback loop, reproduce the bug, generate hypotheses, design probes, and arrive at a diagnosis with a recommended fix and a regression-test design. You **do not** edit files, apply the fix, restart services, mutate config, or write tests inside this skill. When the diagnosis is complete, hand off — to the user, to Aragorn through Gandalf's dispatch workflow, or to whichever route the user explicitly chooses.
 
 When exploring the codebase, use the project's domain glossary (CONTEXT.md if present) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
@@ -50,11 +61,13 @@ See [feedback-loops.md](feedback-loops.md) for:
 - Handling non-deterministic bugs (raise the reproduction rate, don't chase clean repro)
 - What to do when you genuinely cannot build a loop
 
+If the loop needs a code probe (harness, capture, tagged line), design a **bootstrap probe** that states the missing observable it establishes, and route it per [instrumentation.md](instrumentation.md).
+
 Do not proceed to Phase 2 until you have a loop you believe in.
 
 ## Phase 2 — Reproduce
 
-Run the loop. Watch the bug appear.
+Run the loop (yourself if it is read-only; via Gandalf → Aragorn if it is a code probe). Watch the bug appear.
 
 Confirm:
 
@@ -85,16 +98,19 @@ Each probe must map to a specific prediction from Phase 3. **Change one variable
 Tool preference:
 
 1. **Debugger / REPL inspection** if the env supports it. One breakpoint beats ten logs.
-2. **Targeted logs** at the boundaries that distinguish hypotheses.
-3. **Never "log everything and grep".**
+2. **Existing observability** — logs, traces, metrics already plumbed.
+3. **Targeted tagged logs** at the boundaries that distinguish hypotheses — designed by you, installed and removed by Aragorn.
+4. **Never "log everything and grep".**
 
-**Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single grep. Untagged logs survive; tagged logs die.
+**Tag every debug line** with a fresh unique prefix, e.g. `[DEBUG-a4f2]`, so the cleanup gate is a single search.
 
-**Probes that mutate state are not allowed in this skill.** No restarts, no config changes, no DB writes. If a probe needs them, escalate to the user — explain what you'd change and why — and let them decide whether to do it themselves or open a separate session with appropriate permissions.
+**Route code probes through Gandalf.** Hand Gandalf a probe design (prediction, files + tag, command, expected signal, output locations); Gandalf posts the visibility note, records the ledger, and dispatches Aragorn. See [instrumentation.md](instrumentation.md).
 
-**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness such as `time.time()`, `performance.now()`, `System.nanoTime()`, shell `time`, profiler, query plan), then bisect. Measure first, fix second. Profilers and heap snapshots fall under long-running-command discipline — propose, estimate, ask.
+**Probes that mutate state are not allowed.** No restarts, no config changes, no DB writes, no dependency changes. If a probe needs them, escalate to the user — explain what you'd change and why — and let them decide whether to do it themselves, route it through the full plan cycle, or drop that avenue.
 
-See [instrumentation.md](instrumentation.md) for log tagging conventions, perf measurement patterns, and clean-up checklists.
+**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (existing tooling, a timing harness such as `time.time()`, `performance.now()`, `System.nanoTime()`, shell `time`, profiler, query plan), then bisect (via Aragorn or the user only). Measure first, fix second. Profilers, heap snapshots, and bisect fall under long-running-command discipline — propose, estimate, ask.
+
+See [instrumentation.md](instrumentation.md) for probe design, the Aragorn probe contract, the ledger, the cleanup gate, and perf measurement patterns.
 
 ## Phase 5 — Propose fix + design regression test
 
@@ -149,13 +165,14 @@ Make the recommendation **after** the diagnosis is complete, not before — you 
 
 - Build the feedback loop before hypothesising. No loop, no diagnosis.
 - Apply the long-running-command discipline before any expensive command.
-- Tag every debug log with a unique prefix.
+- Design every code probe with a fresh unique tag and route it through Gandalf to Aragorn.
 - Show the ranked hypothesis list to the user before testing.
+- Pass the cleanup gate at close and on block/abandon.
 - Hand off the fix; do not apply it yourself.
 
 ### Never
 
-- Never apply a fix. Diagnosis ends at the proposal.
+- Never edit files or apply a fix. Diagnosis ends at the proposal.
 - Never run a long-running command without proposing it first and getting confirmation.
 - Never mutate state during instrumentation (no restarts, no config changes, no DB writes).
 - Never proceed past a phase without satisfying its exit criteria.
@@ -167,8 +184,9 @@ Make the recommendation **after** the diagnosis is complete, not before — you 
 [ ] Feedback loop built and verified
 [ ] Bug reproduced — exact symptom matches user's report
 [ ] 3–5 falsifiable hypotheses ranked and shown
-[ ] Each probe mapped to a specific prediction
-[ ] Debug logs tagged for cleanup
+[ ] Each probe mapped to a specific prediction (or Phase 1 observable)
+[ ] Code probes routed via Gandalf → Aragorn with a ledger
+[ ] Cleanup gate passed (see instrumentation.md)
 [ ] Diagnosis package complete (symptom, repro, cause, evidence, recommended fix, risks)
 [ ] Handoff target identified
 [ ] Post-mortem asked: what would have prevented this?
@@ -177,4 +195,4 @@ Make the recommendation **after** the diagnosis is complete, not before — you 
 ## References
 
 - [feedback-loops.md](feedback-loops.md) — ten ways to build a loop, iteration discipline, non-determinism, fallbacks
-- [instrumentation.md](instrumentation.md) — log tagging, perf measurement, cleanup checklists
+- [instrumentation.md](instrumentation.md) — probe roles and design, Aragorn probe contract, ledger, cleanup gate, bisect, perf measurement
