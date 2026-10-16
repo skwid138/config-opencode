@@ -89,6 +89,7 @@ planning, Jira comments, and QA subtask generation are visibly separated.
 | Command | Skill | What it does |
 |---------|-------|-------------|
 | `/jira-qa-subtask [ticket] [--push]` | jira-qa-subtask | Generate a Jira QA subtask description from ticket AC + PR/code context; previews by default with a local render envelope and gates Jira mutations |
+| `/release-deploy-checks [ticket...]` | release-deploy-checks | Draft pasteable per-ticket prod deploy-check blurbs (chat only) from read-only ticket, git, and live tst/prod evidence; lists sprint tickets for selection when no keys are given |
 
 ### Defensive analysis
 | Command | Skill | What it does |
@@ -132,6 +133,7 @@ planning, Jira comments, and QA subtask generation are visibly separated.
 | `grill-with-docs` | "stress-test against the glossary", grilling + routes CONTEXT.md/ADR writes through Aragorn |
 | `improve-codebase-architecture` | "review the architecture", system-level deepening-opportunity scan |
 | `jira-qa-subtask` | "write QA steps", "create a QA subtask", generate QA instructions from AC + PR |
+| `release-deploy-checks` | "deploy checks", "deploy-check blurbs", "prod verification blurbs" for the release page |
 
 ## MCPs
 
