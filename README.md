@@ -24,7 +24,7 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 │   ├── jira-ac-quality.md, jira-add-imp-plan.md, jira-qa-subtask.md
 │   ├── review.md, review-plan.md, sonar.md, bug-hunt.md
 │   └── scripts-doctor.md, update-opencode-deps.md
-├── skill/                       # Local skill library (19 skills)
+├── skill/                       # Local skill library (29 skills)
 │   ├── bug-hunter/, chrome-devtools/, diagnose/, figma/
 │   ├── gh-fetch-pr-comments/, github-review-analyzer/, grill-me/, grill-with-docs/
 │   ├── improve-codebase-architecture/, jira-enhance/, jira-ticket/, plan-author/
