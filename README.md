@@ -278,10 +278,35 @@ Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
 | Bump default model | `opencode models` → edit `opencode.jsonc` |
 | Audit & update all config deps | `/update-opencode-deps` (or `~/code/scripts/agent/opencode-deps-check.sh` for read-only check) |
 | Add a provider | `opencode auth login` |
-| Verify LM Studio local models | `~/code/scripts/personal/local-models.sh verify` |
+| Verify LM Studio local models | `~/code/scripts/personal/local-models.sh verify` (may start the LM Studio server; see below) |
 | Tail DCP logs | `tail -f ~/.config/opencode/logs/dcp/*.log` |
 | Inspect tasks | `/tasks`, then `/task <id>` |
 | Health check | `opencode mcp list` (verify MCPs), `opencode models` (verify model) |
+
+### LM Studio local models
+
+Design rationale lives in [`docs/adr/0002-lm-studio-local-models.md`](docs/adr/0002-lm-studio-local-models.md). That ADR is a historical record; this section describes the maintenance process as it works today.
+
+**Two places own the roster, and they must match exactly:**
+
+- `opencode.jsonc` → `provider.lmstudio.models` is a **static picker list**. OpenCode does not discover LM Studio models; every key listed there (e.g. `local/gpt-oss-120b`) shows up in the model picker whether or not the model is installed or loaded.
+- `~/code/scripts/personal/local-models.sh` maps each **alias** → LM Studio **source model key** → stable **`local/...` identifier**. The stable identifiers must equal the `provider.lmstudio.models` keys exactly; `verify` fails on any missing or extra key and on limits other than `32768`/`8192`.
+- The source model key is LM Studio's installed model key (`modelKey` in `lms ls --json`). It is **not** the API identifier — `load` attaches the stable `local/...` identifier via `--identifier`, and that is what OpenCode requests.
+
+**Configured is not the same as available.** A model can be listed in `opencode.jsonc` and in the script mapping while its source model is absent from LM Studio. It still appears in the picker but cannot be loaded or used, and `verify` reports it as a missing installed source model.
+
+**Adding or removing a model is a coordinated two-repo change.** In `~/code/scripts/personal/local-models.sh`, update `all_aliases`, `model_source`, `model_identifier`, and the alias table in `usage`; update the fixtures and expectations in `tests/local-models.bats` and the roster table in `docs/local-models.md`. In this repo, update `provider.lmstudio.models` in `opencode.jsonc` and any docs that list the roster. Neither side is complete on its own.
+
+**If maintenance is interrupted and validation fails,** recover by finishing or reverting only the intended mapping edits in each repo (`git diff` the specific files involved). Do not reset, stash, or clean the whole worktree — both repos may carry unrelated in-progress changes that must be preserved.
+
+**Runtime commands have side effects.** None of these run automatically when config changes; run them by hand when you are ready:
+
+- `local-models.sh verify` calls `start` first, so it may start the LM Studio server. It never loads a model.
+- `local-models.sh load <alias>` loads a model into memory (estimate first; may prompt).
+- `opensession --local` prepares the LM Studio endpoint only. It does not load models, does not route agents to local models, and does not restart the OpenCode daemon unless `--restart` is also passed.
+- The OpenCode daemon freezes config at boot, so after editing `provider.lmstudio` use `opensession --local --restart` (or accept `openattach`'s stale-daemon prompt) to reload it.
+
+**Current state:** `opencode.jsonc` and the script mapping list four models: `gpt-oss-120b` (`local/gpt-oss-120b`), `qwen3.5-122b-a10b` (`local/qwen3.5-122b-a10b`), `qwen3.8-27b` (`local/qwen3.8-27b`, MLX 8-bit), and `qwen3-coder-next` (`local/qwen3-coder-next`, MLX 6-bit). The earlier `ministral-3b`, `qwen3-vl-8b`, and `qwen3-vl-30b` entries have been removed from both repos.
 
 ## Setup (fresh machine)
 

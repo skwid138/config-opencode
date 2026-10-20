@@ -440,29 +440,15 @@
                 "baseURL": "http://127.0.0.1:1234/v1"
             },
             "models": {
-                "local/ministral-3b": {
-                    "name": "Ministral 3 3B (LM Studio)",
-                    "limit": {
-                        "context": 32768,
-                        "output": 8192
-                    }
-                },
-                "local/qwen3-vl-8b": {
-                    "name": "Qwen3 VL 8B (LM Studio)",
-                    "limit": {
-                        "context": 32768,
-                        "output": 8192
-                    }
-                },
-                "local/qwen3-vl-30b": {
-                    "name": "Qwen3 VL 30B (LM Studio)",
+                "local/qwen3.8-27b": {
+                    "name": "Qwen3.8 27B MLX 8-bit (LM Studio)",
                     "limit": {
                         "context": 32768,
                         "output": 8192
                     }
                 },
                 "local/qwen3-coder-next": {
-                    "name": "Qwen3 Coder Next (LM Studio)",
+                    "name": "Qwen3 Coder Next MLX 6-bit (LM Studio)",
                     "limit": {
                         "context": 32768,
                         "output": 8192
