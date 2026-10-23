@@ -53,15 +53,30 @@
     // (Anthropic context-engineering guidance) and per-token credit cost.
     // Keys are exact providerID/modelID. Use absolute numbers, never percentages:
     // "80%" of a 1M window would mean 800K.
+    //
+    // Local LM Studio Qwen (provider "lmstudio", model "local/qwen3.8-27b",
+    // OpenCode limit 131072 context / 8192 output => native compaction at ~122880
+    // usable). Min 49152 = turn/iteration compression reminders become eligible
+    // (not a tool minimum). Max 65536 = urgent compress nudge only, not hard
+    // compaction; with summaryBuffer on, tokens held in active DCP summaries are
+    // added to the effective max. Soft budgets: the model must act on the nudge.
     "modelMaxLimits": {
       "github-copilot/claude-opus-5.5": 200000,
       "github-copilot/claude-sonnet-5.5": 200000,
-      "github-copilot/gpt-6.1-sol": 200000
+      "github-copilot/gpt-6.1-sol": 200000,
+      "github-copilot/gpt-6-luna": 100000,
+      "openai/gpt-6.1-sol": 200000,
+      "lmstudio/local/qwen3.8-27b": 65536,
+      "peesea/qwen3-coder-4090": 50000
     },
     "modelMinLimits": {
       "github-copilot/claude-opus-5.5": 100000,
       "github-copilot/claude-sonnet-5.5": 100000,
-      "github-copilot/gpt-6.1-sol": 100000
+      "github-copilot/gpt-6.1-sol": 100000,
+      "github-copilot/gpt-6-luna": 50000,
+      "openai/gpt-6.1-sol": 100000,
+      "lmstudio/local/qwen3.8-27b": 49152,
+      "peesea/qwen3-coder-4090": 30000
     },
     "nudgeFrequency": 5,
     "iterationNudgeThreshold": 15,

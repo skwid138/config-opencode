@@ -187,6 +187,9 @@ Currently running in **autonomous mode**. Current notable settings in `dcp.jsonc
 Context limits (absolute token counts — never percentages, since e.g. `80%` of a 1M window would mean 800K):
 - `maxContextLimit: 80000` / `minContextLimit: 40000` — global fallback for any model not listed below; strong compression nudges above max, no reminder nudges below min
 - `modelMaxLimits` / `modelMinLimits` — exact `providerID/modelID` keys at **200000 / 100000** for `github-copilot/claude-opus-5.5`, `github-copilot/claude-sonnet-5.5`, and `github-copilot/gpt-6.1-sol`. Copilot was verified to exceed 128K through OpenCode on 2026-10-01 (a Gandalf session on claude-opus-5.5 reached 134.8K tokens = 13%). 200K/100K is a conservative operating band chosen over the full 1M window because of context rot (Anthropic context-engineering guidance) and credit cost
+- `lmstudio/local/qwen3.8-27b` — **65536 / 49152** (the key is the full `providerID/modelID`, with `lmstudio` as provider). Qwen runs at OpenCode `limit.context` 131072 / `limit.output` 8192, so OpenCode 1.18.35 native compaction triggers around 131072 − 8192 = **122880** usable tokens. DCP's 65536 base max leaves a nominal **57344** tokens of runway before native compaction, less whatever active summaries and new content consume. The other three local models (32768 context) stay on the 80000/40000 global fallback, which is above their window, so native compaction is their effective limit
+- How the thresholds behave (DCP 3.2.0): at or above **min**, turn/iteration compression reminders become eligible (it is not a minimum for the compress tool). Above **max**, DCP injects an urgent compress nudge — it never compresses on its own; the session model must act. `summaryBuffer: true` adds tokens held in active DCP summaries to the effective max. These are soft budgets, not guarantees
+- DCP compression is separate from OpenCode's native compaction: DCP asks the session model to summarize ranges in place; native compaction rewrites the whole history using `agent.compaction` (cloud `github-copilot/claude-opus-5.5`, unchanged), even for Qwen sessions
 - `nudgeFrequency: 5`, `iterationNudgeThreshold: 15`, `nudgeForce: "soft"`
 - `protectUserMessages: false` — allows compression of large pasted content
 
@@ -290,12 +293,12 @@ Design rationale lives in [`docs/adr/0002-lm-studio-local-models.md`](docs/adr/0
 **Two places own the roster, and they must match exactly:**
 
 - `opencode.jsonc` → `provider.lmstudio.models` is a **static picker list**. OpenCode does not discover LM Studio models; every key listed there (e.g. `local/gpt-oss-120b`) shows up in the model picker whether or not the model is installed or loaded.
-- `~/code/scripts/personal/local-models.sh` maps each **alias** → LM Studio **source model key** → stable **`local/...` identifier**. The stable identifiers must equal the `provider.lmstudio.models` keys exactly; `verify` fails on any missing or extra key and on limits other than `32768`/`8192`.
+- `~/code/scripts/personal/local-models.sh` maps each **alias** → LM Studio **source model key** → stable **`local/...` identifier**. The stable identifiers must equal the `provider.lmstudio.models` keys exactly; `verify` fails on any missing or extra key and on limits that differ from the helper's per-alias default: `131072`/`8192` for `local/qwen3.8-27b`, `32768`/`8192` for the other three.
 - The source model key is LM Studio's installed model key (`modelKey` in `lms ls --json`). It is **not** the API identifier — `load` attaches the stable `local/...` identifier via `--identifier`, and that is what OpenCode requests.
 
 **Configured is not the same as available.** A model can be listed in `opencode.jsonc` and in the script mapping while its source model is absent from LM Studio. It still appears in the picker but cannot be loaded or used, and `verify` reports it as a missing installed source model.
 
-**Adding or removing a model is a coordinated two-repo change.** In `~/code/scripts/personal/local-models.sh`, update `all_aliases`, `model_source`, `model_identifier`, and the alias table in `usage`; update the fixtures and expectations in `tests/local-models.bats` and the roster table in `docs/local-models.md`. In this repo, update `provider.lmstudio.models` in `opencode.jsonc` and any docs that list the roster. Neither side is complete on its own.
+**Adding or removing a model is a coordinated two-repo change.** In `~/code/scripts/personal/local-models.sh`, update `all_aliases`, `model_source`, `model_identifier`, `model_context_length` (the alias's default load context, which is also the `limit.context` that `verify` expects), and the alias table in `usage`; update the fixtures and expectations in `tests/local-models.bats` and the roster table in `docs/local-models.md`. In this repo, update `provider.lmstudio.models` in `opencode.jsonc` and any docs that list the roster. Neither side is complete on its own.
 
 **If maintenance is interrupted and validation fails,** recover by finishing or reverting only the intended mapping edits in each repo (`git diff` the specific files involved). Do not reset, stash, or clean the whole worktree — both repos may carry unrelated in-progress changes that must be preserved.
 
@@ -307,6 +310,10 @@ Design rationale lives in [`docs/adr/0002-lm-studio-local-models.md`](docs/adr/0
 - The OpenCode daemon freezes config at boot, so after editing `provider.lmstudio` use `opensession --local --restart` (or accept `openattach`'s stale-daemon prompt) to reload it.
 
 **Current state:** `opencode.jsonc` and the script mapping list four models: `gpt-oss-120b` (`local/gpt-oss-120b`), `qwen3.5-122b-a10b` (`local/qwen3.5-122b-a10b`), `qwen3.8-27b` (`local/qwen3.8-27b`, MLX 8-bit), and `qwen3-coder-next` (`local/qwen3-coder-next`, MLX 6-bit). The earlier `ministral-3b`, `qwen3-vl-8b`, and `qwen3-vl-30b` entries have been removed from both repos.
+
+**Context windows:** `local/qwen3.8-27b` is configured at `limit.context` **131072** / `limit.output` **8192**; the other three stay at **32768** / **8192**. `local-models.sh load <alias>` defaults to the same per-alias context that `verify` expects in `opencode.jsonc` (one lookup in the script, `model_context_length`), so a default load matches OpenCode. `--context-length N` overrides only that load and never edits config; a runtime context **lower** than OpenCode's `limit.context` leaves OpenCode budgeting for a window the loaded model does not have. DCP budgets for Qwen are described in the DCP section above (`lmstudio/local/qwen3.8-27b` 65536/49152).
+
+**Reloading Qwen at 131072** (manual; nothing runs automatically): `local-models.sh unload qwen3.8-27b`, then `local-models.sh load qwen3.8-27b` (defaults to 131072; read the estimate and confirm — LM Studio's estimate can show identical memory at every context size with `LOW` confidence, so it does not reflect the KV-cache peak), then restart OpenCode freshly (`opensession --local --restart`) so `opencode.jsonc` and `dcp.jsonc` reload. Memory and speed at 128K are still to be validated in use.
 
 ## Setup (fresh machine)
 
