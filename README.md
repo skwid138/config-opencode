@@ -6,6 +6,9 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 
 ## Directory Layout
 
+OpenCode V2 reads global assets from the standard plural roots under
+`~/.config/opencode/`. This directory is the source of truth for global config.
+
 ```
 ~/.config/opencode/
 ├── opencode.jsonc                # Model, instructions, hidden agents, permissions, npm plugins
@@ -13,18 +16,18 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 ├── package.json                 # npm deps (@opencode-ai/plugin), engines, package manager
 ├── package-lock.json            # tracked for reproducible installs
 ├── .nvmrc                       # pins Node version
-├── agent/                       # Local agent definitions (LOTR-named)
+├── agents/                      # Global agent definitions (LOTR-named)
 │   ├── gandalf.md               # Primary orchestrator
 │   ├── legolas.md               # Codebase exploration subagent
 │   ├── radagast.md              # External docs/OSS research subagent
 │   ├── aragorn.md               # Implementation subagent (sole writer)
 │   └── saruman.md               # Adversarial reviewer subagent
-├── command/                     # Slash commands that drive skills
+├── commands/                    # Global slash commands that drive skills
 │   ├── jira-ticket.md, jira-plan.md, plan-author.md
 │   ├── jira-ac-quality.md, jira-add-imp-plan.md, jira-qa-subtask.md
 │   ├── review.md, review-plan.md, sonar.md, bug-hunt.md
 │   └── scripts-doctor.md, update-opencode-deps.md
-├── skill/                       # Local skill library (29 skills)
+├── skills/                      # Global skill library (29 tracked skills)
 │   ├── bug-hunter/, chrome-devtools/, diagnose/, figma/
 │   ├── gh-fetch-pr-comments/, github-review-analyzer/, grill-me/, grill-with-docs/
 │   ├── improve-codebase-architecture/, jira-enhance/, jira-ticket/, plan-author/
@@ -33,10 +36,10 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 ├── instruction/                 # Auto-loaded into every agent's context
 │   ├── repo-context.md, script-usage.md
 │   ├── agent-defaults.md
-│   ├── wpromote-context.md      # Loaded CONDITIONALLY by bin/opencode wrapper (only when $PWD is under ~/code/wpromote/)
-├── bin/                         # Launcher infrastructure
-│   ├── opencode -> ~/code/scripts/personal/opencode-wrapper.sh  # symlink, intercepts `opencode` via PATH
-│   └── install-wrapper.sh       # idempotent bootstrap for the symlink
+│   ├── wpromote-context.md      # Read only under ~/code/wpromote/, as directed by AGENTS.md
+├── bin/                         # Direct-binary link and legacy V1 installer
+│   ├── opencode                 # points to the pinned native V2 binary
+│   └── install-wrapper.sh       # legacy V1 installer; do not run
 ├── docs/                        # Reference documentation (skill authoring, etc.)
 ├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
 │   ├── chrome-devtools/, context7/, exa/, figma/  # source-of-truth lives in opencode.jsonc
@@ -48,23 +51,23 @@ Personal, self-contained OpenCode configuration. LOTR-themed agents, dynamic con
 
 ## Agents
 
-All agents are defined locally under `agent/`. The default OpenCode `build`, `plan`, and `general` agents are explicitly hidden in `opencode.jsonc` so the LOTR roster is the surface area.
+All agents are defined locally under `agents/`. The default OpenCode `build`, `plan`, and `general` agents are explicitly hidden in `opencode.jsonc` so the LOTR roster is the surface area.
 
 | Name | Mode | Model | Role |
 |------|------|-------|------|
-| **gandalf** | primary | github-copilot/claude-opus-5.5 (medium) | Orchestrator — intent classification, planning, delegation |
-| **legolas** | subagent | github-copilot/gpt-6-luna (medium) | Codebase exploration & call-path discovery |
-| **radagast** | subagent | github-copilot/gpt-6.1-sol (high) | External docs / OSS research |
-| **aragorn** | subagent | github-copilot/claude-opus-5.5 (high) | Autonomous end-to-end implementation; the only writer in the roster |
-| **saruman** | subagent | github-copilot/gpt-6.1-sol (high) | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time |
+| **gandalf** | primary | `github-copilot/claude-opus-5.5#medium` | Orchestrator — intent classification, planning, delegation |
+| **legolas** | subagent | `github-copilot/gpt-6-luna#medium` | Codebase exploration & call-path discovery |
+| **radagast** | subagent | `github-copilot/gpt-6-luna#high` | External docs / OSS research |
+| **aragorn** | subagent | `github-copilot/gpt-6-luna#high` | Autonomous end-to-end implementation; the only writer in the roster |
+| **saruman** | subagent | `github-copilot/gpt-6-luna#high` | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time |
 
-**Why the model split:** All agents run on GitHub Copilot (billing consolidated; the openai provider stays configured but unused). Planner (Gandalf) and implementer (Aragorn) use Claude Opus 5.5; the adversarial gate (Saruman) uses GPT-6.1 Sol so reviews stay cross-family. Per-agent effort is set via `variant` in agent frontmatter. See `.project-plans/2026-10-01_copilot-model-consolidation.md` for rationale.
+**Model choices:** All agents use GitHub Copilot. Gandalf uses Claude Opus 5.5 for orchestration; the other roles use GPT-6 Luna. Per-agent effort is encoded in the `provider/model#variant` frontmatter value.
 
-**All read-only agents are locked down:** every agent except Aragorn has an explicit `permission` block denying `write` and `edit`, with bash restricted to a read-only allowlist. Aragorn is the sole writer. The global posture (in `opencode.jsonc`) is `ask`-by-default with a small denylist for catastrophic operations (`rm -rf /*`, `sudo *`, `git push --force*`).
+**Agent frontmatter uses V2 syntax:** `model` includes the reasoning variant as `provider/model#variant`, and `permissions` is an ordered list of action/resource/effect rules. Read-only agents deny edit and restrict shell access; Aragorn is the sole writer. The global posture (in `opencode.jsonc`) is `ask`-by-default with a small denylist for catastrophic operations (`rm -rf /*`, `sudo *`, `git push --force*`).
 
 ## Commands
 
-Commands live in `command/*.md` and are thin wrappers around skills.
+Commands live in `commands/*.md` and are thin wrappers around skills.
 
 ### Jira / ticket workflow
 Jira-facing commands intentionally use a `jira-` prefix so ticket reads,
@@ -137,7 +140,7 @@ planning, Jira comments, and QA subtask generation are visibly separated.
 
 ## MCPs
 
-MCP servers are defined inline in `opencode.jsonc` under the top-level `mcp` key — that is the only location OpenCode reads. The `mcp/<name>/mcp.json` files in this repo are **reference snippets only** (kept for diffability and as paste-ready blocks); they are not auto-discovered. Any change must be made in `opencode.jsonc` to take effect.
+MCP servers are defined inline in `opencode.jsonc` under the top-level `mcp` key; that is the only location OpenCode reads. The `mcp/<name>/mcp.json` files are reference snippets only. All four current MCP entries are disabled in `opencode.jsonc`; this cleanup leaves that state unchanged.
 
 | MCP | Type | Notes |
 |-----|------|-------|
@@ -152,19 +155,19 @@ Verify registration after edits with `opencode mcp list`.
 
 ## Plugins
 
-Four plugins are loaded — one local TypeScript file and three npm packages.
-
-### `plugins/src/vision-tool.ts` (local)
-Exposes a `vision` tool that bypasses Claude's 8000px image limit by routing files to a Gemini agent (`github-copilot/gemini-3.8-flash`). Supports JPEG/PNG/GIF/WebP/HEIC/BMP, PDFs, MP4/MOV/AVI/WebM, and WAV/MP3/OGG. Use it instead of `read` for any media file.
+Two plugins are enabled in the current config. Optional Council and Vision entries remain in `opencode.jsonc` as commented-out experiments and are not loaded.
 
 ### `@tarquinen/opencode-dcp` (npm)
-Dynamic Context Pruning. Configured via `dcp.jsonc` — see next section for current settings.
+Dynamic Context Pruning, pinned at 3.2.0 and enabled. Configured via `dcp.jsonc` — see next section for current settings.
 
 ### `@skwid138/opencode-command-normalizer` (npm)
-Normalizes safe bash argv0 home forms before permission evaluation so anchored absolute script rules match `~/` and `$HOME/` command forms without unsafe wildcard suffixes.
+Pinned at 0.3.0 and enabled. Normalizes safe shell argv0 home forms before permission evaluation so anchored absolute script rules match `~/` and `$HOME/` command forms without unsafe wildcard suffixes.
 
 ### `@skwid138/opencode-council` (npm)
-Exposes a `council_review` tool that fans a review prompt out to configured Saruman councillors (claude-opus-5.5, gemini-3.8-flash, gpt-6.1-sol; quorum 3) and asks a separate aggregator model (gpt-6.1-sol) to structurally aggregate the responses.
+The commented-out config entry retains the multi-model `council_review` experiment. It is currently disabled.
+
+### `plugins/src/vision-tool.ts` (local)
+The commented-out config entry retains the Gemini-backed media `vision` tool experiment. It is currently disabled.
 
 ## Dynamic Context Pruning (DCP) — Autonomous Configuration
 
@@ -189,82 +192,34 @@ Context limits (absolute token counts — never percentages, since e.g. `80%` of
 - `modelMaxLimits` / `modelMinLimits` — exact `providerID/modelID` keys at **200000 / 100000** for `github-copilot/claude-opus-5.5`, `github-copilot/claude-sonnet-5.5`, and `github-copilot/gpt-6.1-sol`. Copilot was verified to exceed 128K through OpenCode on 2026-10-01 (a Gandalf session on claude-opus-5.5 reached 134.8K tokens = 13%). 200K/100K is a conservative operating band chosen over the full 1M window because of context rot (Anthropic context-engineering guidance) and credit cost
 - `lmstudio/local/qwen3.8-27b` — **65536 / 49152** (the key is the full `providerID/modelID`, with `lmstudio` as provider). Qwen runs at OpenCode `limit.context` 131072 / `limit.output` 8192, so OpenCode 1.18.35 native compaction triggers around 131072 − 8192 = **122880** usable tokens. DCP's 65536 base max leaves a nominal **57344** tokens of runway before native compaction, less whatever active summaries and new content consume. The other three local models (32768 context) stay on the 80000/40000 global fallback, which is above their window, so native compaction is their effective limit
 - How the thresholds behave (DCP 3.2.0): at or above **min**, turn/iteration compression reminders become eligible (it is not a minimum for the compress tool). Above **max**, DCP injects an urgent compress nudge — it never compresses on its own; the session model must act. `summaryBuffer: true` adds tokens held in active DCP summaries to the effective max. These are soft budgets, not guarantees
-- DCP compression is separate from OpenCode's native compaction: DCP asks the session model to summarize ranges in place; native compaction rewrites the whole history using `agent.compaction` (cloud `github-copilot/claude-opus-5.5`, unchanged), even for Qwen sessions
+- DCP compression is separate from OpenCode's native compaction: DCP asks the session model to summarize ranges in place; native compaction rewrites the whole history using `agent.compaction` (`github-copilot/gpt-6-luna`), even for Qwen sessions
 - `nudgeFrequency: 5`, `iterationNudgeThreshold: 15`, `nudgeForce: "soft"`
 - `protectUserMessages: false` — allows compression of large pasted content
 
 ## Instructions (auto-loaded into every agent)
 
-`opencode.jsonc` lists the global, always-on instruction files. `wpromote-context.md` is **not** in that list — it's injected by the launcher wrapper at `bin/opencode` only when `$PWD` is under `~/code/wpromote/` (see "Conditional Wpromote Context" below).
+`opencode.jsonc` lists the global, always-on instruction files. The root `AGENTS.md` directs agents to read `instruction/wpromote-context.md` only when working under `~/code/wpromote/`; do not load it elsewhere.
 
 | File | Loaded | What it injects |
 |------|--------|-----------------|
 | `repo-context.md` | always | "Read the project's `AGENTS.md` and `.agents/skills/` if present" — silently no-ops when absent |
 | `script-usage.md` | always | Reference for `~/code/scripts/` utilities — `agent/` (`branch-to-ticket.sh`, `gh-current-pr.sh`, `gh-pr-comments.sh`, `sonar-pr-issues.sh`, `jira-fetch-ticket.sh`) and `lib/` helpers. Mentions that wpromote-internal scripts are documented separately |
 | `agent-defaults.md` | always | Standing engineering defaults — TDD posture, planning conversation routing, bug investigation routing, post-implementation audit routing, architecture review routing, long-running command discipline (Stryker, full test suites, broad scans), honest-disagreement posture |
-| `wpromote-context.md` | conditional (under `~/code/wpromote/`) | Wpromote repo topology incl. local dev URLs (`polaris.local`, `polarisiq.local`, `api.polaris.local`): `polaris-web`, `client-portal`, `polaris-api`, `cube`, `kraken`, `polaris-apps`, `wp-sdk`. Frontend → API → Cube/Kraken/BigQuery dependency map, Jira component → repo mapping, GCP/GKE gotchas, and the `~/code/wpromote/scripts/agent/` script catalog |
+| `wpromote-context.md` | read only under `~/code/wpromote/` | The root `AGENTS.md` is the conditional gate. The file contains Wpromote repo topology, GCP/GKE guidance, and internal scripts; do not open it for work outside that tree |
 
-## Conditional Wpromote Context (launcher)
+## Native OpenCode V2
 
-OpenCode has no native `if cwd contains X then load Y` mechanism for instruction files — the agent's directive file list is fixed at session start. To load wpromote-specific context **only inside wpromote work**, this config uses a launcher wrapper that intercepts the `opencode` binary via `PATH` and conditionally injects the file via the documented `OPENCODE_CONFIG_CONTENT` env var.
+Use the pinned native binary directly: `~/.local/opt/opencode-v2-2.1.4/bin/opencode`. The global configuration and its `agents/`, `commands/`, and `skills/` roots live here, under `~/.config/opencode/`; `opencode.jsonc` is the source of truth for runtime settings, plugin registrations, MCPs, and always-on instructions.
 
-**Components:**
+OpenCode V2 watches config and asset files for live reload. If a running session has not picked up a change, use `/reload` in the session or run `opencode reload`. Do not restart the service just to apply config edits.
 
-- **`bin/opencode`** — symlink to `~/code/scripts/personal/opencode-wrapper.sh`. The shell scripts repo prepends `$HOME/.config/opencode/bin` to `PATH` (in `shell/env/paths.zsh`), so a bare `opencode` invocation hits the wrapper before the real binary at `/opt/homebrew/bin/opencode`. The wrapper itself is the source of truth (lives in `~/code/scripts/personal/`) so it's audited by `scripts-doctor`, has bats coverage (`tests/opencode-wrapper.bats`), and follows the standard script conventions (`-h`/`--help`, `set -uo pipefail`, sources `lib/common.sh`).
-- **`bin/install-wrapper.sh`** — idempotent bootstrap. Creates the `bin/opencode` symlink (or repairs it on drift). Run once per machine; rerun if `scripts-doctor` reports the symlink is missing or drifted.
-  - `--check` exits 0 (healthy) / 1 (drift or missing) for CI / health-check use.
-  - `--force` overwrites a regular file at the symlink path; refuses to overwrite a directory.
-- **`scripts-doctor` integration** — audits that `bin/opencode` is a symlink resolving to `personal/opencode-wrapper.sh` in the scripts repo. Surfaces `missing — run install-wrapper.sh` if the bootstrap hasn't been run.
+> **Do not run `bin/install-wrapper.sh`.** It is a legacy V1 bootstrap and can replace `bin/opencode` with an obsolete PATH wrapper. Leave the V1 installer and daemon-wrapper infrastructure untouched.
 
-> Note: `bin/opencode` will appear as **untracked** in `git status` after running `install-wrapper.sh`. This is expected — it's a per-machine symlink (the target is an absolute path on this machine), not a tracked artifact. If it ever shows up as a regular file rather than a symlink, re-run `install-wrapper.sh` to repair.
-
-**Behavior:**
-
-The wrapper inspects `$PWD` and, when it's under `~/code/wpromote/`, sets `OPENCODE_CONFIG_CONTENT` to a JSON document that adds `instruction/wpromote-context.md` to the instruction list, then `exec`s the real `opencode` with the same argv. Outside the wpromote tree, it `exec`s through unmodified — zero overhead, no injection.
-
-Carve-outs:
-- **`opencode web` and `opencode attach`** pass through unmodified. `web` freezes config at boot (already-running daemon), and `attach` is a TUI client that doesn't need the conditional context.
-- **`--help`** is handled by the wrapper itself (not passed through), to satisfy `scripts-doctor`'s `--help` audit and prevent wrapper-vs-binary recursion edge cases.
-- **`--no-conditional`** is a manual escape hatch that bypasses injection regardless of `$PWD`.
-
-Verbose mode: `OPENCODE_WRAPPER_VERBOSE=1` prints a one-line stderr notice when injection happens. Off by default to keep `opencode` invocations quiet.
-
-**Bootstrap on a fresh box:**
-
-```bash
-~/.config/opencode/bin/install-wrapper.sh
-which opencode    # should resolve to ~/.config/opencode/bin/opencode
-~/code/scripts/agent/scripts-doctor.sh | grep wrapper  # should be ✓
-```
-
-If `which opencode` resolves to `/opt/homebrew/bin/opencode` instead, `~/.config/opencode/bin` isn't on `PATH` ahead of Homebrew. The shell scripts repo's `shell/env/paths.zsh` handles this via `_path_prepend "$HOME/.config/opencode/bin"`; ensure the env-tier init (`init_env.zsh` from `.zshenv`) is wired up.
-
-## OpenCode daemon and the wrapper quartet
-
-`opencode web` starts a long-lived HTTP daemon that **freezes the entire config tree at boot** — `opencode.jsonc`, all instructions, all agent files, all skill `SKILL.md` files. Edits made after the daemon starts have no effect on attached sessions until the daemon is restarted. This caused a recurring class of bug ("I edited the agent prompt, why is the old behavior still happening?") because nothing surfaced the staleness.
-
-Four wrappers in `~/code/scripts/personal/` cooperate to make this safe:
-
-| Wrapper | Alias | Purpose |
-|---------|-------|---------|
-| `opensession.sh` | `opensession` | **Daily driver.** Ensures a daemon is running on the port, then attaches. No daemon → background-spawns `openweb`, waits for the listener with identity verification, exec's `openattach`. Fresh daemon → attaches silently. Stale daemon → delegates the prompt to `openattach`. `--restart` calls `openweb --restart`; `--force` passes through to `openattach --force`; `--debug` exports `OPENCODE_WEB_LOG_LEVEL=DEBUG` and implies `--restart` so the daemon starts with `--log-level DEBUG`; `--local` runs `local-models.sh start` before opening/attaching. |
-| `opencode-web.sh` | `openweb` | Starts the daemon. If a daemon is already running on the port, exits with guidance to re-invoke with `--restart` (kill + respawn) or `--force` (kill any holder, including foreign listeners). On start, writes a sidecar file recording the SHA-256 hash of the config tree at boot. |
-| `opencode-attach.sh` | `openattach` | TUI client. Before exec'ing into the daemon, compares the current config-tree hash against the sidecar. If they differ ("stale daemon"), warns and prompts on a real TTY; aborts non-interactively with exit 5 and bypass instructions. |
-| `opencode-wrapper.sh` | (PATH shim) | The conditional-context wrapper above. Web/attach pass through unmodified. |
-
-**Sidecar file:** `~/.local/share/opencode/daemon-config-hash-<port>-<pid>` — written atomically when `openweb` starts. Records the port, pid, ISO 8601 start time, and SHA-256 over the sorted file list of `~/.config/opencode/` (with symlink targets included via `readlink`). Cleaned up on graceful exit; orphan sidecars are filtered out by a `ps` identity check on the recorded pid (`comm == opencode`, no `pgrep -f` matches against arbitrary command lines).
-
-**Bypass:** `openattach --force` (or `OPENCODE_ATTACH_FORCE=1 openattach`) skips the staleness check. Use when you know the config drift is intentional and irrelevant to the current session (e.g. you edited an unrelated skill).
-
-**Local models:** `opensession --local` prepares LM Studio only. It starts/verifies the LM Studio OpenAI-compatible endpoint at `http://127.0.0.1:1234/v1`, but it does not load any model and does not restart the OpenCode daemon by itself. After editing the static `provider.lmstudio` model config, use `opensession --local --restart` (or let `openattach`'s stale-daemon prompt guide you) so the daemon reloads config.
-
-**Shared helper:** `~/code/scripts/lib/opencode-daemon.sh` is sourced by both `openweb` and `openattach`. It owns the hash function, sidecar I/O, and identity verification — the wrappers stay declarative.
-
-**Coverage:** `tests/opencode-daemon.bats` (43 tests on the helper), `tests/opencode-web.bats` (28 tests, 3-phase lsof stub model for pre-flight detection), `tests/opencode-attach.bats` (29 tests including a real-pty test via BSD `script(1)` for the TTY prompt branch), and `tests/opensession.bats` (spawn / fresh / stale / foreign-listener / race / timeout / `--restart` / `--force` / bash-3.2 regression coverage).
+Web access and Tailscale integration are deferred. This cleanup does not configure remote access or start a server.
 
 ## Configuration Choices
 
-**Default model:** `github-copilot/claude-sonnet-5.5` (fallback for hidden build/plan/general). `small_model` and `agent.title` use `github-copilot/gpt-6-luna` (title at variant `low`); `agent.compaction` uses `github-copilot/claude-opus-5.5` to match the dominant session model. No auto-update — run `opencode models` and edit `opencode.jsonc` when a better default ships.
+**Default model:** `github-copilot/claude-sonnet-5.5` (fallback for hidden build/plan/general). `small_model` and `agent.title` use `github-copilot/gpt-6-luna` (title at variant `low`); `agent.compaction` uses `github-copilot/gpt-6-luna`. No auto-update — run `opencode models` and edit `opencode.jsonc` when a better default ships.
 
 **Hidden built-in agents:** `build`, `plan`, and `general` are hidden via `opencode.jsonc`. The LOTR roster covers their roles (aragorn for build, plan-author skill for planning, Gandalf for general orchestration).
 
@@ -306,33 +261,23 @@ Design rationale lives in [`docs/adr/0002-lm-studio-local-models.md`](docs/adr/0
 
 - `local-models.sh verify` calls `start` first, so it may start the LM Studio server. It never loads a model.
 - `local-models.sh load <alias>` loads a model into memory (estimate first; may prompt).
-- `opensession --local` prepares the LM Studio endpoint only. It does not load models, does not route agents to local models, and does not restart the OpenCode daemon unless `--restart` is also passed.
-- The OpenCode daemon freezes config at boot, so after editing `provider.lmstudio` use `opensession --local --restart` (or accept `openattach`'s stale-daemon prompt) to reload it.
+- OpenCode V2 reads the provider roster from `opencode.jsonc` and watches config changes. If a running session has not picked up an edit, use `/reload` or `opencode reload`; do not restart the service just to reload provider config.
 
 **Current state:** `opencode.jsonc` and the script mapping list four models: `gpt-oss-120b` (`local/gpt-oss-120b`), `qwen3.5-122b-a10b` (`local/qwen3.5-122b-a10b`), `qwen3.8-27b` (`local/qwen3.8-27b`, MLX 8-bit), and `qwen3-coder-next` (`local/qwen3-coder-next`, MLX 6-bit). The earlier `ministral-3b`, `qwen3-vl-8b`, and `qwen3-vl-30b` entries have been removed from both repos.
 
 **Context windows:** `local/qwen3.8-27b` is configured at `limit.context` **131072** / `limit.output` **8192**; the other three stay at **32768** / **8192**. `local-models.sh load <alias>` defaults to the same per-alias context that `verify` expects in `opencode.jsonc` (one lookup in the script, `model_context_length`), so a default load matches OpenCode. `--context-length N` overrides only that load and never edits config; a runtime context **lower** than OpenCode's `limit.context` leaves OpenCode budgeting for a window the loaded model does not have. DCP budgets for Qwen are described in the DCP section above (`lmstudio/local/qwen3.8-27b` 65536/49152).
 
-**Reloading Qwen at 131072** (manual; nothing runs automatically): `local-models.sh unload qwen3.8-27b`, then `local-models.sh load qwen3.8-27b` (defaults to 131072; read the estimate and confirm — LM Studio's estimate can show identical memory at every context size with `LOW` confidence, so it does not reflect the KV-cache peak), then restart OpenCode freshly (`opensession --local --restart`) so `opencode.jsonc` and `dcp.jsonc` reload. Memory and speed at 128K are still to be validated in use.
+**Reloading Qwen at 131072** (manual; nothing runs automatically): `local-models.sh unload qwen3.8-27b`, then `local-models.sh load qwen3.8-27b` (defaults to 131072; read the estimate and confirm — LM Studio's estimate can show identical memory at every context size with `LOW` confidence, so it does not reflect the KV-cache peak). If OpenCode has not picked up a provider/config edit, use `/reload` or `opencode reload`. Memory and speed at 128K are still to be validated in use.
 
-## Setup (fresh machine)
+## Runtime and package versions
 
-This config uses **npm** (not Bun) and pins all dependency versions for reproducibility. Recent OpenCode versions install plugin/config dependencies via npm/Arborist internally, so npm is the right tool here.
+The current runtime is pinned to OpenCode V2.1.4 at
+`~/.local/opt/opencode-v2-2.1.4/bin/opencode`; invoke that binary directly.
+The native runtime does not need the V1 PATH wrapper. Do not run
+`bin/install-wrapper.sh`.
 
-```bash
-# 1. Install the Node version pinned by .nvmrc via nvm
-nvm install
-cd ~/.config/opencode
-nvm use                    # picks up .nvmrc
-
-# 2. Enable Corepack (one-time, system-level) so the packageManager field takes effect
-corepack enable
-
-# 3. Install dependencies
-npm install
-```
-
-`engines.node` declares the supported Node range and `packageManager` pins npm in `package.json`. Corepack will shim the right npm version automatically once enabled.
+The tracked npm manifests pin local plugin-development dependencies. They do
+not replace the native binary or define the global configuration roots.
 
 ### Pinned vs floating versions
 
@@ -361,11 +306,11 @@ Things that are intentionally pending or under iteration:
 
 | Asset | Path | Notes |
 |-------|------|-------|
-| Skill | `skill/<name>/SKILL.md` | Frontmatter description must be sharp — that's what triggers auto-invocation. See [`docs/skill-authoring.md`](docs/skill-authoring.md) for the authoring rubric |
-| Command | `command/<name>.md` | Frontmatter `description` is shown in the slash menu; body is the prompt |
-| Agent | `agent/<name>.md` | Frontmatter: `model`, `description`, `variant`, `mode` (`primary`/`subagent`), optional `permission`. `variant` sets reasoning effort (`low`/`medium`/`high`/`xhigh`/`max`, depending on what the model supports). Don't set `temperature` (Claude 5.5 / GPT-6 models don't support it), and don't set both `variant` and `reasoningEffort` |
+| Skill | `skills/<name>/SKILL.md` | Frontmatter description must be sharp — that's what triggers auto-invocation. See [`docs/skill-authoring.md`](docs/skill-authoring.md) for the authoring rubric |
+| Command | `commands/<name>.md` | Frontmatter `description` is shown in the slash menu; body is the prompt |
+| Agent | `agents/<name>.md` | Frontmatter: `model: provider/model#variant`, `description`, `mode` (`primary`/`subagent`), and optional ordered `permissions` rules. Keep the reasoning variant in `model`; do not add a separate `variant` field. Don't set `temperature` for models that do not support it. |
 | Instruction | `instruction/<name>.md` + entry in `opencode.jsonc` `instructions[]` | Loaded into every agent's context — keep them short and high-signal |
 | MCP | `opencode.jsonc` `mcp.<name>` | Add inline under the `mcp` key. `type: "local"` (with `command`) or `"remote"` (with `url`). Optionally drop a reference snippet at `mcp/<name>/mcp.json` for diffability — but the inline entry is what OpenCode actually loads. |
 | Plugin | `plugins/<name>.ts` | Import from `@opencode-ai/plugin`; export default a Plugin function |
 
-Per-project overrides go in `<repo>/.opencode/` and "local wins" — a local skill/command of the same name supersedes the global one.
+Per-project overrides go in `<repo>/.opencode/` and "local wins" — project-local assets can supersede global assets of the same name.

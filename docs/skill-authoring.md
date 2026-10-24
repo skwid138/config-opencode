@@ -170,7 +170,7 @@ Each rule in a skill should defend against an observed failure mode. Decorative 
 | Layer | Purpose | Examples |
 |-------|---------|----------|
 | `AGENTS.md` / `instruction/` | Durable, repo-wide expectations | TDD default, commit rules, honest-disagreement posture |
-| Skills (`skill/`) | Repeatable task workflows | TDD cycle, PR review, ticket planning |
+| Skills (`skills/`) | Repeatable task workflows | TDD cycle, PR review, ticket planning |
 | MCP / tools | Live external data that changes frequently | Jira, GitHub, SonarCloud, Chrome DevTools |
 | Scripts (in skills) | Deterministic validation / discovery | Test-command detection, branch-to-ticket extraction |
 
