@@ -1,7 +1,7 @@
 node_modules
 
 # OpenCode remote skills plugin
-skill/_plugins/
+skills/_plugins/
 
 # Used by DCP
 logs/
@@ -9,3 +9,4 @@ logs/**/*
 logs/**/**/*
 
 .project-plans
+/service.json

@@ -19,17 +19,18 @@
             "description": "Hidden by local config"
         },
         "compaction": {
-            "model": "github-copilot/claude-opus-5.5"
+            "model": "github-copilot/gpt-6-luna"
         },
         "title": {
             "model": "github-copilot/gpt-6-luna",
             "variant": "low"
         }
     },
+    "default_agent": "gandalf",
     "instructions": [
-        "instruction/repo-context.md",
-        "instruction/script-usage.md",
-        "instruction/agent-defaults.md"
+        "/Users/hunter/.config/opencode/instruction/repo-context.md",
+        "/Users/hunter/.config/opencode/instruction/script-usage.md",
+        "/Users/hunter/.config/opencode/instruction/agent-defaults.md"
     ],
     "permission": {
         "external_directory": {
@@ -56,8 +57,7 @@
             "*wpromute*": "deny"
         },
         "edit": "ask",
-        "write": "ask",
-        "bash": {
+        "shell": {
             "*": "ask",
             "bats": "allow",
             "bun test*": "allow",
@@ -387,51 +387,52 @@
             "sed -i*": "deny",
             "sudo *": "deny",
             "*wpromute*": "deny"
-        }
+        },
+        "subagent": "deny"
     },
     "plugin": [
         "@tarquinen/opencode-dcp@3.2.0",
         [
-            "@skwid138/opencode-command-normalizer@0.2.0",
+            "@skwid138/opencode-command-normalizer@0.3.0",
             {
                 "roots": [
                     "~/code/scripts/agent",
                     "~/code/wpromote/scripts/agent"
                 ]
             }
-        ],
-        "./plugins/src/vision-tool.ts",
-        [
-            "@skwid138/opencode-council@0.10.0",
-            {
-                "council": {
-                    "reviewer": "saruman",
-                    "debug": true,
-                    "models": [
-                        {
-                            "providerID": "github-copilot",
-                            "modelID": "claude-opus-5.5"
-                        },
-                        {
-                            "providerID": "github-copilot",
-                            "modelID": "gemini-3.8-flash"
-                        },
-                        {
-                            "providerID": "github-copilot",
-                            "modelID": "gpt-6.1-sol"
-                        }
-                    ],
-                    "aggregator_model": {
-                        "providerID": "github-copilot",
-                        "modelID": "gpt-6.1-sol"
-                    },
-                    "quorum": 3,
-                    "timeouts": {
-                        "aggregator_ms": 120000
-                    }
-                }
-            }
-        ]
+        ]//,
+        //"./plugins/src/vision-tool.ts",
+        // [
+        //     "@skwid138/opencode-council@0.10.0",
+        //     {
+        //         "council": {
+        //             "reviewer": "saruman",
+        //             "debug": true,
+        //             "models": [
+        //                 {
+        //                     "providerID": "github-copilot",
+        //                     "modelID": "claude-opus-5.5"
+        //                 },
+        //                 {
+        //                     "providerID": "github-copilot",
+        //                     "modelID": "gemini-3.8-flash"
+        //                 },
+        //                 {
+        //                     "providerID": "github-copilot",
+        //                     "modelID": "gpt-6.1-sol"
+        //                 }
+        //             ],
+        //             "aggregator_model": {
+        //                 "providerID": "github-copilot",
+        //                 "modelID": "gpt-6.1-sol"
+        //             },
+        //             "quorum": 3,
+        //             "timeouts": {
+        //                 "aggregator_ms": 120000
+        //             }
+        //         }
+        //     }
+        // ]
     ],
     "provider": {
         "lmstudio": {
@@ -510,17 +511,17 @@
                 "--browserUrl",
                 "http://127.0.0.1:9222"
             ],
-            "enabled": true
+            "enabled": false
         },
         "context7": {
             "type": "remote",
             "url": "https://mcp.context7.com/mcp",
-            "enabled": true
+            "enabled": false
         },
         "exa": {
             "type": "remote",
             "url": "https://mcp.exa.ai/mcp",
-            "enabled": true
+            "enabled": false
         },
         "figma": {
             "type": "remote",

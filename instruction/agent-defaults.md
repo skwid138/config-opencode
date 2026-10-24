@@ -67,7 +67,7 @@ After Aragorn completes non-trivial work, Gandalf should load the `post-impl-aud
 Detection precedence:
 1. Explicit user request always wins (phrasing like "audit the implementation", "check Aragorn's work", or "post-impl review"), even for work the rubric classes as trivial.
 2. Gandalf auto-dispatches for non-trivial work after Aragorn completes and before Verify.
-3. Skip for work matching either trivial class in Gandalf's triage rubric (`agent/gandalf.md`): ordinary trivial work or a qualifying diagnostic probe.
+3. Skip for work matching either trivial class in Gandalf's triage rubric (`agents/gandalf.md`): ordinary trivial work or a qualifying diagnostic probe.
 
 ## Architecture review
 
@@ -119,7 +119,7 @@ A loaded skill's explicitly prescribed invocation takes precedence over these pr
 
 Not overridable by any skill.
 
-- Agents without write access never write files via bash (redirects, `tee`, `sed -i`, `sort -o`, heredoc-to-file). Two exceptions: saving a sanctioned script's stdout to the session temp dir (the path named in the bash tool description) when a skill requires it; and Gandalf may run `git add`/`git commit` on explicit user request per `agent/gandalf.md`.
+- Agents without write access never write files via bash (redirects, `tee`, `sed -i`, `sort -o`, heredoc-to-file). Two exceptions: saving a sanctioned script's stdout to the session temp dir (the path named in the bash tool description) when a skill requires it; and Gandalf may run `git add`/`git commit` on explicit user request per `agents/gandalf.md`.
 - Reviewer/research agents (saruman, legolas, radagast) never invoke mutating scripts, including with `--dry-run`.
 - Never work around a permission prompt or deny by rephrasing the command.
 

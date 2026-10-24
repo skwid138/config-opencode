@@ -1,6 +1,6 @@
 # Instrumentation
 
-How to design probes that produce signal without producing noise — and how they get installed, run, and removed. This file is the canonical home for the probe contract, ledger, and cleanup gate; `SKILL.md` and `feedback-loops.md` point here. Whether a probe dispatch skips Saruman review is defined only in the `agent/gandalf.md` triage rubric ("Trivial — diagnostic probe").
+How to design probes that produce signal without producing noise — and how they get installed, run, and removed. This file is the canonical home for the probe contract, ledger, and cleanup gate; `SKILL.md` and `feedback-loops.md` point here. Whether a probe dispatch skips Saruman review is defined only in the `agents/gandalf.md` triage rubric ("Trivial — diagnostic probe").
 
 ## Roles
 

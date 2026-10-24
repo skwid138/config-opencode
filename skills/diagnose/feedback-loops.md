@@ -41,6 +41,6 @@ Stop and say so explicitly. List what you tried. Ask the user for one of:
 
 - **Access** to whatever environment reproduces it (staging, a customer's data, a specific machine).
 - **A captured artifact** — HAR file, log dump, core dump, screen recording with timestamps, OpenTelemetry trace export.
-- **Permission to add temporary production instrumentation** — but only if the user owns the system and explicitly authorises it. This is a mutation; it crosses the read-only line and is never a probe-class exemption. It is executed by the user or by Aragorn through the full plan cycle (see the `agent/gandalf.md` triage rubric).
+- **Permission to add temporary production instrumentation** — but only if the user owns the system and explicitly authorises it. This is a mutation; it crosses the read-only line and is never a probe-class exemption. It is executed by the user or by Aragorn through the full plan cycle (see the `agents/gandalf.md` triage rubric).
 
 Do **not** proceed to hypothesise without a loop. Hypothesising without a loop is just guessing in a more elaborate format.

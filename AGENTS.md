@@ -1,14 +1,18 @@
 # AGENTS.md — OpenCode Personal Config
 
+## Conditional Wpromote context
+
+Before doing any work under `/Users/hunter/code/wpromote/`, read the authoritative `/Users/hunter/.config/opencode/instruction/wpromote-context.md`. Do not load that context when working outside the Wpromote tree.
+
 ## Agent Roster
 
 | Agent | Role | Model | Write Access |
 |-------|------|-------|-------------|
-| **gandalf** | Primary orchestrator — intent classification, planning, delegation | github-copilot/claude-opus-5.5 (medium) | no (commits on explicit request) |
-| **legolas** | Codebase exploration & call-path discovery | github-copilot/gpt-6-luna (medium) | no |
-| **radagast** | External docs / OSS research | github-copilot/gpt-6.1-sol (high) | no |
-| **aragorn** | Autonomous end-to-end implementation; sole writer | github-copilot/claude-opus-5.5 (high) | **yes** |
-| **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | github-copilot/gpt-6.1-sol (high) | no |
+| **gandalf** | Primary orchestrator — intent classification, planning, delegation | `github-copilot/claude-opus-5.5#medium` | no (commits on explicit request) |
+| **legolas** | Codebase exploration & call-path discovery | `github-copilot/gpt-6-luna#medium` | no |
+| **radagast** | External docs / OSS research | `github-copilot/gpt-6-luna#high` | no |
+| **aragorn** | Autonomous end-to-end implementation; sole writer | `github-copilot/gpt-6-luna#high` | **yes** |
+| **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | `github-copilot/gpt-6-luna#high` | no |
 
 ## Skills (29)
 
@@ -44,8 +48,8 @@
 | `triage` | GitHub issue triage state machine for personal non-Wpromote repos |
 | `zoom-out` | Higher-abstraction module/caller map in domain-glossary terms |
 
-Skills live in `skill/<name>/SKILL.md`. They inject context only when triggered.
-Borrowed/upstream skill provenance is tracked in `skill/UPSTREAM-REGISTRY.md`.
+Skills live in `skills/<name>/SKILL.md`. They inject context only when triggered.
+Borrowed/upstream skill provenance is tracked in `skills/UPSTREAM-REGISTRY.md`.
 
 ## Coding Conventions
 
@@ -87,12 +91,12 @@ Borrowed/upstream skill provenance is tracked in `skill/UPSTREAM-REGISTRY.md`.
 ```
 ~/.config/opencode/
 ├── opencode.jsonc         # Model, MCPs, plugins, permissions
-├── agent/                 # Agent definitions (frontmatter + system prompt)
-├── command/               # Slash commands (thin wrappers around skills)
-├── skill/                 # Skill library (29 skills)
+├── agents/                # Agent definitions (frontmatter + system prompt)
+├── commands/              # Slash commands (thin wrappers around skills)
+├── skills/                # Skill library (29 skills)
 ├── instruction/           # Auto-loaded context for all agents
 ├── plugins/               # Local TypeScript plugins
-├── bin/                   # Launcher wrapper infrastructure
+├── bin/                   # Legacy wrapper installer and native binary link
 ├── mcp/                   # Reference-only MCP snippets
 ├── docs/                  # Reference documentation (skill authoring, etc.)
 └── dcp.jsonc              # Dynamic Context Pruning config

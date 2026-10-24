@@ -125,7 +125,7 @@ writes route through Aragorn:
 
 - **Naming a deepened module after a concept not in `CONTEXT.md`?** Propose the
   term for `CONTEXT.md` — same discipline as the `grill-with-docs` skill (see
-  `skill/grill-with-docs/context-format.md`). Aragorn creates or updates the
+  `skills/grill-with-docs/context-format.md`). Aragorn creates or updates the
   file after confirmation.
 - **Sharpening a fuzzy term during the conversation?** Stage the CONTEXT.md
   update immediately, then route the approved write to Aragorn.
@@ -134,7 +134,7 @@ writes route through Aragorn:
   don't re-suggest it?"_ Only offer when the reason would actually be needed by
   a future explorer to avoid re-suggesting the same thing — skip ephemeral
   reasons ("not worth it right now") and self-evident ones. See
-  `skill/grill-with-docs/adr-format.md`. Aragorn writes approved ADRs.
+  `skills/grill-with-docs/adr-format.md`. Aragorn writes approved ADRs.
 - **Want to explore alternative interfaces for the deepened module?** See [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md) for the parallel-sub-agent design exploration.
 
 ### 4. Hand off

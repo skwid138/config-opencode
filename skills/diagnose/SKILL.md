@@ -30,7 +30,7 @@ probes (tagged debug lines, throwaway harnesses, captures, `git bisect`) are
 Aragorn via Gandalf. Legolas or Saruman running this skill gain no new powers;
 they return probe designs to Gandalf. A qualifying probe-only dispatch is a
 trivial class that skips Saruman review — the definition lives only in the
-`agent/gandalf.md` triage rubric ("Trivial — diagnostic probe"). Probe design,
+`agents/gandalf.md` triage rubric ("Trivial — diagnostic probe"). Probe design,
 Aragorn's probe contract, the ledger, and the cleanup gate live in
 [instrumentation.md](instrumentation.md).
 

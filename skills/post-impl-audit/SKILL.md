@@ -32,7 +32,7 @@ dispatch. Aragorn addresses any REVISE findings through Gandalf's workflow.
 ## When to skip
 
 Skip only for work that matches one of the two trivial classes in Gandalf's
-triage rubric (`agent/gandalf.md`): ordinary trivial work, or a qualifying
+triage rubric (`agents/gandalf.md`): ordinary trivial work, or a qualifying
 diagnostic probe. The rubric is the single definition; do not restate it here.
 
 If qualification is borderline or uncertain, treat it as non-trivial and audit.

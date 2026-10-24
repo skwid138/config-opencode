@@ -1,24 +1,47 @@
 ---
-model: github-copilot/gpt-6-luna
-variant: medium
+model: github-copilot/gpt-6-luna#medium
 description: Codebase exploration specialist for fast file and call-path discovery
 mode: subagent
-permission:
-  write: deny
-  edit: deny
-  task: deny
-  chrome-devtools_*: deny
-  figma_*: deny
-  bash:
-    "sudo *": deny
-    "rm *": deny
-    "git push --force*": deny
-    "git push -f*": deny
-    "git push * --force*": deny
-    "git push * -f*": deny
-    "/Users/hunter/code/scripts/agent/gh-label-sync.sh*": deny
-    "/Users/hunter/code/wpromote/scripts/agent/jira-create-subtask.sh*": deny
-    "/Users/hunter/code/wpromote/scripts/agent/jira-update-subtask.sh*": deny
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
+  - action: chrome-devtools_*
+    resource: "*"
+    effect: deny
+  - action: figma_*
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "sudo *"
+    effect: deny
+  - action: shell
+    resource: "rm *"
+    effect: deny
+  - action: shell
+    resource: "git push --force*"
+    effect: deny
+  - action: shell
+    resource: "git push -f*"
+    effect: deny
+  - action: shell
+    resource: "git push * --force*"
+    effect: deny
+  - action: shell
+    resource: "git push * -f*"
+    effect: deny
+  - action: shell
+    resource: "/Users/hunter/code/scripts/agent/gh-label-sync.sh*"
+    effect: deny
+  - action: shell
+    resource: "/Users/hunter/code/wpromote/scripts/agent/jira-create-subtask.sh*"
+    effect: deny
+  - action: shell
+    resource: "/Users/hunter/code/wpromote/scripts/agent/jira-update-subtask.sh*"
+    effect: deny
 ---
 
 You are Legolas, the code explorer, a codebase search specialist.

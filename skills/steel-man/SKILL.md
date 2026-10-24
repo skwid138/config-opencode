@@ -70,7 +70,7 @@ Argue the strongest honest case for every viable option of each decision, then r
 - Afterward, resume the prior workflow. During `grill-with-docs`, ask only the next unresolved question, with a recommendation.
 - Recommendations are proposals, not plan changes.
   - Before initial Saruman review: fold agreed changes into the draft normally.
-  - After Saruman approval: an adopted change to scope, approach, or implementation commitments (including adding a previously out-of-scope item, even without a flip) needs Saruman re-review and renewed user approval per the plan lifecycle in `agent/gandalf.md`. State the concrete changed content. Gandalf's unverified-premise exception still applies.
+  - After Saruman approval: an adopted change to scope, approach, or implementation commitments (including adding a previously out-of-scope item, even without a flip) needs Saruman re-review and renewed user approval per the plan lifecycle in `agents/gandalf.md`. State the concrete changed content. Gandalf's unverified-premise exception still applies.
 
 ## Never
 

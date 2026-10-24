@@ -16,9 +16,9 @@ Invocation rules that avoid needless permission prompts:
 - General bash hygiene (wrappers, compound commands, loops) lives in
   `instruction/agent-defaults.md` → "Bash invocation hygiene".
 
-When working under `~/code/wpromote/`, additional Wpromote-internal scripts
-under `~/code/wpromote/scripts/` are documented in `wpromote-context.md`,
-which is loaded conditionally by the OpenCode launcher wrapper.
+When working under `~/code/wpromote/`, the root `AGENTS.md` directs agents to
+read `instruction/wpromote-context.md`. Do not load that context outside the
+Wpromote tree.
 
 ## Layout
 
