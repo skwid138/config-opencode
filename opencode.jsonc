@@ -434,10 +434,10 @@
         //     }
         // ]
     ],
-    "provider": {
+    "providers": {
         "lmstudio": {
-            "npm": "@ai-sdk/openai-compatible",
-            "options": {
+            "package": "@opencode/ai/providers/openai-compatible",
+            "settings": {
                 "baseURL": "http://127.0.0.1:1234/v1"
             },
             "models": {
@@ -472,15 +472,19 @@
             }
         },
         "peesea": {
-            "npm": "@ai-sdk/openai-compatible",
-            "options": {
+            "package": "@opencode/ai/providers/openai-compatible",
+            "settings": {
                 "baseURL": "http://192.168.50.66:1234/v1",
                 "apiKey": "{file:~/.secrets/lmstudio-4090-key}"
             },
             "models": {
                 "qwen3-coder-4090": {
                     "name": "Qwen3-Coder 30B Q4 (4090)",
-                    "tool_call": true,
+                    "capabilities": {
+                        "tools": true,
+                        "input": ["text"],
+                        "output": ["text"]
+                    },
                     "limit": { "context": 81920, "output": 8192 }
                 }
             }
