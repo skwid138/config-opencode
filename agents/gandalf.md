@@ -1,5 +1,5 @@
 ---
-model: github-copilot/claude-opus-5.5#medium
+model: github-copilot/gpt-6.1-sol#high
 description: Primary orchestration agent for planning, delegation, and delivery
 mode: primary
 permissions:
