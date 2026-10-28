@@ -24,13 +24,13 @@ OpenCode V2 reads global assets from the standard plural roots under
 │   └── saruman.md               # Adversarial reviewer subagent
 ├── commands/                    # Global slash commands that drive skills
 │   ├── jira-ticket.md, jira-plan.md, plan-author.md
-│   ├── jira-ac-quality.md, jira-add-imp-plan.md, jira-qa-subtask.md
+│   ├── jira-ac-quality.md, jira-add-imp-plan.md, jira-qa-results.md, jira-qa-subtask.md
 │   ├── review.md, review-plan.md, sonar.md, bug-hunt.md
 │   └── scripts-doctor.md, update-opencode-deps.md
-├── skills/                      # Global skill library (29 tracked skills)
+├── skills/                      # Global skill library (30 tracked skills)
 │   ├── bug-hunter/, chrome-devtools/, diagnose/, figma/
 │   ├── gh-fetch-pr-comments/, github-review-analyzer/, grill-me/, grill-with-docs/
-│   ├── improve-codebase-architecture/, jira-enhance/, jira-ticket/, plan-author/
+│   ├── improve-codebase-architecture/, jira-enhance/, jira-qa-results/, jira-ticket/, plan-author/
 │   ├── post-impl-audit/, pr-review/, prototype/, jira-qa-subtask/, sonarcloud/, tdd/
 │   └── jira-plan/
 ├── instruction/                 # Auto-loaded into every agent's context
@@ -91,6 +91,7 @@ planning, Jira comments, and QA subtask generation are visibly separated.
 ### QA
 | Command | Skill | What it does |
 |---------|-------|-------------|
+| `/jira-qa-results` | jira-qa-results | Prepare a Jira ADF comment preview from completed QA evidence; publishing is gated and not the default |
 | `/jira-qa-subtask [ticket] [--push]` | jira-qa-subtask | Generate a Jira QA subtask description from ticket AC + PR/code context; previews by default with a local render envelope and gates Jira mutations |
 | `/release-deploy-checks [ticket...]` | release-deploy-checks | Draft pasteable per-ticket prod deploy-check blurbs (chat only) from read-only ticket, git, and live tst/prod evidence; lists sprint tickets for selection when no keys are given |
 
@@ -124,6 +125,7 @@ planning, Jira comments, and QA subtask generation are visibly separated.
 | `github-review-analyzer` | "triage PR comments", deep PR review analysis with codebase context and Gandalf action-plan handoff |
 | `jira-enhance` | "improve AC", "flesh out ticket", AC-quality audits |
 | `jira-ticket` | Any Jira ticket ID or URL for summary/scope/estimate; implementation routes to jira-plan/Aragorn |
+| `jira-qa-results` | Report completed QA evidence or prepare a Jira comment preview; does not execute QA |
 | `pr-review` | "review my PR", "does my code satisfy the AC" |
 | `prototype` | "prototype this", "let me play with it", "try a few designs", sanity-check data models or UI options |
 | `sonarcloud` | "what did sonar find", static-analysis triage |

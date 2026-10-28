@@ -14,7 +14,7 @@ Before doing any work under `/Users/hunter/code/wpromote/`, read the authoritati
 | **aragorn** | Autonomous end-to-end implementation; sole writer | `github-copilot/gpt-6-luna#high` | **yes** |
 | **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | `github-copilot/gpt-6-luna#high` | no |
 
-## Skills (29)
+## Skills (30)
 
 | Skill | Description |
 |-------|-------------|
@@ -31,6 +31,7 @@ Before doing any work under `/Users/hunter/code/wpromote/`, read the authoritati
 | `improve-codebase-architecture` | System-level architecture review and deepening-opportunity scan |
 | `jira-enhance` | Audit and improve Jira acceptance criteria quality |
 | `jira-plan` | Chat-first multi-codebase implementation planning from Jira tickets |
+| `jira-qa-results` | Prepare a Jira ADF comment preview from completed QA evidence; publishing is gated and not default |
 | `jira-qa-subtask` | Generate QA subtask descriptions from AC + implementing PR |
 | `jira-ticket` | Fetch and summarize Jira tickets for summary/estimation |
 | `manual-qa` | Evidence-based browser QA of a running web app against Jira ACs via Chrome DevTools |
@@ -60,8 +61,9 @@ Borrowed/upstream skill provenance is tracked in `skills/UPSTREAM-REGISTRY.md`.
 - Refer to `instruction/script-usage.md` for available shell scripts and conventions.
 - In this repo, `~` expands to `/Users/hunter`; script invocations should use absolute paths or `$HOME` paths.
 - Jira-facing commands use a `jira-` prefix (`/jira-ticket`, `/jira-plan`,
-  `/jira-ac-quality`, `/jira-add-imp-plan`, `/jira-qa-subtask`) so ticket reads,
-  planning, Jira comments, and QA subtask generation are visibly separated.
+  `/jira-ac-quality`, `/jira-add-imp-plan`, `/jira-qa-results`,
+  `/jira-qa-subtask`) so ticket reads, planning, completed-QA evidence
+  reporting, Jira comments, and QA subtask generation are visibly separated.
 
 ## Git Workflow
 
@@ -93,7 +95,7 @@ Borrowed/upstream skill provenance is tracked in `skills/UPSTREAM-REGISTRY.md`.
 ├── opencode.jsonc         # Model, MCPs, plugins, permissions
 ├── agents/                # Agent definitions (frontmatter + system prompt)
 ├── commands/              # Slash commands (thin wrappers around skills)
-├── skills/                # Skill library (29 skills)
+├── skills/                # Skill library (30 skills)
 ├── instruction/           # Auto-loaded context for all agents
 ├── plugins/               # Local TypeScript plugins
 ├── bin/                   # Legacy wrapper installer and native binary link
