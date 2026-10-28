@@ -443,30 +443,91 @@
             "models": {
                 "local/qwen3.8-27b": {
                     "name": "Qwen3.8 27B MLX 8-bit (LM Studio)",
+                    "modelID": "qwen/qwen3.8-27b",
                     "limit": {
                         "context": 131072,
-                        "output": 8192
+                        "output": 16384
+                    },
+                    "body": {
+                        "temperature": 1,
+                        "top_p": 0.95,
+                        "top_k": 20
+                    }
+                },
+                "local/qwen3.8-27b-splash": {
+                    "name": "Qwen3.8 27B Splash (LM Studio)",
+                    "modelID": "qwen3.8-27b-splash",
+                    "limit": {
+                        "context": 131072,
+                        "output": 16384
+                    },
+                    "body": {
+                        "temperature": 1,
+                        "top_p": 0.95,
+                        "top_k": 20
+                    }
+                },
+                // Experimental context target; 131072 runtime fit is unverified.
+                "local/qwen3.8-flash-next-gsq-rco": {
+                    "name": "Qwen3.8 Flash Next GSQ RCO (LM Studio)",
+                    "modelID": "qwen3.8-flash-next-gsq-rco",
+                    "limit": {
+                        "context": 131072,
+                        "output": 16384
+                    },
+                    "body": {
+                        "temperature": 1,
+                        "top_p": 0.95,
+                        "top_k": 20
                     }
                 },
                 "local/qwen3-coder-next": {
                     "name": "Qwen3 Coder Next MLX 6-bit (LM Studio)",
+                    "modelID": "qwen/qwen3-coder-next",
+                    "capabilities": {
+                        "tools": true,
+                        "input": ["text"],
+                        "output": ["text"],
+                        "reasoning": { "supported": false }
+                    },
                     "limit": {
-                        "context": 32768,
+                        "context": 131072,
                         "output": 8192
+                    },
+                    "body": {
+                        "temperature": 1,
+                        "top_p": 0.95,
+                        "top_k": 40
                     }
                 },
                 "local/qwen3.5-122b-a10b": {
                     "name": "Qwen3.5 122B A10B (LM Studio)",
+                    "modelID": "qwen_qwen3.5-122b-a10b",
                     "limit": {
-                        "context": 32768,
-                        "output": 8192
+                        "context": 131072,
+                        "output": 16384
+                    },
+                    "body": {
+                        "temperature": 0.6,
+                        "top_p": 0.95,
+                        "top_k": 20
                     }
                 },
                 "local/gpt-oss-120b": {
                     "name": "GPT-OSS 120B (LM Studio)",
+                    "modelID": "gpt-oss-120b",
+                    "capabilities": {
+                        "input": ["text"],
+                        "output": ["text"]
+                    },
                     "limit": {
-                        "context": 32768,
-                        "output": 8192
+                        "context": 131072,
+                        "output": 16384
+                    },
+                    "body": {
+                        "temperature": 1,
+                        "top_p": 1,
+                        "top_k": 0
                     }
                 }
             }
