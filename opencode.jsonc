@@ -467,6 +467,26 @@
                         "top_k": 20
                     }
                 },
+                "local/qwen3.6-35b-a3b-splash": {
+                    "name": "Qwen3.6 35B A3B Splash (LM Studio)",
+                    "modelID": "qwen3.6-35b-a3b-splash",
+                    "capabilities": {
+                        "tools": true,
+                        "input": ["text", "image"],
+                        "output": ["text"]
+                    },
+                    "limit": {
+                        "context": 131072,
+                        "output": 16384
+                    },
+                    "body": {
+                        "temperature": 0.6,
+                        "top_p": 0.95,
+                        "top_k": 20,
+                        "repeat_penalty": 1,
+                        "presence_penalty": 0
+                    }
+                },
                 // Experimental context target; 131072 runtime fit is unverified.
                 "local/qwen3.8-flash-next-gsq-rco": {
                     "name": "Qwen3.8 Flash Next GSQ RCO (LM Studio)",
