@@ -136,14 +136,25 @@ than merging them. Evidence fields record action, method/path, state, observatio
 window, limits, and artifact. Builder and publisher reject common POSIX roots
 (including `/Users`, `/Volumes`, `/mnt`, `/private/var`, `/tmp`, and
 `/var/folders`), drive-letter and UNC paths, dot-relative paths, and `file://`
-references in ADF-visible text. `evidence.path` is separate: it accepts an
-HTTP(S) URL, a root-relative API route such as `/api/items`, or a textual marker
-without separators. `evidence.artifact` accepts textual markers/descriptions
-without slash or backslash characters, or an HTTP(S) URL; it is not a local-path
-field. The publisher validates the evidence table's Path and Artifact cells
-against those rules. These checks are conservative and pattern-based, not
-universal path recognition. They do not detect every secret or prove semantic
-redaction, so review free text and URLs before preview.
+references in ADF-visible text. They also reject bare relative slash- or
+backslash-separated file-like tokens ending in this finite, case-insensitive
+extension set: `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg`, `.pdf`, `.json`,
+`.txt`, `.log`, `.csv`, `.zip`, `.har`, and `.mp4`. Examples include
+`screenshots/private.png` and `reports/retained-data.json`, including when
+surrounded by punctuation or quotes. This extension check is bounded, not a
+universal filesystem-path or secret detector. It does not impose a blanket ban
+on slashes: root-relative API routes such as `/api/file.json`, HTTP(S) URLs
+(including URL paths), `ENV-1/build-1`, and ordinary slash-containing prose
+remain valid. HTTP(S) URLs are excluded from this freeform-text scan as a whole.
+
+`evidence.path` has its separate field policy: it accepts an HTTP(S) URL, a
+root-relative API route such as `/api/items` (including routes with file
+suffixes), or a textual marker without separators. `evidence.artifact` accepts
+textual markers/descriptions without slash or backslash characters, or an
+HTTP(S) URL; it is not a local-path field. The publisher validates the evidence
+table's Path and Artifact cells against those field rules. All checks are
+conservative and pattern-based; they do not detect every secret or prove
+semantic redaction, so review free text and URLs before preview.
 
 ## Canonical report and ADF
 
@@ -192,8 +203,13 @@ byte ceiling or promise the comment will be accepted.
 The stdout envelope has version 1 and these fields: `target_issue_key`,
 `parent_story`, generated bare `adf`, readable `preview`, `attachment_handoff`,
 and `body_digest`. The builder makes no Jira/network call and writes no files.
-The preview includes expand titles and generated ADF text in document order,
-separated by newlines.
+The preview includes standalone heading text, expand titles, and logical ADF
+text segments in document order, with segments separated by newlines. Within
+each paragraph the publisher concatenates adjacent text nodes in content order
+before path checking and preview generation, including paragraphs inside
+expands and table cells. Separate paragraphs, table cells, and expand titles
+remain separate segments and are never joined to invent a path. Character-limit
+accounting sums the lengths of those same logical segments.
 
 `body_digest` is lowercase SHA-256 over the canonical compact JSON serialization
 of the actual `adf` object, recursively key-sorted with `jq -cS`, followed by
