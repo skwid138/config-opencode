@@ -1,0 +1,55 @@
+{
+  "skill_name": "jira-qa-results",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Manual QA is complete. Prepare the local Jira ADF report preview from the supplied synthetic results. Keep the agent assessment distinct from QA sign-off and do not post anything.",
+      "expected_output": "A version-1 preview for the synthetic target with the completed AC, environment, evidence register, and explicit no-sign-off wording.",
+      "files": ["../../../../code/scripts/tests/fixtures/jira-qa-results/complete.json"],
+      "expectations": [
+        "The report includes the target and distinct parent story keys.",
+        "The verdict says agent assessment and not QA sign-off.",
+        "Environment, AC, subtask, and evidence sections are collapsible, while the three closers remain visible at top level.",
+        "The AC status and its evidence ID are preserved.",
+        "No Jira mutation is attempted."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Turn these completed results into a report preview. One acceptance criterion is only partially covered, CI is green, one human check is still needed, and the design comparison is unavailable. Do not convert CI into live QA or invent missing subtask steps.",
+      "expected_output": "A report that separates CI-only and human evidence, keeps the partial AC at Human double-check required, marks design Inconclusive, and states missing steps plainly.",
+      "files": ["../../../../code/scripts/tests/fixtures/jira-qa-results/partial-human-ci.json"],
+      "expectations": [
+        "The partial criterion is not Passed.",
+        "CI-only evidence remains labeled ci_only.",
+        "Design verification remains Inconclusive.",
+        "The report does not invent subtask steps."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Create a preview from these synthetic QA notes. Required data was unavailable, the approved subtask steps were not supplied, and authentication status was not checked. Keep blocked-data, not-run, and inconclusive results separate; make no auth call.",
+      "expected_output": "A report with Blocked by data for the AC, Not run for the unavailable steps, and Inconclusive for the unchecked authentication precondition.",
+      "files": ["../../../../code/scripts/tests/fixtures/jira-qa-results/not-run-blocked-data.json"],
+      "expectations": [
+        "The AC remains Blocked by data rather than Failed or Passed.",
+        "Unavailable subtask steps are not fabricated.",
+        "Authentication remains Inconclusive and no authentication call is made.",
+        "The report records why checks were not run."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Prepare a completed-QA report preview for these synthetic mixed-environment results. Preserve the defect, the observation that asserts no violation, the unresolved 403/404 requirement, CI/static distinctions, retained cleanup state, and unavailable attachment mapping. Do not upload or post.",
+      "expected_output": "A report separating DEV and CI/build evidence, defect facts, non-defect observation, unresolved requirement, cleanup residual, and the stable screenshot marker with unavailable path mapping.",
+      "files": ["../../../../code/scripts/tests/fixtures/jira-qa-results/mixed-findings-cleanup-attachment.json"],
+      "expectations": [
+        "DEV and CI results retain their separate environment/build references.",
+        "The defect, observation, and unresolved requirement remain distinct.",
+        "The retained cleanup item is not described as complete.",
+        "The screenshot marker is preserved without a local path in ADF.",
+        "No Jira post or attachment upload is attempted."
+      ]
+    }
+  ]
+}

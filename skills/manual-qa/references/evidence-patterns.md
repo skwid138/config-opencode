@@ -147,6 +147,9 @@ describes the unresolved requirement and list passed subchecks separately.
 
 ## Report template
 
+This is the generic plain-text report for the QA session, not the canonical Jira
+ADF comment. For the Jira ADF report, use the `jira-qa-results` skill below.
+
 ```markdown
 # <ticket> Manual QA Report
 
@@ -188,3 +191,10 @@ describes the unresolved requirement and list passed subchecks separately.
 ## Design verification
 <include the separate design table when applicable>
 ```
+
+## Final Jira ADF report
+
+When a user asks to turn completed QA evidence into the canonical Jira ADF
+report, follow the private `jira-qa-results` skill and its report/input
+contract. It formats the completed evidence only. It does not execute QA,
+replace this evidence ladder, provide QA sign-off, or post to Jira by default.

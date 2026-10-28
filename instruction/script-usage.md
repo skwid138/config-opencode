@@ -48,6 +48,13 @@ Wpromote tree.
 | `/Users/hunter/code/scripts/agent/jira-sprint-tickets.sh` | List sprint tickets (read-only `acli` search) as JSON `{version:1,jql,count,limited,tickets:[{key,summary,status,type}]}`. Defaults: assignee `currentUser()`, all open sprints, all pages. `--status` is repeatable (OR). No components — use `jira-fetch-ticket.sh` per ticket. Exit 2 usage / 3 missing dep / 4 unauthed / 5 search failure or bad upstream output. | `/Users/hunter/code/scripts/agent/jira-sprint-tickets.sh --project KEY [--assignee 'currentUser()'\|EMAIL] [--sprint open\|ID] [--status NAME]... [--limit N]` |
 | `/Users/hunter/code/scripts/agent/opencode-deps-check.sh` | Check OpenCode config deps (`package.json` + `opencode.json`) for outdated/unpinned versions | `/Users/hunter/code/scripts/agent/opencode-deps-check.sh [--human\|--json]` |
 
+## Jira QA result reporting
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `/Users/hunter/code/scripts/agent/jira-qa-results-build.sh` | Pure local builder for completed QA evidence. Reads one structured JSON document (or stdin `-`), emits a version-1 ADF preview envelope; no Jira calls or file writes. | `/Users/hunter/code/scripts/agent/jira-qa-results-build.sh INPUT.json` |
+| `/Users/hunter/code/scripts/agent/jira-qa-results-publish.sh` | Validates and previews a saved envelope by default. `--write` requires one exact `--key` and the reviewed `--expected-digest`; one CLI invocation, no script retry or automated readback. | `/Users/hunter/code/scripts/agent/jira-qa-results-publish.sh ENVELOPE.json [--key ISSUE-KEY --expected-digest SHA256 --write]` |
+
 ## Library (`~/code/scripts/lib/`)
 
 | File | Contents |

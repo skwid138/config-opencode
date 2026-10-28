@@ -120,10 +120,16 @@ effects, AC matrix, boundary results, network/console summary, defects, and
 specific human checks with reasons. Include a separate design table when used.
 Never claim evidence that the live tools did not retain or expose.
 
+If asked to format completed QA evidence as the canonical Jira ADF report,
+follow `jira-qa-results`. That skill formats supplied evidence only; it does not
+run QA, provide sign-off, or mutate Jira.
+
 ## References
 
 - [Evidence patterns](references/evidence-patterns.md): evidence strength,
   negative assertions, boundaries, statuses, and report templates.
+- [Jira QA results](../jira-qa-results/SKILL.md): format completed evidence
+  as a local ADF preview; no QA execution or Jira mutation.
 - [Wpromote](references/wpromote.md): internal discovery, current topology
   source, local startup, client-data, and feature-gate cautions.
 - [Design verification](references/design-verification.md): optional Figma
