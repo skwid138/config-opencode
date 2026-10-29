@@ -558,15 +558,62 @@
                 "baseURL": "http://192.168.50.66:1234/v1",
                 "apiKey": "{file:~/.secrets/lmstudio-4090-key}"
             },
+            "compatibility": {
+                "maxTokensField": "max_tokens"
+            },
             "models": {
                 "qwen3-coder-4090": {
                     "name": "Qwen3-Coder 30B Q4 (4090)",
+                    "modelID": "qwen3-coder-4090",
                     "capabilities": {
                         "tools": true,
                         "input": ["text"],
-                        "output": ["text"]
+                        "output": ["text"],
+                        "reasoning": { "supported": false }
                     },
-                    "limit": { "context": 81920, "output": 8192 }
+                    "limit": { "context": 81920, "output": 8192 },
+                    "body": {
+                        "temperature": 0.7,
+                        "top_p": 0.8,
+                        "top_k": 20,
+                        "repeat_penalty": 1.05
+                    }
+                },
+                "qwen3.8-27b-4090": {
+                    "name": "Qwen3.8 27B Q4_K_M (4090)",
+                    "modelID": "qwen/qwen3.8-27b",
+                    "capabilities": {
+                        "tools": true,
+                        "input": ["text", "image"],
+                        "output": ["text"],
+                        "reasoning": { "supported": true }
+                    },
+                    "limit": { "context": 81920, "output": 16384 },
+                    "body": {
+                        "temperature": 1,
+                        "top_p": 0.95,
+                        "top_k": 20,
+                        "repeat_penalty": 1,
+                        "presence_penalty": 0
+                    }
+                },
+                "swift-1.5-qwen3.8-27b-4090": {
+                    "name": "Swift 1.5 Qwen3.8 27B Q4_K_M (4090) Experimental",
+                    "modelID": "swift-1.5-qwen3.8-27b",
+                    "capabilities": {
+                        "tools": true,
+                        "input": ["text", "image"],
+                        "output": ["text"],
+                        "reasoning": { "supported": true }
+                    },
+                    "limit": { "context": 81920, "output": 16384 },
+                    "body": {
+                        "temperature": 1,
+                        "top_p": 0.95,
+                        "top_k": 20,
+                        "repeat_penalty": 1,
+                        "presence_penalty": 0
+                    }
                 }
             }
         }
