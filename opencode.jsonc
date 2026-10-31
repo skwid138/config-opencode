@@ -614,6 +614,18 @@
                         "repeat_penalty": 1,
                         "presence_penalty": 0
                     }
+                },
+                "mistralai/devstral-small-2-2512": {
+                    "name": "Devstral Small 2 24B Q4_K_M (4090)",
+                    "capabilities": {
+                        "tools": true,
+                        "input": ["text"],
+                        "output": ["text"]
+                    },
+                    "limit": {
+                        "context": 65536,
+                        "output": 8192
+                    }
                 }
             }
         }

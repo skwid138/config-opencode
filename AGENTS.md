@@ -11,8 +11,11 @@ Before doing any work under `/Users/hunter/code/wpromote/`, read the authoritati
 | **gandalf** | Primary orchestrator — intent classification, planning, delegation | `github-copilot/claude-opus-5.5#medium` | no (commits on explicit request) |
 | **legolas** | Codebase exploration & call-path discovery | `github-copilot/gpt-6-luna#medium` | no |
 | **radagast** | External docs / OSS research | `github-copilot/gpt-6-luna#high` | no |
-| **aragorn** | Autonomous end-to-end implementation; sole writer | `github-copilot/gpt-6-luna#high` | **yes** |
+| **aragorn** | Autonomous end-to-end implementation for ordinary work; sole ordinary writer | `github-copilot/gpt-6-luna#high` | **yes** |
+| **aragorn-benchmark** | Implementation only for explicitly approved frozen benchmark fixture tasks | `peesea/mistralai/devstral-small-2-2512` | **yes, only approved fixture source files** |
 | **saruman** | Adversarial reviewer; finds what is wrong with plans and implementations before they cost real time | `github-copilot/gpt-6-luna#high` | no |
+
+`aragorn` remains the sole writer for ordinary code, configuration, docs, plans, and setup. `aragorn-benchmark` is a narrow exception for the explicitly approved frozen benchmark fixture scope only.
 
 ## Skills (30)
 
