@@ -67,7 +67,14 @@
       "github-copilot/gpt-6-luna": 100000,
       "openai/gpt-6.1-sol": 200000,
       "lmstudio/local/qwen3.8-27b": 65536,
-      "peesea/qwen3-coder-4090": 50000
+      "peesea/qwen3-coder-4090": 40000,
+      "peesea/swift-1.5-qwen3.8-27b-4090": 40000,
+      "peesea/qwen3.8-27b-4090": 40000,
+      "peesea/mistralai/devstral-small-2-2512": 40000,
+      "peesea/gpt-oss-20b": 40000,
+      "peesea/zai-org/glm-4.7-flash": 40000,
+      "peesea/google/gemma-4-26b-a4b-qat": 40000,
+      "peesea/laguna-xs-2.1-apex": 40000
     },
     "modelMinLimits": {
       "github-copilot/claude-opus-5.5": 100000,
@@ -76,7 +83,14 @@
       "github-copilot/gpt-6-luna": 50000,
       "openai/gpt-6.1-sol": 100000,
       "lmstudio/local/qwen3.8-27b": 49152,
-      "peesea/qwen3-coder-4090": 30000
+      "peesea/qwen3-coder-4090": 30000,
+      "peesea/swift-1.5-qwen3.8-27b-4090": 30000,
+      "peesea/qwen3.8-27b-4090": 30000,
+      "peesea/mistralai/devstral-small-2-2512": 30000,
+      "peesea/gpt-oss-20b": 30000,
+      "peesea/zai-org/glm-4.7-flash": 30000,
+      "peesea/google/gemma-4-26b-a4b-qat": 30000,
+      "peesea/laguna-xs-2.1-apex": 30000
     },
     "nudgeFrequency": 5,
     "iterationNudgeThreshold": 15,
