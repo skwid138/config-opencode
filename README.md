@@ -160,7 +160,7 @@ Verify registration after edits with `opencode mcp list`.
 Two plugins are enabled in the current config. Optional Council and Vision entries remain in `opencode.jsonc` as commented-out experiments and are not loaded.
 
 ### `@tarquinen/opencode-dcp` (npm)
-Dynamic Context Pruning, pinned at 3.2.0 and enabled. Configured via `dcp.jsonc` — see next section for current settings.
+Dynamic Context Pruning, pinned at 3.2.1 and enabled. Configured via `dcp.jsonc` — see next section for current settings.
 
 ### `@skwid138/opencode-command-normalizer` (npm)
 Pinned at 0.3.0 and enabled. Normalizes safe shell argv0 home forms before permission evaluation so anchored absolute script rules match `~/` and `$HOME/` command forms without unsafe wildcard suffixes.
@@ -182,7 +182,7 @@ Currently running in **autonomous mode**. Current notable settings in `dcp.jsonc
 | `manualMode.automaticStrategies` | `true` | Deduplication and error-purge strategies remain available as a safety net |
 | `debug` | `false` | Re-enable only when debugging DCP behavior |
 | `pruneNotification` | `"minimal"` | Chat notifications stay low-noise |
-| `autoUpdate` | `false` | Version pinned in `opencode.jsonc` (currently 3.2.0); upgrade via `/update-opencode-deps` |
+| `autoUpdate` | `false` | Version pinned in `opencode.jsonc` (currently 3.2.1); upgrade via `/update-opencode-deps` |
 | `turnProtection` | `enabled: true, turns: 2` | Most recent turns protected from pruning |
 | `compress.showCompression` | `false` | Compression summaries hidden to reduce noise |
 | `compress.protectTags` | `true` | Tagged content protected from compression |
