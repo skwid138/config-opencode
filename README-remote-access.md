@@ -1,12 +1,16 @@
-# Remote opencode Web UI Access (Tailscale)
+# Legacy V1 Remote OpenCode Web UI Access (Tailscale)
 
-How to use opencode from a phone, tablet, or any device on the tailnet, with the Mac (`Glitch`) as the backend.
+Archived instructions for a V1-era workflow to use OpenCode from another tailnet device, with the Mac (`Glitch`) as the backend.
 
-> **Primary use case:** drive opencode sessions from an iPhone over cellular while away from the desk (e.g. walking the dog) without exposing the Mac to the public internet.
+> **Legacy V1-only reference.** This document records the old `opencode web` and `opencode attach` (`openattach`) workflow. Those commands were already unsupported by native V2.1.4 before cutover and remain unsupported and unrepaired on native V2.3.0. Do not use this as a current setup guide. No V2 remote-access replacement is documented; helper repairs are deferred.
+
+> **Historical primary use case:** drive opencode sessions from an iPhone over cellular while away from the desk (e.g. walking the dog) without exposing the Mac to the public internet.
 
 ---
 
-## TL;DR — daily use
+## Historical V1 daily-use commands
+
+The commands below are retained as a historical example only; they are not supported with the current native V2 runtime.
 
 ```sh
 # On the Mac, when you want remote access:
@@ -27,7 +31,9 @@ To stop: `Ctrl+C` in the terminal where `openweb` is running. The Mac is then fr
 
 ---
 
-## Architecture
+## Historical V1 architecture
+
+This diagram describes the archived V1 workflow, not a current V2 deployment.
 
 ```
 [iPhone Safari]
@@ -57,7 +63,7 @@ Key design points:
 
 ---
 
-## Initial setup (one-time)
+## Historical V1 initial setup (one-time)
 
 If you ever rebuild the Mac, do these in order. Most of this is captured in `~/.project-plans/2026.05.08_opencode-web-ui.md`.
 
@@ -128,7 +134,7 @@ This config persists across reboots. You only ever need to do this once per mach
 
 ---
 
-## Operational details
+## Historical V1 operational details
 
 ### Power / sleep
 
@@ -168,7 +174,7 @@ No Mac-side changes needed — Serve already exposes the URL to the entire tailn
 
 ---
 
-## Troubleshooting
+## Historical V1 troubleshooting
 
 ### Phone says "Cannot connect" / page won't load
 
@@ -210,15 +216,15 @@ lsof -nP -iTCP:4096 -sTCP:LISTEN
 pkill -f "caffeinate -is opencode web"
 ```
 
-### opencode upgrade broke `web` flags or auth env vars
+### Historical compatibility note: V1 `1.14.40` only
 
-Verified working on opencode `1.14.40`. If a future upgrade changes flag names (`--port`, `--hostname`) or auth env vars (`OPENCODE_SERVER_PASSWORD`, `OPENCODE_SERVER_USERNAME`):
+This note records verification on OpenCode `1.14.40` only. It does not establish compatibility with native V2. The documented `web`/`attach` helpers remain unsupported and unrepaired for V2. For historical V1 maintenance, the original diagnostic was:
 
 ```sh
 opencode web --help
 ```
 
-…and update `~/code/scripts/personal/opencode-web.sh` accordingly. If env vars change, the official docs at <https://opencode.ai/docs/web/> and <https://opencode.ai/docs/server/> are authoritative.
+Any V1 helper repair remains deferred. Do not use this note as a V2 migration or repair procedure. If a future V1-era maintenance change affects flags or environment variables, the official docs at <https://opencode.ai/docs/web/> and <https://opencode.ai/docs/server/> are authoritative for that legacy workflow.
 
 ### Want to confirm the security model
 
@@ -237,7 +243,7 @@ pmset -g assertions | grep -i caffeinate
 
 ---
 
-## Rollback / disable
+## Historical V1 workflow rollback / disable
 
 Each piece is independently reversible.
 

@@ -38,7 +38,7 @@ OpenCode V2 reads global assets from the standard plural roots under
 │   ├── agent-defaults.md
 │   ├── wpromote-context.md      # Read only under ~/code/wpromote/, as directed by AGENTS.md
 ├── bin/                         # Direct-binary link and legacy V1 installer
-│   ├── opencode                 # points to the pinned native V2 binary
+│   ├── opencode                 # stable symlink to the Homebrew-managed V2 binary
 │   └── install-wrapper.sh       # legacy V1 installer; do not run
 ├── docs/                        # Reference documentation (skill authoring, etc.)
 ├── mcp/                         # Reference-only per-server JSON snippets (NOT auto-loaded)
@@ -211,13 +211,15 @@ Context limits (absolute token counts — never percentages, since e.g. `80%` of
 
 ## Native OpenCode V2
 
-Use the pinned native binary directly: `~/.local/opt/opencode-v2-2.1.4/bin/opencode`. The global configuration and its `agents/`, `commands/`, and `skills/` roots live here, under `~/.config/opencode/`; `opencode.jsonc` is the source of truth for runtime settings, plugin registrations, MCPs, and always-on instructions.
+The active runtime is Homebrew-managed OpenCode V2.3.0. Invoke it through `~/.config/opencode/bin/opencode`, the stable symlink to `/opt/homebrew/opt/opencode-v2/bin/opencode`. The global configuration and its `agents/`, `commands/`, and `skills/` roots live here, under `~/.config/opencode/`; `opencode.jsonc` is the source of truth for runtime settings, plugin registrations, MCPs, and always-on instructions.
+
+`~/.local/opt/opencode-v2-2.1.4/bin/opencode` is an archived binary, not a safe automatic rollback target. After V2.3.0 starts, it may have migrated the live database. Never run V2.1.4 against that possibly migrated database; recovery requires a separate approved restoration plan.
 
 OpenCode V2 watches config and asset files for live reload. If a running session has not picked up a change, use `/reload` in the session or run `opencode reload`. Do not restart the service just to apply config edits.
 
 > **Do not run `bin/install-wrapper.sh`.** It is a legacy V1 bootstrap and can replace `bin/opencode` with an obsolete PATH wrapper. Leave the V1 installer and daemon-wrapper infrastructure untouched.
 
-Web access and Tailscale integration are deferred. This cleanup does not configure remote access or start a server.
+The legacy `openweb`/`openattach` workflow in `README-remote-access.md` is unsupported on native V2 and remains unrepaired. No V2 remote-access replacement is documented here. This config does not configure remote access or start a server.
 
 ## Configuration Choices
 
@@ -275,17 +277,26 @@ If the helper emits a `PARTIAL_REVIEW_REQUIRED` model-map fragment for an unconf
 
 ## Runtime and package versions
 
-The current runtime is pinned to OpenCode V2.1.4 at
-`~/.local/opt/opencode-v2-2.1.4/bin/opencode`; invoke that binary directly.
+The active runtime is Homebrew-managed OpenCode V2.3.0, invoked through
+`~/.config/opencode/bin/opencode` and resolved via
+`/opt/homebrew/opt/opencode-v2/bin/opencode`.
+
+Treat runtime upgrades as planned maintenance. A Homebrew upgrade may migrate
+the live database; it is not a safe database downgrade. After a separately
+approved, verified backup and service quiescence, use the qualified formula
+command `brew upgrade anomalyco/tap/opencode-v2`. Do not assume the archived
+V2.1.4 binary can reopen a database after V2.3.0 starts. This command is
+guidance only; it was not run for this documentation update.
+
 The native runtime does not need the V1 PATH wrapper. Do not run
 `bin/install-wrapper.sh`.
 
 The tracked npm manifests pin local plugin-development dependencies. They do
 not replace the native binary or define the global configuration roots.
 
-### Pinned vs floating versions
+### Pinned config and development package versions
 
-All external packages are pinned to exact versions:
+The npm/config dependencies below are pinned to exact versions:
 - `package.json` → `@opencode-ai/plugin` (the plugin SDK)
 - `opencode.jsonc` → `@tarquinen/opencode-dcp` (DCP plugin)
 - `opencode.jsonc` → `chrome-devtools-mcp` (in the MCP `command` array)
