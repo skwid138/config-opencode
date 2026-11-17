@@ -391,7 +391,7 @@
         "subagent": "deny"
     },
     "plugin": [
-        "@tarquinen/opencode-dcp@3.2.0",
+        "@tarquinen/opencode-dcp@3.2.1",
         [
             "@skwid138/opencode-command-normalizer@0.3.0",
             {
