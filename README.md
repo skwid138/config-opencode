@@ -213,7 +213,7 @@ Context limits (absolute token counts — never percentages, since e.g. `80%` of
 
 The active runtime is Homebrew-managed OpenCode V2.3.0. Invoke it through `~/.config/opencode/bin/opencode`, the stable symlink to `/opt/homebrew/opt/opencode-v2/bin/opencode`. The global configuration and its `agents/`, `commands/`, and `skills/` roots live here, under `~/.config/opencode/`; `opencode.jsonc` is the source of truth for runtime settings, plugin registrations, MCPs, and always-on instructions.
 
-`~/.local/opt/opencode-v2-2.1.4/bin/opencode` is an archived binary, not a safe automatic rollback target. After V2.3.0 starts, it may have migrated the live database. Never run V2.1.4 against that possibly migrated database; recovery requires a separate approved restoration plan.
+The former local V2.1.4 installation at `~/.local/opt/opencode-v2-2.1.4/` has been moved to a private Trash archive. It is not a valid automatic rollback target. After V2.3.0 starts, it may have migrated the live database. Never run a recovered V2.1.4 binary against that possibly migrated database; recovery requires a separate approved restoration plan.
 
 OpenCode V2 watches config and asset files for live reload. If a running session has not picked up a change, use `/reload` in the session or run `opencode reload`. Do not restart the service just to apply config edits.
 
