@@ -8,7 +8,7 @@ Before doing any work under `/Users/hunter/code/wpromote/`, read the authoritati
 
 | Agent | Role | Model | Write Access |
 |-------|------|-------|-------------|
-| **gandalf** | Primary orchestrator — intent classification, planning, delegation | `github-copilot/claude-opus-5.5#medium` | no (commits on explicit request) |
+| **gandalf** | Primary orchestrator — intent classification, planning, delegation | `github-copilot/gpt-6.1-sol#high` | no (commits on explicit request) |
 | **legolas** | Codebase exploration & call-path discovery | `github-copilot/gpt-6-luna#medium` | no |
 | **radagast** | External docs / OSS research | `github-copilot/gpt-6-luna#high` | no |
 | **aragorn** | Autonomous end-to-end implementation for ordinary work; sole ordinary writer | `github-copilot/gpt-6-luna#high` | **yes** |
